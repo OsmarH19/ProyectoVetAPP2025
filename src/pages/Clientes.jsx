@@ -1,10 +1,10 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { base44 } from "@/api/base44Client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Plus, Search, Edit, Trash2, Mail, Phone, MapPin, User } from "lucide-react";
+import { Plus, Search, Edit, Trash2, Mail, Phone, MapPin } from "lucide-react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import ClienteForm from "../components/clientes/ClienteForm";
@@ -15,28 +15,19 @@ export default function Clientes() {
   const [searchTerm, setSearchTerm] = useState("");
   const queryClient = useQueryClient();
 
-  const { data: clientes = [], isLoading } = useQuery({
+  const { data: clientes = [] } = useQuery({
     queryKey: ['clientes'],
-    queryFn: () => base44.entities.Cliente.list('-created_date'),
-  });
-
-  const createMutation = useMutation({
-    mutationFn: (data) => base44.entities.Cliente.create(data),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['clientes'] });
-      setShowForm(false);
-      setEditingCliente(null);
+    queryFn: async () => {
+      const res = await fetch('http://localhost:8000/api/clientes');
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const json = await res.json();
+      const items = Array.isArray(json?.data) ? json.data : [];
+      return items.map(it => ({ ...it, id: it.cliente_id }));
     },
   });
 
-  const updateMutation = useMutation({
-    mutationFn: ({ id, data }) => base44.entities.Cliente.update(id, data),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['clientes'] });
-      setShowForm(false);
-      setEditingCliente(null);
-    },
-  });
+  const createMutation = { isPending: false };
+  const updateMutation = { isPending: false };
 
   const deleteMutation = useMutation({
     mutationFn: (id) => base44.entities.Cliente.delete(id),
@@ -45,12 +36,10 @@ export default function Clientes() {
     },
   });
 
-  const handleSubmit = (data) => {
-    if (editingCliente) {
-      updateMutation.mutate({ id: editingCliente.id, data });
-    } else {
-      createMutation.mutate(data);
-    }
+  const handleSubmit = () => {
+    queryClient.invalidateQueries({ queryKey: ['clientes'] });
+    setShowForm(false);
+    setEditingCliente(null);
   };
 
   const handleEdit = (cliente) => {
