@@ -1,0 +1,29 @@
+[
+  {
+    "nombres": "Dr. Angelo",
+    "apellidos": "Pingon",
+    "especialidad": "Cirugia",
+    "telefono": "94928433",
+    "email": "holi@gmail.com",
+    "turnos": [
+      {
+        "dia": "Lunes",
+        "hora_inicio": "08:00",
+        "hora_fin": "16:00"
+      },
+      {
+        "dia": "Martes",
+        "hora_inicio": "08:00",
+        "hora_fin": "16:00"
+      },
+      {
+        "dia": "Miércoles",
+        "hora_inicio": "08:00",
+        "hora_fin": "16:00"
+      }
+    ],
+    "activo": true,
+    "id": "1763155199837",
+    "created_date": "2025-11-14T21:19:59.837Z"
+  }
+]

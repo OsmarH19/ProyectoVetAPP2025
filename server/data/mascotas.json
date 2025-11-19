@@ -1,0 +1,30 @@
+[
+  {
+    "nombre": "oso",
+    "especie": "Perro",
+    "raza": "cho cho",
+    "edad": 2,
+    "sexo": "Macho",
+    "peso": 30,
+    "color": "negro",
+    "foto_url": "",
+    "observaciones": "lulin",
+    "cliente_id": "1763155031318",
+    "id": "1763155107022",
+    "created_date": "2025-11-14T21:18:27.022Z"
+  },
+  {
+    "nombre": "Toby",
+    "especie": "Perro",
+    "raza": "raza yorkshire",
+    "edad": 99,
+    "sexo": "Macho",
+    "peso": 88,
+    "color": "Dorado",
+    "foto_url": "/uploads/fake-1763523510511.png",
+    "observaciones": "",
+    "cliente_id": "1763155031318",
+    "id": "1763523525958",
+    "created_date": "2025-11-19T03:38:45.958Z"
+  }
+]

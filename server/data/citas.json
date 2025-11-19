@@ -1,0 +1,15 @@
+[
+  {
+    "fecha": "2025-11-18",
+    "hora": "09:00",
+    "motivo": "vacuna antirrabica",
+    "veterinario": "Dr. Angelo Pingon",
+    "estado": "Completada",
+    "mascota_id": "1763155107022",
+    "cliente_id": "1763155031318",
+    "observaciones": "jewjeje",
+    "id": "1763155226169",
+    "created_date": "2025-11-14T21:20:26.169Z",
+    "updated_date": "2025-11-14T21:20:48.324Z"
+  }
+]

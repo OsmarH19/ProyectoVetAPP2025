@@ -1,0 +1,25 @@
+[
+  {
+    "cita_id": "1763155226169",
+    "diagnostico": "mi perro estaba mal",
+    "tratamiento_indicado": "le hicimos su funeral",
+    "medicamentos": [
+      {
+        "nombre": "paracetaml de 100mg",
+        "dosis": "cada 4 horas",
+        "duracion": "9 dias"
+      },
+      {
+        "nombre": "rcocan",
+        "dosis": "5 horas",
+        "duracion": "3 dias"
+      }
+    ],
+    "recomendaciones": "que se muera",
+    "veterinario": "Dr. Angelo Pingon",
+    "mascota_id": "1763155107022",
+    "cliente_id": "1763155031318",
+    "id": "1763155312287",
+    "created_date": "2025-11-14T21:21:52.287Z"
+  }
+]
