@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Plus, Search } from "lucide-react";
-import MascotaCard from "../components/mascotas/MascotaCard";
+import { MascotasApiCards } from "../components/mascotas/MascotaCard";
 import MascotaForm from "../components/mascotas/MascotaForm";
 
 export default function Mascotas() {
@@ -14,10 +14,7 @@ export default function Mascotas() {
   const [searchTerm, setSearchTerm] = useState("");
   const queryClient = useQueryClient();
 
-  const { data: mascotas = [], isLoading } = useQuery({
-    queryKey: ['mascotas'],
-    queryFn: () => base44.entities.Mascota.list('-created_date'),
-  });
+  
 
   const { data: clientes = [] } = useQuery({
     queryKey: ['clientes'],
@@ -27,7 +24,7 @@ export default function Mascotas() {
   const createMutation = useMutation({
     mutationFn: (data) => base44.entities.Mascota.create(data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['mascotas'] });
+      queryClient.invalidateQueries({ queryKey: ['mascotas_api'] });
       setShowForm(false);
       setEditingMascota(null);
     },
@@ -36,7 +33,7 @@ export default function Mascotas() {
   const updateMutation = useMutation({
     mutationFn: ({ id, data }) => base44.entities.Mascota.update(id, data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['mascotas'] });
+      queryClient.invalidateQueries({ queryKey: ['mascotas_api'] });
       setShowForm(false);
       setEditingMascota(null);
     },
@@ -45,7 +42,7 @@ export default function Mascotas() {
   const deleteMutation = useMutation({
     mutationFn: (id) => base44.entities.Mascota.delete(id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['mascotas'] });
+      queryClient.invalidateQueries({ queryKey: ['mascotas_api'] });
     },
   });
 
@@ -68,15 +65,7 @@ export default function Mascotas() {
     }
   };
 
-  const filteredMascotas = mascotas.filter(m => {
-    const cliente = clientes.find(c => c.id === m.cliente_id);
-    const nombreCliente = cliente ? `${cliente.nombres} ${cliente.apellidos}` : '';
-    return (
-      m.nombre?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      m.especie?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      nombreCliente.toLowerCase().includes(searchTerm.toLowerCase())
-    );
-  });
+  
 
   return (
     <div className="p-4 md:p-8">
@@ -125,22 +114,11 @@ export default function Mascotas() {
               </CardHeader>
             </Card>
 
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {filteredMascotas.map((mascota) => (
-                <MascotaCard
-                  key={mascota.id}
-                  mascota={mascota}
-                  cliente={clientes.find(c => c.id === mascota.cliente_id)}
-                  onEdit={handleEdit}
-                  onDelete={handleDelete}
-                />
-              ))}
-              {filteredMascotas.length === 0 && (
-                <div className="col-span-full text-center py-12 text-gray-500">
-                  No se encontraron mascotas
-                </div>
-              )}
-            </div>
+            <MascotasApiCards
+              onEdit={handleEdit}
+              onDelete={handleDelete}
+              searchTerm={searchTerm}
+            />
           </>
         )}
       </div>

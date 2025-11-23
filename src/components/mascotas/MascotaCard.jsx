@@ -1,4 +1,5 @@
 import React from "react";
+import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -15,6 +16,10 @@ export default function MascotaCard({ mascota, cliente, onEdit, onDelete }) {
     "Otro": "bg-gray-100 text-gray-800"
   };
 
+  const especieLabel = typeof mascota.especie === "string" ? mascota.especie : mascota.especie?.nombre;
+  const sexoLabel = typeof mascota.sexo === "string" ? mascota.sexo : mascota.sexo?.nombre;
+  const mascotaId = mascota.id ?? mascota.mascota_id;
+
   return (
     <Card className="overflow-hidden shadow-lg hover:shadow-xl transition-shadow">
       <CardHeader className="p-0">
@@ -27,7 +32,7 @@ export default function MascotaCard({ mascota, cliente, onEdit, onDelete }) {
         ) : (
           <div className="w-full h-48 bg-gradient-to-br from-green-400 to-blue-500 flex items-center justify-center">
             <span className="text-6xl text-white">
-              {mascota.especie === 'Perro' ? '🐕' : mascota.especie === 'Gato' ? '🐈' : '🐾'}
+              {especieLabel === 'Perro' ? '🐕' : especieLabel === 'Gato' ? '🐈' : '🐾'}
             </span>
           </div>
         )}
@@ -35,8 +40,8 @@ export default function MascotaCard({ mascota, cliente, onEdit, onDelete }) {
       <CardContent className="p-6">
         <div className="flex justify-between items-start mb-3">
           <h3 className="text-2xl font-bold text-gray-900">{mascota.nombre}</h3>
-          <Badge className={especieColors[mascota.especie] || especieColors["Otro"]}>
-            {mascota.especie}
+          <Badge className={especieColors[especieLabel] || especieColors["Otro"]}>
+            {especieLabel}
           </Badge>
         </div>
 
@@ -58,8 +63,8 @@ export default function MascotaCard({ mascota, cliente, onEdit, onDelete }) {
               </div>
             )}
           </div>
-          {mascota.sexo && (
-            <p><span className="font-semibold">Sexo:</span> {mascota.sexo}</p>
+          {sexoLabel && (
+            <p><span className="font-semibold">Sexo:</span> {sexoLabel}</p>
           )}
           {mascota.color && (
             <p><span className="font-semibold">Color:</span> {mascota.color}</p>
@@ -67,7 +72,7 @@ export default function MascotaCard({ mascota, cliente, onEdit, onDelete }) {
           {cliente && (
             <div className="flex items-center gap-2 mt-3 pt-3 border-t">
               <User className="w-4 h-4" />
-              <span className="font-semibold">Dueño:</span> {cliente.nombres} {cliente.apellidos}
+              <span className="font-semibold">Dueño:</span> {clientDisplayName(cliente)}
             </div>
           )}
         </div>
@@ -76,7 +81,7 @@ export default function MascotaCard({ mascota, cliente, onEdit, onDelete }) {
         <Button
           variant="outline"
           size="sm"
-          onClick={() => onEdit(mascota)}
+          onClick={() => onEdit?.(mascota)}
         >
           <Edit className="w-4 h-4 mr-1" />
           Editar
@@ -84,7 +89,7 @@ export default function MascotaCard({ mascota, cliente, onEdit, onDelete }) {
         <Button
           variant="outline"
           size="sm"
-          onClick={() => onDelete(mascota.id)}
+          onClick={() => onDelete?.(mascotaId)}
           className="text-red-600 hover:bg-red-50"
         >
           <Trash2 className="w-4 h-4 mr-1" />
@@ -92,5 +97,81 @@ export default function MascotaCard({ mascota, cliente, onEdit, onDelete }) {
         </Button>
       </CardFooter>
     </Card>
+  );
+}
+
+function clientDisplayName(cliente) {
+  if (cliente?.nombres || cliente?.apellidos) {
+    return `${cliente?.nombres || ''} ${cliente?.apellidos || ''}`.trim();
+  }
+  return cliente?.nombre_completo || '';
+}
+
+export function MascotasApiCards({ onEdit, onDelete, searchTerm = "" }) {
+  const { data, isLoading, isError } = useQuery({
+    queryKey: ["mascotas_api"],
+    queryFn: async () => {
+      const res = await fetch("http://localhost:8000/api/mascotas");
+      if (!res.ok) {
+        throw new Error("Error al cargar mascotas");
+      }
+      const json = await res.json();
+      return json?.data || [];
+    },
+  });
+
+  if (isLoading) {
+    return <div className="p-4 text-center text-gray-600">Cargando mascotas...</div>;
+  }
+
+  if (isError) {
+    return <div className="p-4 text-center text-red-600">Error al cargar mascotas</div>;
+  }
+
+  const normalize = (item) => ({
+    id: item?.mascota_id,
+    nombre: item?.nombre,
+    especie: item?.especie?.nombre,
+    raza: item?.raza,
+    edad: item?.edad,
+    sexo: item?.sexo?.nombre,
+    peso: item?.peso ? parseFloat(item.peso) : undefined,
+    color: item?.color,
+    foto_url: item?.foto_url,
+    observaciones: item?.observaciones,
+    cliente_id: item?.cliente?.cliente_id,
+  });
+
+  const normalizeCliente = (item) => ({
+    nombre_completo: item?.cliente?.nombre_completo,
+  });
+
+  const filtered = (data || []).filter((item) => {
+    const nombre = item?.nombre || "";
+    const especieNombre = item?.especie?.nombre || "";
+    const clienteNombre = item?.cliente?.nombre_completo || "";
+    const s = searchTerm.toLowerCase();
+    return (
+      nombre.toLowerCase().includes(s) ||
+      especieNombre.toLowerCase().includes(s) ||
+      clienteNombre.toLowerCase().includes(s)
+    );
+  });
+
+  return (
+    <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+      {filtered.map((m) => (
+        <MascotaCard
+          key={m.mascota_id}
+          mascota={normalize(m)}
+          cliente={normalizeCliente(m)}
+          onEdit={onEdit}
+          onDelete={onDelete}
+        />
+      ))}
+      {filtered.length === 0 && (
+        <div className="col-span-full text-center py-12 text-gray-500">No se encontraron mascotas</div>
+      )}
+    </div>
   );
 }
