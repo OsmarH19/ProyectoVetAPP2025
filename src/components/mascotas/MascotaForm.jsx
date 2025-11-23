@@ -1,20 +1,20 @@
-import React, { useState } from "react";
-import { base44 } from "@/api/base44Client";
+import React, { useEffect, useState } from "react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { X, Save, Upload } from "lucide-react";
+import { X, Save } from "lucide-react";
 
-export default function MascotaForm({ mascota, clientes, onSubmit, onCancel, isLoading }) {
-  const [formData, setFormData] = useState(mascota || {
+export default function MascotaForm({ mascota, onCancel, isLoading }) {
+  const [formData, setFormData] = useState({
     nombre: "",
-    especie: "Perro",
+    especie: "",
     raza: "",
     edad: "",
-    sexo: "Macho",
+    sexo: "",
     peso: "",
     color: "",
     foto_url: "",
@@ -23,10 +23,69 @@ export default function MascotaForm({ mascota, clientes, onSubmit, onCancel, isL
   });
 
   const [uploading, setUploading] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [fotoFile, setFotoFile] = useState(null);
+  const queryClient = useQueryClient();
+
+  const { data: clientesApi = [] } = useQuery({
+    queryKey: ["api_clientes"],
+    queryFn: async () => {
+      const res = await fetch("http://localhost:8000/api/clientes");
+      const json = await res.json();
+      return json?.data || [];
+    },
+  });
+
+  const { data: especies = [] } = useQuery({
+    queryKey: ["api_especies"],
+    queryFn: async () => {
+      const res = await fetch("http://localhost:8000/api/mascotas/datos-maestros/11");
+      const json = await res.json();
+      return json?.data || [];
+    },
+  });
+
+  const { data: sexos = [] } = useQuery({
+    queryKey: ["api_sexos"],
+    queryFn: async () => {
+      const res = await fetch("http://localhost:8000/api/mascotas/datos-maestros/12");
+      const json = await res.json();
+      return json?.data || [];
+    },
+  });
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    onSubmit(formData);
+    const fd = new FormData();
+    fd.append("nombre", formData.nombre || "");
+    if (formData.especie) fd.append("especie", String(formData.especie));
+    fd.append("raza", formData.raza || "");
+    if (formData.edad !== "") fd.append("edad", String(parseInt(formData.edad)));
+    if (formData.sexo) fd.append("sexo", String(formData.sexo));
+    if (formData.peso !== "") fd.append("peso", String(formData.peso));
+    fd.append("color", formData.color || "");
+    fd.append("observaciones", formData.observaciones || "");
+    if (formData.cliente_id) fd.append("cliente_id", String(formData.cliente_id));
+    if (fotoFile) fd.append("foto", fotoFile);
+
+    const mascotaId = mascota?.id ?? mascota?.mascota_id;
+    const url = mascotaId
+      ? `http://localhost:8000/api/mascotas/${mascotaId}`
+      : `http://localhost:8000/api/mascotas`;
+    const method = mascotaId ? "POST" : "POST";
+
+    setSubmitting(true);
+    fetch(url, { method, body: fd })
+      .then((res) => {
+        if (!res.ok) throw new Error("Error al guardar mascota");
+        return res.json();
+      })
+      .then(() => {
+        queryClient.invalidateQueries({ queryKey: ["mascotas_api"] });
+        onCancel?.();
+      })
+      .catch(() => {})
+      .finally(() => setSubmitting(false));
   };
 
   const handleChange = (field, value) => {
@@ -38,14 +97,33 @@ export default function MascotaForm({ mascota, clientes, onSubmit, onCancel, isL
     if (!file) return;
 
     setUploading(true);
-    try {
-      const { file_url } = await base44.integrations.Core.UploadFile({ file });
-      handleChange('foto_url', file_url);
-    } catch (error) {
-      console.error("Error uploading file:", error);
-    }
+    setFotoFile(file);
+    const url = URL.createObjectURL(file);
+    handleChange('foto_url', url);
     setUploading(false);
   };
+
+  useEffect(() => {
+    if (mascota) {
+      const especieNombre = typeof mascota.especie === "string" ? mascota.especie : mascota.especie?.nombre;
+      const sexoNombre = typeof mascota.sexo === "string" ? mascota.sexo : mascota.sexo?.nombre;
+      const especieItem = especies.find((e) => e.nombre === especieNombre);
+      const sexoItem = sexos.find((s) => s.nombre === sexoNombre);
+      setFormData((prev) => ({
+        ...prev,
+        nombre: mascota.nombre || prev.nombre,
+        especie: especieItem?.MaeestroID ?? prev.especie,
+        raza: mascota.raza || prev.raza,
+        edad: mascota.edad ?? prev.edad,
+        sexo: sexoItem?.MaeestroID ?? prev.sexo,
+        peso: mascota.peso ?? prev.peso,
+        color: mascota.color || prev.color,
+        foto_url: mascota.foto_url || prev.foto_url,
+        observaciones: mascota.observaciones || prev.observaciones,
+        cliente_id: mascota.cliente_id ?? mascota.cliente?.cliente_id ?? prev.cliente_id,
+      }));
+    }
+  }, [mascota, especies, sexos]);
 
   return (
     <Card className="mb-6 shadow-lg">
@@ -77,8 +155,8 @@ export default function MascotaForm({ mascota, clientes, onSubmit, onCancel, isL
                   <SelectValue placeholder="Seleccionar cliente" />
                 </SelectTrigger>
                 <SelectContent>
-                  {clientes.map(c => (
-                    <SelectItem key={c.id} value={c.id}>
+                  {clientesApi.map(c => (
+                    <SelectItem key={c.cliente_id} value={c.cliente_id}>
                       {c.nombres} {c.apellidos}
                     </SelectItem>
                   ))}
@@ -98,13 +176,11 @@ export default function MascotaForm({ mascota, clientes, onSubmit, onCancel, isL
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="Perro">Perro</SelectItem>
-                  <SelectItem value="Gato">Gato</SelectItem>
-                  <SelectItem value="Ave">Ave</SelectItem>
-                  <SelectItem value="Conejo">Conejo</SelectItem>
-                  <SelectItem value="Hamster">Hamster</SelectItem>
-                  <SelectItem value="Reptil">Reptil</SelectItem>
-                  <SelectItem value="Otro">Otro</SelectItem>
+                  {especies.map((e) => (
+                    <SelectItem key={e.MaeestroID} value={e.MaeestroID}>
+                      {e.nombre}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>
@@ -140,8 +216,11 @@ export default function MascotaForm({ mascota, clientes, onSubmit, onCancel, isL
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="Macho">Macho</SelectItem>
-                  <SelectItem value="Hembra">Hembra</SelectItem>
+                  {sexos.map((s) => (
+                    <SelectItem key={s.MaeestroID} value={s.MaeestroID}>
+                      {s.nombre}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>
@@ -153,7 +232,7 @@ export default function MascotaForm({ mascota, clientes, onSubmit, onCancel, isL
                 min="0"
                 step="0.1"
                 value={formData.peso}
-                onChange={(e) => handleChange('peso', parseFloat(e.target.value))}
+                onChange={(e) => handleChange('peso', e.target.value)}
               />
             </div>
           </div>
@@ -198,7 +277,7 @@ export default function MascotaForm({ mascota, clientes, onSubmit, onCancel, isL
             type="button"
             variant="outline"
             onClick={onCancel}
-            disabled={isLoading}
+            disabled={isLoading || submitting}
           >
             <X className="w-4 h-4 mr-2" />
             Cancelar
@@ -206,7 +285,7 @@ export default function MascotaForm({ mascota, clientes, onSubmit, onCancel, isL
           <Button
             type="submit"
             className="bg-green-600 hover:bg-green-700"
-            disabled={isLoading || uploading}
+            disabled={isLoading || uploading || submitting}
           >
             <Save className="w-4 h-4 mr-2" />
             {mascota ? "Actualizar" : "Guardar"}
