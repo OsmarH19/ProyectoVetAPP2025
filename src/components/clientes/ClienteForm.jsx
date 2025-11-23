@@ -8,7 +8,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { X, Save } from "lucide-react";
 
 export default function ClienteForm({ cliente, onSubmit, onCancel, isLoading }) {
-  const FACTILIZA_API_KEY = String(import.meta.env.VITE_FACTILIZA_API_KEY || "");
+
   const [formData, setFormData] = useState(cliente || {
     nombres: "",
     apellidos: "",
@@ -18,7 +18,7 @@ export default function ClienteForm({ cliente, onSubmit, onCancel, isLoading }) 
     email: "",
   });
   const [submitting, setSubmitting] = useState(false);
-  const [dniLoading, setDniLoading] = useState(false);
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -55,38 +55,7 @@ export default function ClienteForm({ cliente, onSubmit, onCancel, isLoading }) 
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
-  const handleDniBlur = async () => {
-    const dni = String(formData.dni || "").trim();
-    if (dni.length < 8) return;
-    try {
-      setDniLoading(true);
-      const res = await fetch(`https://api.factiliza.com/v1/dni/info/${dni}`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          ...(FACTILIZA_API_KEY ? { Authorization: `Bearer ${FACTILIZA_API_KEY}` } : {})
-        },
-        body: JSON.stringify({ numero: dni })
-      });
-      if (!res.ok) {
-        let errDetail = '';
-        try { errDetail = await res.text(); } catch { errDetail = ''; }
-        throw new Error(`dni ${res.status} ${errDetail}`);
-      }
-      const data = await res.json();
-      const info = data?.data || {};
-      setFormData(prev => ({
-        ...prev,
-        nombres: info.nombres || prev.nombres,
-        apellidos: [info.apellido_paterno, info.apellido_materno].filter(Boolean).join(" ") || prev.apellidos,
-        direccion: info.direccion || info.direccion_completa || prev.direccion,
-      }));
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setDniLoading(false);
-    }
-  };
+
 
   return (
     <Card className="mb-6 shadow-lg">
@@ -125,7 +94,6 @@ export default function ClienteForm({ cliente, onSubmit, onCancel, isLoading }) 
                 id="dni"
                 value={formData.dni}
                 onChange={(e) => handleChange('dni', e.target.value)}
-                onBlur={handleDniBlur}
                 required
               />
             </div>
@@ -166,7 +134,7 @@ export default function ClienteForm({ cliente, onSubmit, onCancel, isLoading }) 
             type="button"
             variant="outline"
             onClick={onCancel}
-            disabled={isLoading || submitting || dniLoading}
+            disabled={isLoading || submitting}
           >
             <X className="w-4 h-4 mr-2" />
             Cancelar
@@ -174,7 +142,7 @@ export default function ClienteForm({ cliente, onSubmit, onCancel, isLoading }) 
           <Button
             type="submit"
             className="bg-green-600 hover:bg-green-700"
-            disabled={isLoading || submitting || dniLoading}
+            disabled={isLoading || submitting}
           >
             <Save className="w-4 h-4 mr-2" />
             {cliente ? "Actualizar" : "Guardar"}
