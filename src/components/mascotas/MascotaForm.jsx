@@ -112,15 +112,15 @@ export default function MascotaForm({ mascota, onCancel, isLoading }) {
       setFormData((prev) => ({
         ...prev,
         nombre: mascota.nombre || prev.nombre,
-        especie: especieItem?.MaeestroID ?? prev.especie,
+        especie: especieItem?.MaeestroID ? String(especieItem.MaeestroID) : prev.especie,
         raza: mascota.raza || prev.raza,
         edad: mascota.edad ?? prev.edad,
-        sexo: sexoItem?.MaeestroID ?? prev.sexo,
+        sexo: sexoItem?.MaeestroID ? String(sexoItem.MaeestroID) : prev.sexo,
         peso: mascota.peso ?? prev.peso,
         color: mascota.color || prev.color,
         foto_url: mascota.foto_url || prev.foto_url,
         observaciones: mascota.observaciones || prev.observaciones,
-        cliente_id: mascota.cliente_id ?? mascota.cliente?.cliente_id ?? prev.cliente_id,
+        cliente_id: (mascota.cliente_id ?? mascota.cliente?.cliente_id ?? prev.cliente_id) ? String(mascota.cliente_id ?? mascota.cliente?.cliente_id ?? prev.cliente_id) : prev.cliente_id,
       }));
     }
   }, [mascota, especies, sexos]);
@@ -147,7 +147,7 @@ export default function MascotaForm({ mascota, onCancel, isLoading }) {
             <div className="space-y-2">
               <Label htmlFor="cliente_id">Dueño *</Label>
               <Select
-                value={formData.cliente_id}
+                value={formData.cliente_id ? String(formData.cliente_id) : ""}
                 onValueChange={(value) => handleChange('cliente_id', value)}
                 required
               >
@@ -156,7 +156,7 @@ export default function MascotaForm({ mascota, onCancel, isLoading }) {
                 </SelectTrigger>
                 <SelectContent>
                   {clientesApi.map(c => (
-                    <SelectItem key={c.cliente_id} value={c.cliente_id}>
+                    <SelectItem key={c.cliente_id} value={String(c.cliente_id)}>
                       {c.nombres} {c.apellidos}
                     </SelectItem>
                   ))}
@@ -169,7 +169,7 @@ export default function MascotaForm({ mascota, onCancel, isLoading }) {
             <div className="space-y-2">
               <Label htmlFor="especie">Especie *</Label>
               <Select
-                value={formData.especie}
+                value={formData.especie ? String(formData.especie) : ""}
                 onValueChange={(value) => handleChange('especie', value)}
               >
                 <SelectTrigger>
@@ -177,7 +177,7 @@ export default function MascotaForm({ mascota, onCancel, isLoading }) {
                 </SelectTrigger>
                 <SelectContent>
                   {especies.map((e) => (
-                    <SelectItem key={e.MaeestroID} value={e.MaeestroID}>
+                    <SelectItem key={e.MaeestroID} value={String(e.MaeestroID)}>
                       {e.nombre}
                     </SelectItem>
                   ))}
@@ -209,7 +209,7 @@ export default function MascotaForm({ mascota, onCancel, isLoading }) {
             <div className="space-y-2">
               <Label htmlFor="sexo">Sexo</Label>
               <Select
-                value={formData.sexo}
+                value={formData.sexo ? String(formData.sexo) : ""}
                 onValueChange={(value) => handleChange('sexo', value)}
               >
                 <SelectTrigger>
@@ -217,7 +217,7 @@ export default function MascotaForm({ mascota, onCancel, isLoading }) {
                 </SelectTrigger>
                 <SelectContent>
                   {sexos.map((s) => (
-                    <SelectItem key={s.MaeestroID} value={s.MaeestroID}>
+                    <SelectItem key={s.MaeestroID} value={String(s.MaeestroID)}>
                       {s.nombre}
                     </SelectItem>
                   ))}
