@@ -16,9 +16,27 @@ export default function Citas() {
   const queryClient = useQueryClient();
 
   const { data: citas = [] } = useQuery({
-    queryKey: ['citas'],
-    queryFn: () => base44.entities.Cita.list('-fecha'),
+    queryKey: ['api_citas'],
+    queryFn: async () => {
+      const res = await fetch('http://localhost:8000/api/citas');
+      const json = await res.json();
+      const items = json?.data || [];
+      return items.map((item) => ({
+        id: item?.cita_id,
+        fecha: item?.fecha,
+        hora: item?.hora,
+        motivo: item?.motivo,
+        estado: item?.estados?.nombre || item?.estado,
+        estado_id: item?.estados?.MaeestroID ? Number(item.estados.MaeestroID) : (item?.estado && !isNaN(Number(item.estado)) ? Number(item.estado) : undefined),
+        mascota_id: item?.mascota_id ? Number(item.mascota_id) : item?.mascota?.mascota_id,
+        cliente_id: item?.cliente_id ? Number(item.cliente_id) : item?.cliente?.cliente_id,
+        veterinario: item?.veterinario ? `${item.veterinario?.nombres || ''} ${item.veterinario?.apellidos || ''}`.trim() : '',
+        mascota: item?.mascota || null,
+        cliente: item?.cliente || null,
+      }));
+    },
   });
+
 
   const { data: mascotas = [] } = useQuery({
     queryKey: ['mascotas'],
@@ -91,10 +109,20 @@ export default function Citas() {
     }
   };
 
-  const handleChangeStatus = (id, newStatus) => {
-    const cita = citas.find(c => c.id === id);
-    if (cita) {
-      updateMutation.mutate({ id, data: { ...cita, estado: newStatus } });
+  const handleChangeStatus = async (id, newStatus) => {
+    try {
+      const res = await fetch(`http://localhost:8000/api/citas/${id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ estado: newStatus }),
+      });
+      if (!res.ok) {
+        throw new Error('Error actualizando estado');
+      }
+      await queryClient.invalidateQueries({ queryKey: ['api_citas'] });
+    } catch (e) {
+      console.error(e);
+      alert('No se pudo actualizar el estado de la cita');
     }
   };
 
@@ -138,16 +166,16 @@ export default function Citas() {
               <TabsTrigger value="calendario">Calendario</TabsTrigger>
             </TabsList>
 
-            <TabsContent value="lista">
-              <CitasList
-                citas={citas}
-                mascotas={mascotas}
-                clientes={clientes}
-                onEdit={handleEdit}
-                onDelete={handleDelete}
-                onChangeStatus={handleChangeStatus}
-              />
-            </TabsContent>
+              <TabsContent value="lista">
+                <CitasList
+                  citas={citas}
+                  mascotas={mascotas}
+                  clientes={clientes}
+                  onEdit={handleEdit}
+                  onDelete={handleDelete}
+                  onChangeStatus={handleChangeStatus}
+                />
+              </TabsContent>
 
             <TabsContent value="calendario">
               <CitasCalendar

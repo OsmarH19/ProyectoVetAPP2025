@@ -58,7 +58,9 @@ export default function CitasList({ citas, mascotas, clientes, onEdit, onDelete,
               {filteredCitas.map((cita) => {
                 const mascota = mascotas.find(m => m.id === cita.mascota_id);
                 const cliente = clientes.find(c => c.id === cita.cliente_id);
-                
+                const mascotaNombre = mascota?.nombre ?? cita?.mascota?.nombre;
+                const clienteNombre = cliente ? `${cliente.nombres || ''} ${cliente.apellidos || ''}`.trim() : `${cita?.cliente?.nombres || ''} ${cita?.cliente?.apellidos || ''}`.trim();
+
                 return (
                   <TableRow key={cita.id} className="hover:bg-gray-50">
                     <TableCell>
@@ -77,15 +79,17 @@ export default function CitasList({ citas, mascotas, clientes, onEdit, onDelete,
                       <div className="flex items-center gap-2">
                         <PawPrint className="w-4 h-4 text-green-600" />
                         <div>
-                          <p className="font-semibold">{mascota?.nombre}</p>
-                          <p className="text-sm text-gray-500">{mascota?.especie}</p>
+                          <p className="font-semibold">{mascotaNombre}</p>
+                          {mascota?.especie && (
+                            <p className="text-sm text-gray-500">{mascota.especie}</p>
+                          )}
                         </div>
                       </div>
                     </TableCell>
                     <TableCell>
                       <div className="flex items-center gap-2">
                         <User className="w-4 h-4 text-gray-400" />
-                        <span>{cliente?.nombres} {cliente?.apellidos}</span>
+                        <span>{clienteNombre}</span>
                       </div>
                     </TableCell>
                     <TableCell>
@@ -95,22 +99,22 @@ export default function CitasList({ citas, mascotas, clientes, onEdit, onDelete,
                       )}
                     </TableCell>
                     <TableCell>
-                      <Select
-                        value={cita.estado}
-                        onValueChange={(value) => onChangeStatus(cita.id, value)}
-                      >
-                        <SelectTrigger className="w-32">
-                          <Badge className={estadoColors[cita.estado]} variant="outline">
-                            {cita.estado}
-                          </Badge>
-                        </SelectTrigger>
-                        <SelectContent>
+                    <Select
+                      value={cita.estado}
+                      onValueChange={(value) => onChangeStatus(cita.id, value)}
+                    >
+                      <SelectTrigger className="w-32">
+                        <Badge className={estadoColors[cita.estado]} variant="outline">
+                          {cita.estado}
+                        </Badge>
+                      </SelectTrigger>
+                      <SelectContent>
                           <SelectItem value="Pendiente">Pendiente</SelectItem>
                           <SelectItem value="Confirmada">Confirmada</SelectItem>
                           <SelectItem value="Completada">Completada</SelectItem>
                           <SelectItem value="Cancelada">Cancelada</SelectItem>
-                        </SelectContent>
-                      </Select>
+                      </SelectContent>
+                    </Select>
                     </TableCell>
                     <TableCell className="text-right">
                       <div className="flex justify-end gap-2">
