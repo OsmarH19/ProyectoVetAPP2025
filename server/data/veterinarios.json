@@ -25,5 +25,22 @@
     "activo": true,
     "id": "1763155199837",
     "created_date": "2025-11-14T21:19:59.837Z"
+  },
+  {
+    "nombres": "ASD",
+    "apellidos": "ASDASD",
+    "especialidad": "ASDASD",
+    "telefono": "5655546465465",
+    "email": "ADASD@ASDAS.COM",
+    "turnos": [
+      {
+        "dia": "Lunes",
+        "hora_inicio": "08:00",
+        "hora_fin": "12:00"
+      }
+    ],
+    "activo": true,
+    "id": "1764179095140",
+    "created_date": "2025-11-26T17:44:55.140Z"
   }
 ]

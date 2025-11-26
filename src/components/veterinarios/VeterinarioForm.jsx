@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -8,19 +9,73 @@ import { X, Save, Plus, Trash2 } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 
 export default function VeterinarioForm({ veterinario, onSubmit, onCancel, isLoading }) {
-  const [formData, setFormData] = useState(veterinario || {
+  const [formData, setFormData] = useState({
     nombres: "",
     apellidos: "",
     especialidad: "",
     telefono: "",
     email: "",
-    turnos: [{ dia: "Lunes", hora_inicio: "08:00", hora_fin: "12:00" }],
+    turnos: [{ dia: "", hora_inicio: "08:00", hora_fin: "12:00" }],
     activo: true,
   });
+  const [savingTurnoIndex, setSavingTurnoIndex] = useState(null);
+  const queryClient = useQueryClient();
+
+  const { data: diasMaestros = [] } = useQuery({
+    queryKey: ["dias_maestros"],
+    queryFn: async () => {
+      const res = await fetch("http://localhost:8000/api/mascotas/datos-maestros/14");
+      const json = await res.json();
+      return json?.data || [];
+    },
+  });
+
+  const { data: turnosApi = [] } = useQuery({
+    queryKey: ["turnos_veterinario", veterinario?.id],
+    queryFn: async () => {
+      if (!veterinario?.id) return [];
+      const res = await fetch(`http://localhost:8000/api/turnos-veterinarios/veterinario/${veterinario.id}`);
+      const json = await res.json();
+      return json?.data || [];
+    },
+    enabled: !!veterinario?.id,
+  });
+
+  useEffect(() => {
+    if (veterinario) {
+      setFormData(prev => ({
+        ...prev,
+        nombres: veterinario.nombres || prev.nombres,
+        apellidos: veterinario.apellidos || prev.apellidos,
+        especialidad: veterinario.especialidad || prev.especialidad,
+        telefono: veterinario.telefono || prev.telefono,
+        email: veterinario.email || prev.email,
+        activo: typeof veterinario.activo === 'boolean' ? veterinario.activo : prev.activo,
+        turnos: Array.isArray(prev.turnos) ? prev.turnos : [{ dia: "", hora_inicio: "08:00", hora_fin: "12:00" }],
+      }));
+    }
+    if (turnosApi.length > 0) {
+      const normalized = turnosApi.map(t => ({
+        turno_id: t.turno_id,
+        dia: String(t.dia),
+        hora_inicio: (t.hora_inicio || "").slice(0, 5),
+        hora_fin: (t.hora_fin || "").slice(0, 5),
+      }));
+      setFormData(prev => ({ ...prev, turnos: normalized }));
+    }
+  }, [veterinario, turnosApi]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    onSubmit(formData);
+    const payload = {
+      nombres: formData.nombres,
+      apellidos: formData.apellidos,
+      especialidad: formData.especialidad,
+      telefono: formData.telefono,
+      email: formData.email,
+      activo: formData.activo,
+    };
+    onSubmit(payload);
   };
 
   const handleChange = (field, value) => {
@@ -38,7 +93,7 @@ export default function VeterinarioForm({ veterinario, onSubmit, onCancel, isLoa
   const addTurno = () => {
     setFormData(prev => ({
       ...prev,
-      turnos: [...prev.turnos, { dia: "Lunes", hora_inicio: "08:00", hora_fin: "12:00" }]
+      turnos: [...prev.turnos, { dia: "", hora_inicio: "08:00", hora_fin: "12:00" }]
     }));
   };
 
@@ -49,7 +104,36 @@ export default function VeterinarioForm({ veterinario, onSubmit, onCancel, isLoa
     }));
   };
 
-  const diasSemana = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo"];
+  const diasSemana = diasMaestros.map(d => ({ id: String(d.MaeestroID), nombre: d.nombre }));
+
+  const saveTurno = async (index) => {
+    const turno = formData.turnos[index];
+    if (!veterinario?.id) return;
+    if (!turno.dia || !turno.hora_inicio || !turno.hora_fin) return;
+    setSavingTurnoIndex(index);
+    try {
+      const payload = {
+        veterinario_id: veterinario.id,
+        dia: parseInt(turno.dia),
+        hora_inicio: turno.hora_inicio,
+        hora_fin: turno.hora_fin,
+      };
+      const url = turno.turno_id
+        ? `http://localhost:8000/api/turnos-veterinarios/${turno.turno_id}`
+        : `http://localhost:8000/api/turnos-veterinarios`;
+      const method = turno.turno_id ? 'PATCH' : 'POST';
+      const res = await fetch(url, {
+        method,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+      if (!res.ok) throw new Error('Error guardando turno');
+      await res.json();
+      queryClient.invalidateQueries({ queryKey: ["turnos_veterinario", veterinario.id] });
+    } finally {
+      setSavingTurnoIndex(null);
+    }
+  };
 
   return (
     <Card className="mb-6 shadow-lg">
@@ -154,7 +238,7 @@ export default function VeterinarioForm({ veterinario, onSubmit, onCancel, isLoa
                     <div className="space-y-2">
                       <Label htmlFor={`turno-dia-${index}`}>Día</Label>
                       <Select
-                        value={turno.dia}
+                        value={turno.dia ? String(turno.dia) : ""}
                         onValueChange={(value) => handleTurnoChange(index, 'dia', value)}
                       >
                         <SelectTrigger>
@@ -162,7 +246,7 @@ export default function VeterinarioForm({ veterinario, onSubmit, onCancel, isLoa
                         </SelectTrigger>
                         <SelectContent>
                           {diasSemana.map(dia => (
-                            <SelectItem key={dia} value={dia}>{dia}</SelectItem>
+                            <SelectItem key={dia.id} value={dia.id}>{dia.nombre}</SelectItem>
                           ))}
                         </SelectContent>
                       </Select>
@@ -186,6 +270,17 @@ export default function VeterinarioForm({ veterinario, onSubmit, onCancel, isLoa
                       />
                     </div>
                   </div>
+                </div>
+                <div className="flex justify-end gap-2 mt-3">
+                  <Button
+                    type="button"
+                    size="sm"
+                    onClick={() => saveTurno(index)}
+                    disabled={savingTurnoIndex === index || !veterinario?.id}
+                    className="bg-green-600 hover:bg-green-700"
+                  >
+                    Guardar turno
+                  </Button>
                 </div>
               </Card>
             ))}

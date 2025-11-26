@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import { base44 } from "@/api/base44Client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -15,32 +14,79 @@ export default function Veterinarios() {
   const queryClient = useQueryClient();
 
   const { data: veterinarios = [] } = useQuery({
-    queryKey: ['veterinarios'],
-    queryFn: () => base44.entities.Veterinario.list('-created_date'),
+    queryKey: ['veterinarios_api'],
+    queryFn: async () => {
+      const res = await fetch('http://localhost:8000/api/veterinarios');
+      const json = await res.json();
+      const arr = json?.data || [];
+      return arr.map(v => ({
+        id: v.veterinario_id,
+        nombres: v.nombres,
+        apellidos: v.apellidos,
+        especialidad: v.especialidad,
+        telefono: v.telefono,
+        email: v.email,
+        activo: !!v.activo,
+      }));
+    },
   });
 
   const createMutation = useMutation({
-    mutationFn: (data) => base44.entities.Veterinario.create(data),
+    mutationFn: async (data) => {
+      const payload = {
+        nombres: data.nombres,
+        apellidos: data.apellidos,
+        especialidad: data.especialidad,
+        telefono: data.telefono,
+        email: data.email,
+        activo: data.activo ? '1' : '0',
+      };
+      const res = await fetch('http://localhost:8000/api/veterinarios', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+      if (!res.ok) throw new Error('Error creando veterinario');
+      return res.json();
+    },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['veterinarios'] });
+      queryClient.invalidateQueries({ queryKey: ['veterinarios_api'] });
       setShowForm(false);
       setEditingVeterinario(null);
     },
   });
 
   const updateMutation = useMutation({
-    mutationFn: ({ id, data }) => base44.entities.Veterinario.update(id, data),
+    mutationFn: async ({ id, data }) => {
+      const payload = {
+        nombres: data.nombres,
+        apellidos: data.apellidos,
+        especialidad: data.especialidad,
+        telefono: data.telefono,
+        email: data.email,
+        activo: data.activo ? '1' : '0',
+      };
+      const res = await fetch(`http://localhost:8000/api/veterinarios/${id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+      if (!res.ok) throw new Error('Error actualizando veterinario');
+      return res.json();
+    },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['veterinarios'] });
+      queryClient.invalidateQueries({ queryKey: ['veterinarios_api'] });
       setShowForm(false);
       setEditingVeterinario(null);
     },
   });
 
   const deleteMutation = useMutation({
-    mutationFn: (id) => base44.entities.Veterinario.delete(id),
+    mutationFn: async (id) => {
+      return Promise.resolve();
+    },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['veterinarios'] });
+      queryClient.invalidateQueries({ queryKey: ['veterinarios_api'] });
     },
   });
 
