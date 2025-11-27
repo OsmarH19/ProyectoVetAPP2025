@@ -42,12 +42,12 @@ export default function Login() {
 
   return (
     <div className="min-h-screen grid grid-cols-1 lg:grid-cols-2">
-      <div className="hidden lg:block relative">
-        <div className="absolute inset-0 bg-gradient-to-b from-black/30 to-black/30 z-10" />
+      <div className="hidden md:block relative overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-b from-black/30 to-black/30 z-10 pointer-events-none" />
         <img
-          src="/logos/logo2_sinFondo.png"
+          src="/img/login.jpg"
           alt="VetCare"
-          className="h-full w-full object-cover"
+          className="absolute inset-0 w-full h-full object-cover object-center md:object-left"
         />
         <div className="absolute z-20 bottom-8 left-8 text-white">
           <p className="text-lg font-medium">Bienvenido a VetCare</p>
