@@ -31,6 +31,7 @@ export default function Citas() {
         mascota_id: item?.mascota_id ? Number(item.mascota_id) : item?.mascota?.mascota_id,
         cliente_id: item?.cliente_id ? Number(item.cliente_id) : item?.cliente?.cliente_id,
         veterinario: item?.veterinario ? `${item.veterinario?.nombres || ''} ${item.veterinario?.apellidos || ''}`.trim() : '',
+        veterinario_id: item?.veterinario_id ? Number(item.veterinario_id) : (item?.veterinario?.veterinario_id ?? undefined),
         mascota: item?.mascota || null,
         cliente: item?.cliente || null,
       }));
@@ -54,18 +55,55 @@ export default function Citas() {
   });
 
   const createMutation = useMutation({
-    mutationFn: (data) => base44.entities.Cita.create(data),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['citas'] });
+    mutationFn: async (data) => {
+      const payload = {
+        fecha: data.fecha,
+        hora: data.hora,
+        motivo: data.motivo,
+        estado: isNaN(Number(data.estado_id)) ? data.estado_id : Number(data.estado_id),
+        mascota_id: isNaN(Number(data.mascota_id)) ? data.mascota_id : Number(data.mascota_id),
+        cliente_id: isNaN(Number(data.cliente_id)) ? data.cliente_id : Number(data.cliente_id),
+        veterinario_id: isNaN(Number(data.veterinario_id)) ? data.veterinario_id : Number(data.veterinario_id),
+        observaciones: data.observaciones || '',
+        activo: 1,
+      }
+      const res = await fetch('http://localhost:8000/api/citas', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      })
+      if (!res.ok) throw new Error('Error creando cita')
+      return res.json()
+    },
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ['api_citas'] });
       setShowForm(false);
       setEditingCita(null);
     },
   });
 
   const updateMutation = useMutation({
-    mutationFn: ({ id, data }) => base44.entities.Cita.update(id, data),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['citas'] });
+    mutationFn: async ({ id, data }) => {
+      const payload = {
+        fecha: data.fecha,
+        hora: data.hora,
+        motivo: data.motivo,
+        estado: isNaN(Number(data.estado_id)) ? data.estado_id : Number(data.estado_id),
+        mascota_id: isNaN(Number(data.mascota_id)) ? data.mascota_id : Number(data.mascota_id),
+        cliente_id: isNaN(Number(data.cliente_id)) ? data.cliente_id : Number(data.cliente_id),
+        veterinario_id: isNaN(Number(data.veterinario_id)) ? data.veterinario_id : Number(data.veterinario_id),
+        observaciones: data.observaciones || '',
+      }
+      const res = await fetch(`http://localhost:8000/api/citas/${id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      })
+      if (!res.ok) throw new Error('Error actualizando cita')
+      return res.json()
+    },
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ['api_citas'] });
       setShowForm(false);
       setEditingCita(null);
     },
@@ -73,8 +111,8 @@ export default function Citas() {
 
   const deleteMutation = useMutation({
     mutationFn: (id) => base44.entities.Cita.delete(id),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['citas'] });
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ['api_citas'] });
     },
   });
 
