@@ -1,4 +1,5 @@
 import React from "react";
+import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -7,7 +8,19 @@ import { format } from "date-fns";
 import { es } from "date-fns/locale";
 
 export default function TratamientoCard({ tratamiento, mascota, cliente, cita, onEdit, onDelete, onViewHistorial }) {
-  const medicamentos = Array.isArray(tratamiento.medicamentos) ? tratamiento.medicamentos : [];
+  const { data: medicamentos = [] } = useQuery({
+    queryKey: ['api_medicamentos', tratamiento.id],
+    queryFn: async () => {
+      try {
+        const res = await fetch(`http://localhost:8000/api/medicamentos?tratamiento_id=${tratamiento.id}`)
+        const json = await res.json()
+        return Array.isArray(json?.data) ? json.data : []
+      } catch (_) {
+        return []
+      }
+    },
+    enabled: !!tratamiento?.id,
+  })
   
   return (
     <Card className="shadow-lg hover:shadow-xl transition-shadow">

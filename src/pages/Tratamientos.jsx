@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import { base44 } from "@/api/base44Client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -17,23 +16,83 @@ export default function Tratamientos() {
   const queryClient = useQueryClient();
 
   const { data: tratamientos = [] } = useQuery({
-    queryKey: ['tratamientos'],
-    queryFn: () => base44.entities.Tratamiento.list('-created_date'),
+    queryKey: ['api_tratamientos'],
+    queryFn: async () => {
+      try {
+        const res = await fetch('http://localhost:8000/api/tratamientos')
+        const json = await res.json()
+        const items = Array.isArray(json?.data) ? json.data : []
+        return items.map(item => ({
+          id: item?.tratamiento_id,
+          cita_id: item?.cita_id ? Number(item.cita_id) : (item?.cita?.cita_id ?? undefined),
+          diagnostico: item?.diagnostico,
+          tratamiento_indicado: item?.tratamiento_indicado,
+          recomendaciones: item?.recomendaciones,
+          veterinario_id: item?.veterinario_id ? Number(item.veterinario_id) : (item?.veterinario?.veterinario_id ?? undefined),
+          cliente_id: item?.cliente_id ? Number(item.cliente_id) : (item?.cliente?.cliente_id ?? undefined),
+          mascota_id: item?.mascota_id ? Number(item.mascota_id) : (item?.mascota?.mascota_id ?? undefined),
+          veterinario: item?.veterinario ? `${item.veterinario.nombres} ${item.veterinario.apellidos}` : '',
+          cliente: item?.cliente || null,
+          mascota: item?.mascota || null,
+          cita: item?.cita || null,
+        }))
+      } catch (_) {
+        return []
+      }
+    },
   });
 
   const { data: citas = [] } = useQuery({
-    queryKey: ['citas'],
-    queryFn: () => base44.entities.Cita.list(),
+    queryKey: ['api_citas'],
+    queryFn: async () => {
+      try {
+        const res = await fetch('http://localhost:8000/api/citas')
+        const json = await res.json()
+        const items = json?.data || []
+        return items.map((item) => ({
+          id: item?.cita_id,
+          fecha: item?.fecha,
+          hora: item?.hora,
+          motivo: item?.motivo,
+          estado: item?.estados?.nombre || item?.estado,
+          estado_id: item?.estados?.MaeestroID ? Number(item.estados.MaeestroID) : (item?.estado && !isNaN(Number(item.estado)) ? Number(item.estado) : undefined),
+          mascota_id: item?.mascota_id ? Number(item.mascota_id) : item?.mascota?.mascota_id,
+          cliente_id: item?.cliente_id ? Number(item.cliente_id) : item?.cliente?.cliente_id,
+          veterinario_id: item?.veterinario_id ? Number(item.veterinario_id) : (item?.veterinario?.veterinario_id ?? undefined),
+          observaciones: item?.observaciones || '',
+          mascota: item?.mascota || null,
+          cliente: item?.cliente || null,
+        }))
+      } catch (_) {
+        return []
+      }
+    },
   });
 
   const { data: mascotas = [] } = useQuery({
-    queryKey: ['mascotas'],
-    queryFn: () => base44.entities.Mascota.list(),
+    queryKey: ['api_mascotas'],
+    queryFn: async () => {
+      try {
+        const res = await fetch('http://localhost:8000/api/mascotas')
+        const json = await res.json()
+        return Array.isArray(json?.data) ? json.data : []
+      } catch (_) {
+        return []
+      }
+    },
   });
 
   const { data: clientes = [] } = useQuery({
-    queryKey: ['clientes'],
-    queryFn: () => base44.entities.Cliente.list(),
+    queryKey: ['api_clientes'],
+    queryFn: async () => {
+      try {
+        const res = await fetch('http://localhost:8000/api/clientes')
+        const json = await res.json()
+        return Array.isArray(json?.data) ? json.data : []
+      } catch (_) {
+        return []
+      }
+    },
   });
 
   const createMutation = useMutation({
@@ -81,14 +140,12 @@ export default function Tratamientos() {
   };
 
   const filteredTratamientos = tratamientos.filter(t => {
-    const mascota = mascotas.find(m => m.id === t.mascota_id);
-    const cliente = clientes.find(c => c.id === t.cliente_id);
+    const mascotaNombre = t?.mascota?.nombre || ''
+    const clienteNombre = `${t?.cliente?.nombres || ''} ${t?.cliente?.apellidos || ''}`.trim()
     const searchMatch = 
-      mascota?.nombre?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      t.diagnostico?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      cliente?.nombres?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      cliente?.apellidos?.toLowerCase().includes(searchTerm.toLowerCase());
-    
+      mascotaNombre.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (t.diagnostico || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+      clienteNombre.toLowerCase().includes(searchTerm.toLowerCase());
     return searchMatch;
   });
 
@@ -153,9 +210,9 @@ export default function Tratamientos() {
                 <TratamientoCard
                   key={tratamiento.id}
                   tratamiento={tratamiento}
-                  mascota={mascotas.find(m => m.id === tratamiento.mascota_id)}
-                  cliente={clientes.find(c => c.id === tratamiento.cliente_id)}
-                  cita={citas.find(c => c.id === tratamiento.cita_id)}
+                  mascota={tratamiento.mascota}
+                  cliente={tratamiento.cliente}
+                  cita={tratamiento.cita}
                   onEdit={handleEdit}
                   onDelete={handleDelete}
                   onViewHistorial={() => setSelectedMascotaId(tratamiento.mascota_id)}
