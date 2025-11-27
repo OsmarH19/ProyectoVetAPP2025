@@ -28,7 +28,8 @@ export default function Login() {
       const data = await res.json()
       if (data?.status) {
         localStorage.setItem("auth_user", JSON.stringify(data.user))
-        navigate("/Dashboard", { replace: true })
+        const last = localStorage.getItem('last_route')
+        navigate(last && last.toLowerCase() !== '/login' ? last : "/Dashboard", { replace: true })
       } else {
         setError(data?.message || "Credenciales incorrectas")
       }
@@ -105,4 +106,3 @@ export default function Login() {
     </div>
   )
 }
-

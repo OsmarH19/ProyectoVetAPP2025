@@ -18,7 +18,7 @@ import MisCitas from "./MisCitas";
 
 import Veterinarios from "./Veterinarios";
 
-import { BrowserRouter as Router, Route, Routes, useLocation } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Routes, useLocation, Navigate } from 'react-router-dom';
 import Login from "./Login.jsx";
 
 const PAGES = {
@@ -57,6 +57,16 @@ function _getCurrentPage(url) {
 }
 
 // Create a wrapper component that uses useLocation inside the Router context
+function isAuthenticated() {
+  const u = localStorage.getItem('auth_user')
+  const t = localStorage.getItem('auth_token')
+  return !!(u || t)
+}
+
+function ProtectedRoute({ element }) {
+  return isAuthenticated() ? element : <Navigate to="/Login" replace />
+}
+
 function PagesContent() {
   const location = useLocation();
   const currentPage = _getCurrentPage(location.pathname);
@@ -72,16 +82,16 @@ function PagesContent() {
   return (
     <Layout currentPageName={currentPage}>
       <Routes>
-        <Route path="/" element={<Dashboard />} />
-        <Route path="/Dashboard" element={<Dashboard />} />
-        <Route path="/Clientes" element={<Clientes />} />
-        <Route path="/Mascotas" element={<Mascotas />} />
-        <Route path="/Citas" element={<Citas />} />
-        <Route path="/Tratamientos" element={<Tratamientos />} />
-        <Route path="/ClienteDashboard" element={<ClienteDashboard />} />
-        <Route path="/MisMascotas" element={<MisMascotas />} />
-        <Route path="/MisCitas" element={<MisCitas />} />
-        <Route path="/Veterinarios" element={<Veterinarios />} />
+        <Route path="/" element={<Navigate to={isAuthenticated() ? "/Dashboard" : "/Login"} replace />} />
+        <Route path="/Dashboard" element={<ProtectedRoute element={<Dashboard />} />} />
+        <Route path="/Clientes" element={<ProtectedRoute element={<Clientes />} />} />
+        <Route path="/Mascotas" element={<ProtectedRoute element={<Mascotas />} />} />
+        <Route path="/Citas" element={<ProtectedRoute element={<Citas />} />} />
+        <Route path="/Tratamientos" element={<ProtectedRoute element={<Tratamientos />} />} />
+        <Route path="/ClienteDashboard" element={<ProtectedRoute element={<ClienteDashboard />} />} />
+        <Route path="/MisMascotas" element={<ProtectedRoute element={<MisMascotas />} />} />
+        <Route path="/MisCitas" element={<ProtectedRoute element={<MisCitas />} />} />
+        <Route path="/Veterinarios" element={<ProtectedRoute element={<Veterinarios />} />} />
       </Routes>
     </Layout>
   );

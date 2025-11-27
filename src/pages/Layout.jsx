@@ -1,8 +1,7 @@
 
 import React, { useState, useEffect } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
-import { base44 } from "@/api/base44Client";
 import { 
   LayoutDashboard, 
   Users, 
@@ -35,21 +34,24 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 
 export default function Layout({ children, currentPageName }) {
   const location = useLocation();
-  const [user, setUser] = useState(null);
-  const [isAdmin, setIsAdmin] = useState(false);
+  const navigate = useNavigate();
+  const [user, setUser] = useState(() => {
+    const u = localStorage.getItem('auth_user')
+    return u ? JSON.parse(u) : null
+  });
+  const [isAdmin, setIsAdmin] = useState(() => (user?.profileID === 1));
 
   useEffect(() => {
-    async function loadUser() {
-      try {
-        const currentUser = await base44.auth.me();
-        setUser(currentUser);
-        setIsAdmin(currentUser.role === 'admin');
-      } catch (error) {
-        console.error("Error loading user:", error);
-      }
+    const u = localStorage.getItem('auth_user')
+    setUser(u ? JSON.parse(u) : null)
+    setIsAdmin(u ? JSON.parse(u)?.profileID === 1 : false)
+  }, [])
+
+  useEffect(() => {
+    if (user && location.pathname.toLowerCase() !== '/login') {
+      localStorage.setItem('last_route', location.pathname)
     }
-    loadUser();
-  }, []);
+  }, [user, location.pathname])
 
   const adminNavigation = [
     {
@@ -105,7 +107,12 @@ export default function Layout({ children, currentPageName }) {
   const navigation = isAdmin ? adminNavigation : clientNavigation;
 
   const handleLogout = () => {
-    base44.auth.logout();
+    try {
+      localStorage.removeItem('auth_user')
+      localStorage.removeItem('auth_token')
+    } finally {
+      navigate('/Login', { replace: true })
+    }
   };
 
   const getInitials = (name) => {
@@ -158,19 +165,19 @@ export default function Layout({ children, currentPageName }) {
 
           <SidebarFooter className="border-t border-gray-200 p-4">
             <div className="flex items-center gap-3 mb-3">
-              <Avatar className="w-10 h-10 bg-gradient-to-br from-green-400 to-blue-500">
-                <AvatarFallback className="bg-transparent text-white font-semibold">
-                  {getInitials(user?.full_name)}
-                </AvatarFallback>
-              </Avatar>
+                <Avatar className="w-10 h-10 bg-gradient-to-br from-green-400 to-blue-500">
+                  <AvatarFallback className="bg-transparent text-white font-semibold">
+                  {getInitials(user?.name)}
+                  </AvatarFallback>
+                </Avatar>
               <div className="flex-1 min-w-0">
                 <p className="font-semibold text-gray-900 text-sm truncate">
-                  {user?.full_name || "Usuario"}
+                  {user?.name || "Usuario"}
                 </p>
                 <p className="text-xs text-gray-500 truncate">{user?.email}</p>
                 {user && (
                   <p className="text-xs text-green-600 font-medium">
-                    {user.role === 'admin' ? 'Administrador' : 'Cliente'}
+                    {isAdmin ? 'Administrador' : 'Usuario'}
                   </p>
                 )}
               </div>
