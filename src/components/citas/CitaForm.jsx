@@ -99,6 +99,18 @@ export default function CitaForm({ cita, mascotas, clientes, veterinarios, onSub
 
   const timeSlots = generateTimeSlots();
 
+  const fechaValue = useMemo(() => {
+    if (!formData.fecha) return ""
+    const raw = String(formData.fecha)
+    const base = raw.includes('/') ? raw.replace(/\//g, '-') : raw
+    const parts = base.split('T')[0].split('-')
+    if (parts.length === 3) {
+      const [y, m, d] = parts
+      return `${y}-${String(m).padStart(2,'0')}-${String(d).padStart(2,'0')}`
+    }
+    return base
+  }, [formData.fecha])
+
   const handleSubmit = (e) => {
     e.preventDefault();
     onSubmit(formData);
@@ -190,9 +202,9 @@ export default function CitaForm({ cita, mascotas, clientes, veterinarios, onSub
               <Input
                 id="fecha"
                 type="date"
-                value={formData.fecha}
+                value={fechaValue}
                 onChange={(e) => handleChange('fecha', e.target.value)}
-                min={new Date().toISOString().split('T')[0]}
+                min={cita ? undefined : new Date().toISOString().split('T')[0]}
                 required
               />
             </div>
