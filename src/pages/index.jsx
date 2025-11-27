@@ -19,6 +19,7 @@ import MisCitas from "./MisCitas";
 import Veterinarios from "./Veterinarios";
 
 import { BrowserRouter as Router, Route, Routes, useLocation } from 'react-router-dom';
+import Login from "./Login.jsx";
 
 const PAGES = {
     
@@ -57,37 +58,33 @@ function _getCurrentPage(url) {
 
 // Create a wrapper component that uses useLocation inside the Router context
 function PagesContent() {
-    const location = useLocation();
-    const currentPage = _getCurrentPage(location.pathname);
-    
+  const location = useLocation();
+  const currentPage = _getCurrentPage(location.pathname);
+  
+  if (location.pathname.toLowerCase() === '/login') {
     return (
-        <Layout currentPageName={currentPage}>
-            <Routes>            
-                
-                    <Route path="/" element={<Dashboard />} />
-                
-                
-                <Route path="/Dashboard" element={<Dashboard />} />
-                
-                <Route path="/Clientes" element={<Clientes />} />
-                
-                <Route path="/Mascotas" element={<Mascotas />} />
-                
-                <Route path="/Citas" element={<Citas />} />
-                
-                <Route path="/Tratamientos" element={<Tratamientos />} />
-                
-                <Route path="/ClienteDashboard" element={<ClienteDashboard />} />
-                
-                <Route path="/MisMascotas" element={<MisMascotas />} />
-                
-                <Route path="/MisCitas" element={<MisCitas />} />
-                
-                <Route path="/Veterinarios" element={<Veterinarios />} />
-                
-            </Routes>
-        </Layout>
-    );
+      <Routes>
+        <Route path="/Login" element={<Login />} />
+      </Routes>
+    )
+  }
+
+  return (
+    <Layout currentPageName={currentPage}>
+      <Routes>
+        <Route path="/" element={<Dashboard />} />
+        <Route path="/Dashboard" element={<Dashboard />} />
+        <Route path="/Clientes" element={<Clientes />} />
+        <Route path="/Mascotas" element={<Mascotas />} />
+        <Route path="/Citas" element={<Citas />} />
+        <Route path="/Tratamientos" element={<Tratamientos />} />
+        <Route path="/ClienteDashboard" element={<ClienteDashboard />} />
+        <Route path="/MisMascotas" element={<MisMascotas />} />
+        <Route path="/MisCitas" element={<MisCitas />} />
+        <Route path="/Veterinarios" element={<Veterinarios />} />
+      </Routes>
+    </Layout>
+  );
 }
 
 export default function Pages() {
