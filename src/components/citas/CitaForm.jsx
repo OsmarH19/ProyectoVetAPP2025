@@ -38,9 +38,14 @@ export default function CitaForm({ cita, mascotas, clientes, veterinarios, onSub
     if (!cita) return initial
     return {
       ...initial,
-      ...cita,
-      veterinario_id: cita.veterinario_id || "",
-      estado_id: cita.estado_id || "",
+      fecha: cita.fecha || "",
+      hora: cita.hora || "",
+      motivo: cita.motivo || "",
+      mascota_id: cita.mascota_id ? String(cita.mascota_id) : "",
+      cliente_id: cita.cliente_id ? String(cita.cliente_id) : "",
+      veterinario_id: cita.veterinario_id ? String(cita.veterinario_id) : "",
+      estado_id: cita.estado_id ? String(cita.estado_id) : "",
+      observaciones: cita.observaciones ?? "",
     }
   });
 
@@ -160,7 +165,7 @@ export default function CitaForm({ cita, mascotas, clientes, veterinarios, onSub
                 </SelectTrigger>
                 <SelectContent>
                   {mascotasApi.map(m => (
-                    <SelectItem key={m.mascota_id} value={m.mascota_id}>
+                    <SelectItem key={m.mascota_id} value={String(m.mascota_id)}>
                       {m.nombre}
                     </SelectItem>
                   ))}
@@ -221,7 +226,7 @@ export default function CitaForm({ cita, mascotas, clientes, veterinarios, onSub
                 </SelectTrigger>
                 <SelectContent>
                   {estadosMaestros.map(e => (
-                    <SelectItem key={e.MaeestroID} value={e.MaeestroID}>
+                    <SelectItem key={e.MaeestroID} value={String(e.MaeestroID)}>
                       {e.nombre}
                     </SelectItem>
                   ))}
@@ -253,7 +258,7 @@ export default function CitaForm({ cita, mascotas, clientes, veterinarios, onSub
                   {formData.hora ? (
                     veterinariosDisponibles.length > 0 ? (
                       veterinariosDisponibles.map(v => (
-                        <SelectItem key={v.veterinario_id} value={v.veterinario_id}>
+                        <SelectItem key={v.veterinario_id} value={String(v.veterinario_id)}>
                           Dr. {v.nombres} {v.apellidos} {v.especialidad ? `- ${v.especialidad}` : ''}
                         </SelectItem>
                       ))

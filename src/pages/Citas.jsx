@@ -32,6 +32,7 @@ export default function Citas() {
         cliente_id: item?.cliente_id ? Number(item.cliente_id) : item?.cliente?.cliente_id,
         veterinario: item?.veterinario ? `${item.veterinario?.nombres || ''} ${item.veterinario?.apellidos || ''}`.trim() : '',
         veterinario_id: item?.veterinario_id ? Number(item.veterinario_id) : (item?.veterinario?.veterinario_id ?? undefined),
+        observaciones: item?.observaciones || '',
         mascota: item?.mascota || null,
         cliente: item?.cliente || null,
       }));
