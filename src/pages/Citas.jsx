@@ -4,6 +4,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Plus } from "lucide-react";
+import toastr from "toastr";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import CitasList from "../components/citas/CitasList";
 import CitasCalendar from "../components/citas/CitasCalendar";
@@ -126,7 +127,7 @@ export default function Citas() {
     );
 
     if (isConflict) {
-      alert('Ya existe una cita en ese horario. Por favor seleccione otro horario.');
+      toastr.warning('Ya existe una cita en ese horario. Por favor seleccione otro horario.');
       return;
     }
 
@@ -161,7 +162,7 @@ export default function Citas() {
       await queryClient.invalidateQueries({ queryKey: ['api_citas'] });
     } catch (e) {
       console.error(e);
-      alert('No se pudo actualizar el estado de la cita');
+      toastr.error('No se pudo actualizar el estado de la cita');
     }
   };
 

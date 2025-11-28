@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { X, Download, FileText, User, Mail, Phone, MapPin, PawPrint, Calendar, Stethoscope, Pill } from "lucide-react";
+import toastr from "toastr";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
 
@@ -74,7 +75,7 @@ export default function HistorialClinico({ mascotaId, onClose }) {
       pdf.save(`Historial_Clinico_${mascota?.nombre}_${format(new Date(), 'dd-MM-yyyy')}.pdf`);
     } catch (error) {
       console.error('Error generating PDF:', error);
-      alert('Error al generar el PDF. Por favor, intente nuevamente.');
+      toastr.error('Error al generar el PDF. Por favor, intente nuevamente.');
     } finally {
       setDownloading(false);
     }

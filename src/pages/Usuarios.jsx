@@ -9,15 +9,6 @@ import { Badge } from "@/components/ui/badge";
 import toastr from "toastr";
 import { Edit, Plus, Save, Search, X } from "lucide-react";
 
-toastr.options = {
-  closeButton: true,
-  progressBar: true,
-  positionClass: "toast-top-right",
-  timeOut: 4000,
-  hideDuration: 300,
-  showDuration: 300,
-};
-
 const fetchUsers = async () => {
   const response = await fetch("https://apivet.strategtic.com/api/user");
   const json = await response.json();
@@ -128,7 +119,6 @@ export default function Usuarios() {
   const [showForm, setShowForm] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
-  const [statusMessage, setStatusMessage] = useState(null);
   const queryClient = useQueryClient();
 
   const { data: users = [], isFetching, error } = useQuery({
@@ -156,11 +146,9 @@ export default function Usuarios() {
       queryClient.invalidateQueries({ queryKey: ["usuarios"] });
       setShowForm(false);
       setSelectedUser(null);
-      setStatusMessage(null);
     },
     onError: (err) => {
       toastr.error(err.message || "Error al crear el usuario.");
-      setStatusMessage({ type: "error", message: err.message || "Error al crear el usuario." });
     },
   });
 
@@ -182,16 +170,13 @@ export default function Usuarios() {
       queryClient.invalidateQueries({ queryKey: ["usuarios"] });
       setShowForm(false);
       setSelectedUser(null);
-      setStatusMessage(null);
     },
     onError: (err) => {
       toastr.error(err.message || "Error al actualizar el usuario.");
-      setStatusMessage({ type: "error", message: err.message || "Error al actualizar el usuario." });
     },
   });
 
   const handleSubmit = (formData) => {
-    setStatusMessage(null);
     if (selectedUser) {
       updateMutation.mutate({
         id: selectedUser.id,
@@ -213,7 +198,6 @@ export default function Usuarios() {
   const handleEdit = (user) => {
     setSelectedUser(user);
     setShowForm(true);
-    setStatusMessage(null);
   };
 
   const filteredUsers = useMemo(() => {
@@ -242,14 +226,13 @@ export default function Usuarios() {
             <h1 className="text-3xl font-bold text-gray-900">Gestión de usuarios</h1>
             <p className="text-gray-600 mt-1">Administra las cuentas que acceden al sistema.</p>
           </div>
-          <Button
-            className="bg-green-600 hover:bg-green-700"
-            onClick={() => {
-              setSelectedUser(null);
-              setShowForm(true);
-              setStatusMessage(null);
-            }}
-          >
+            <Button
+              className="bg-green-600 hover:bg-green-700"
+              onClick={() => {
+                setSelectedUser(null);
+                setShowForm(true);
+              }}
+            >
             <Plus className="w-4 h-4 mr-2" />
             Nuevo usuario
           </Button>
