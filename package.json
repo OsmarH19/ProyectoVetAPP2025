@@ -4,13 +4,11 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "concurrently -k -n client,api -c green,blue \"vite\" \"node server/index.js\"",
-    "server": "node server/index.js",
+    "dev": "vite",
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "start": "node server/index.js",
-    "heroku-postbuild": "npm run build"
+    "start": "vite preview"
   },
   "dependencies": {
     "@hookform/resolvers": "^4.1.2",
