@@ -9,7 +9,7 @@ export default function VeterinarioCard({ veterinario, onEdit, onDelete }) {
   const { data: diasMaestros = [] } = useQuery({
     queryKey: ["dias_maestros"],
     queryFn: async () => {
-      const res = await fetch("http://localhost:8000/api/mascotas/datos-maestros/14");
+      const res = await fetch("https://apivet.strategtic.com/api/mascotas/datos-maestros/14");
       const json = await res.json();
       return json?.data || [];
     },
@@ -18,7 +18,7 @@ export default function VeterinarioCard({ veterinario, onEdit, onDelete }) {
   const { data: turnos = [] } = useQuery({
     queryKey: ["turnos_veterinario", veterinario.id],
     queryFn: async () => {
-      const res = await fetch(`http://localhost:8000/api/turnos-veterinarios/veterinario/${veterinario.id}`);
+      const res = await fetch(`https://apivet.strategtic.com/api/turnos-veterinarios/veterinario/${veterinario.id}`);
       const json = await res.json();
       return json?.data || [];
     },

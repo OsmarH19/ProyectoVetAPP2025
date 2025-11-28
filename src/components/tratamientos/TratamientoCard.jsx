@@ -12,7 +12,7 @@ export default function TratamientoCard({ tratamiento, mascota, cliente, cita, o
     queryKey: ['api_medicamentos', tratamiento.id],
     queryFn: async () => {
       try {
-        const res = await fetch(`http://localhost:8000/api/medicamentos?tratamiento_id=${tratamiento.id}`)
+        const res = await fetch(`https://apivet.strategtic.com/api/medicamentos?tratamiento_id=${tratamiento.id}`)
         const json = await res.json()
         return Array.isArray(json?.data) ? json.data : []
       } catch (_) {

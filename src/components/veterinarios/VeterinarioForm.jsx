@@ -24,7 +24,7 @@ export default function VeterinarioForm({ veterinario, onSubmit, onCancel, isLoa
   const { data: diasMaestros = [] } = useQuery({
     queryKey: ["dias_maestros"],
     queryFn: async () => {
-      const res = await fetch("http://localhost:8000/api/mascotas/datos-maestros/14");
+      const res = await fetch("https://apivet.strategtic.com/api/mascotas/datos-maestros/14");
       const json = await res.json();
       return json?.data || [];
     },
@@ -34,7 +34,7 @@ export default function VeterinarioForm({ veterinario, onSubmit, onCancel, isLoa
     queryKey: ["turnos_veterinario", veterinario?.id],
     queryFn: async () => {
       if (!veterinario?.id) return [];
-      const res = await fetch(`http://localhost:8000/api/turnos-veterinarios/veterinario/${veterinario.id}`);
+      const res = await fetch(`https://apivet.strategtic.com/api/turnos-veterinarios/veterinario/${veterinario.id}`);
       const json = await res.json();
       return json?.data || [];
     },
@@ -119,8 +119,8 @@ export default function VeterinarioForm({ veterinario, onSubmit, onCancel, isLoa
         hora_fin: turno.hora_fin,
       };
       const url = turno.turno_id
-        ? `http://localhost:8000/api/turnos-veterinarios/${turno.turno_id}`
-        : `http://localhost:8000/api/turnos-veterinarios`;
+        ? `https://apivet.strategtic.com/api/turnos-veterinarios/${turno.turno_id}`
+        : `https://apivet.strategtic.com/api/turnos-veterinarios`;
       const method = turno.turno_id ? 'PATCH' : 'POST';
       const res = await fetch(url, {
         method,

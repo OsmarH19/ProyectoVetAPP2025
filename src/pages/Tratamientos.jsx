@@ -19,7 +19,7 @@ export default function Tratamientos() {
     queryKey: ['api_tratamientos'],
     queryFn: async () => {
       try {
-        const res = await fetch('http://localhost:8000/api/tratamientos')
+        const res = await fetch('https://apivet.strategtic.com/api/tratamientos')
         const json = await res.json()
         const items = Array.isArray(json?.data) ? json.data : []
         return items.map(item => ({
@@ -46,7 +46,7 @@ export default function Tratamientos() {
     queryKey: ['api_citas'],
     queryFn: async () => {
       try {
-        const res = await fetch('http://localhost:8000/api/citas')
+        const res = await fetch('https://apivet.strategtic.com/api/citas')
         const json = await res.json()
         const items = json?.data || []
         return items.map((item) => ({
@@ -73,7 +73,7 @@ export default function Tratamientos() {
     queryKey: ['api_mascotas'],
     queryFn: async () => {
       try {
-        const res = await fetch('http://localhost:8000/api/mascotas')
+        const res = await fetch('https://apivet.strategtic.com/api/mascotas')
         const json = await res.json()
         return Array.isArray(json?.data) ? json.data : []
       } catch (_) {
@@ -86,7 +86,7 @@ export default function Tratamientos() {
     queryKey: ['api_clientes'],
     queryFn: async () => {
       try {
-        const res = await fetch('http://localhost:8000/api/clientes')
+        const res = await fetch('https://apivet.strategtic.com/api/clientes')
         const json = await res.json()
         return Array.isArray(json?.data) ? json.data : []
       } catch (_) {

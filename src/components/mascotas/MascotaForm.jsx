@@ -30,7 +30,7 @@ export default function MascotaForm({ mascota, onCancel, isLoading }) {
   const { data: clientesApi = [] } = useQuery({
     queryKey: ["api_clientes"],
     queryFn: async () => {
-      const res = await fetch("http://localhost:8000/api/clientes");
+      const res = await fetch("https://apivet.strategtic.com/api/clientes");
       const json = await res.json();
       return json?.data || [];
     },
@@ -39,7 +39,7 @@ export default function MascotaForm({ mascota, onCancel, isLoading }) {
   const { data: especies = [] } = useQuery({
     queryKey: ["api_especies"],
     queryFn: async () => {
-      const res = await fetch("http://localhost:8000/api/mascotas/datos-maestros/11");
+      const res = await fetch("https://apivet.strategtic.com/api/mascotas/datos-maestros/11");
       const json = await res.json();
       return json?.data || [];
     },
@@ -48,7 +48,7 @@ export default function MascotaForm({ mascota, onCancel, isLoading }) {
   const { data: sexos = [] } = useQuery({
     queryKey: ["api_sexos"],
     queryFn: async () => {
-      const res = await fetch("http://localhost:8000/api/mascotas/datos-maestros/12");
+      const res = await fetch("https://apivet.strategtic.com/api/mascotas/datos-maestros/12");
       const json = await res.json();
       return json?.data || [];
     },
@@ -70,8 +70,8 @@ export default function MascotaForm({ mascota, onCancel, isLoading }) {
 
     const mascotaId = mascota?.id ?? mascota?.mascota_id;
     const url = mascotaId
-      ? `http://localhost:8000/api/mascotas/${mascotaId}`
-      : `http://localhost:8000/api/mascotas`;
+      ? `https://apivet.strategtic.com/api/mascotas/${mascotaId}`
+      : `https://apivet.strategtic.com/api/mascotas`;
     const method = mascotaId ? "POST" : "POST";
 
     setSubmitting(true);

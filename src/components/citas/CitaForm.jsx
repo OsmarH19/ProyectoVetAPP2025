@@ -58,8 +58,8 @@ export default function CitaForm({ cita, mascotas, clientes, veterinarios, onSub
     const loadMascotasYEstados = async () => {
       try {
         const [resMascotas, resEstados] = await Promise.all([
-          fetch('http://localhost:8000/api/mascotas'),
-          fetch('http://localhost:8000/api/mascotas/datos-maestros/13')
+          fetch('https://apivet.strategtic.com/api/mascotas'),
+          fetch('https://apivet.strategtic.com/api/mascotas/datos-maestros/13')
         ])
         const jsonMascotas = await resMascotas.json()
         const jsonEstados = await resEstados.json()
@@ -82,8 +82,8 @@ export default function CitaForm({ cita, mascotas, clientes, veterinarios, onSub
     const loadVeterinariosYTurnos = async () => {
       try {
         const [resVets, resTurnos] = await Promise.all([
-          fetch('http://localhost:8000/api/veterinarios'),
-          fetch('http://localhost:8000/api/turnos-veterinarios')
+          fetch('https://apivet.strategtic.com/api/veterinarios'),
+          fetch('https://apivet.strategtic.com/api/turnos-veterinarios')
         ])
         const jsonVets = await resVets.json()
         const jsonTurnos = await resTurnos.json()

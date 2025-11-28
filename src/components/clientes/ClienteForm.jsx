@@ -26,7 +26,7 @@ export default function ClienteForm({ cliente, onSubmit, onCancel, isLoading }) 
       setSubmitting(true);
       const updateId = cliente?.cliente_id ?? cliente?.id;
       if (updateId) {
-        const res = await fetch(`http://localhost:8000/api/clientes/${updateId}`, {
+        const res = await fetch(`https://apivet.strategtic.com/api/clientes/${updateId}`, {
           method: "PATCH",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(formData),
@@ -35,7 +35,7 @@ export default function ClienteForm({ cliente, onSubmit, onCancel, isLoading }) 
         const updated = await res.json();
         if (onSubmit) onSubmit(updated);
       } else {
-        const res = await fetch("http://localhost:8000/api/clientes", {
+        const res = await fetch("https://apivet.strategtic.com/api/clientes", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(formData),

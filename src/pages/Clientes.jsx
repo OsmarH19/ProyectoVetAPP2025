@@ -18,7 +18,7 @@ export default function Clientes() {
   const { data: clientes = [] } = useQuery({
     queryKey: ['clientes'],
     queryFn: async () => {
-      const res = await fetch('http://localhost:8000/api/clientes');
+      const res = await fetch('https://apivet.strategtic.com/api/clientes');
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const json = await res.json();
       const items = Array.isArray(json?.data) ? json.data : [];

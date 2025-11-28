@@ -16,7 +16,7 @@ export default function Veterinarios() {
   const { data: veterinarios = [] } = useQuery({
     queryKey: ['veterinarios_api'],
     queryFn: async () => {
-      const res = await fetch('http://localhost:8000/api/veterinarios');
+      const res = await fetch('https://apivet.strategtic.com/api/veterinarios');
       const json = await res.json();
       const arr = json?.data || [];
       return arr.map(v => ({
@@ -41,7 +41,7 @@ export default function Veterinarios() {
         email: data.email,
         activo: data.activo ? '1' : '0',
       };
-      const res = await fetch('http://localhost:8000/api/veterinarios', {
+      const res = await fetch('https://apivet.strategtic.com/api/veterinarios', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
@@ -66,7 +66,7 @@ export default function Veterinarios() {
         email: data.email,
         activo: data.activo ? '1' : '0',
       };
-      const res = await fetch(`http://localhost:8000/api/veterinarios/${id}`, {
+      const res = await fetch(`https://apivet.strategtic.com/api/veterinarios/${id}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),

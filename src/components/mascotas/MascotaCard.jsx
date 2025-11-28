@@ -111,7 +111,7 @@ export function MascotasApiCards({ onEdit, onDelete, searchTerm = "" }) {
   const { data, isLoading, isError } = useQuery({
     queryKey: ["mascotas_api"],
     queryFn: async () => {
-      const res = await fetch("http://localhost:8000/api/mascotas");
+      const res = await fetch("https://apivet.strategtic.com/api/mascotas");
       if (!res.ok) {
         throw new Error("Error al cargar mascotas");
       }

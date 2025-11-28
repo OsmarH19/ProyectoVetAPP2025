@@ -18,7 +18,7 @@ export default function Citas() {
   const { data: citas = [] } = useQuery({
     queryKey: ['api_citas'],
     queryFn: async () => {
-      const res = await fetch('http://localhost:8000/api/citas');
+      const res = await fetch('https://apivet.strategtic.com/api/citas');
       const json = await res.json();
       const items = json?.data || [];
       return items.map((item) => ({
@@ -68,7 +68,7 @@ export default function Citas() {
         observaciones: data.observaciones || '',
         activo: 1,
       }
-      const res = await fetch('http://localhost:8000/api/citas', {
+      const res = await fetch('https://apivet.strategtic.com/api/citas', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
@@ -95,7 +95,7 @@ export default function Citas() {
         veterinario_id: isNaN(Number(data.veterinario_id)) ? data.veterinario_id : Number(data.veterinario_id),
         observaciones: data.observaciones || '',
       }
-      const res = await fetch(`http://localhost:8000/api/citas/${id}`, {
+      const res = await fetch(`https://apivet.strategtic.com/api/citas/${id}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
@@ -150,7 +150,7 @@ export default function Citas() {
 
   const handleChangeStatus = async (id, newStatus) => {
     try {
-      const res = await fetch(`http://localhost:8000/api/citas/${id}`, {
+      const res = await fetch(`https://apivet.strategtic.com/api/citas/${id}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ estado: newStatus }),
