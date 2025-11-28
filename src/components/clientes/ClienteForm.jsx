@@ -27,7 +27,7 @@ export default function ClienteForm({ cliente, onSubmit, onCancel, isLoading }) 
       const updateId = cliente?.cliente_id ?? cliente?.id;
       if (updateId) {
         const res = await fetch(`https://apivet.strategtic.com/api/clientes/${updateId}`, {
-          method: "PATCH",
+          method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(formData),
         });
