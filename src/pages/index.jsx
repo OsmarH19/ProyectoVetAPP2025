@@ -18,6 +18,7 @@ import MisCitas from "./MisCitas";
 
 import Veterinarios from "./Veterinarios";
 
+import Usuarios from "./Usuarios";
 import { BrowserRouter as Router, Route, Routes, useLocation, Navigate } from 'react-router-dom';
 import Login from "./Login.jsx";
 
@@ -40,6 +41,7 @@ const PAGES = {
     MisCitas: MisCitas,
     
     Veterinarios: Veterinarios,
+    Usuarios: Usuarios,
     
 }
 
@@ -92,6 +94,7 @@ function PagesContent() {
         <Route path="/mismascotas" element={<ProtectedRoute element={<MisMascotas />} />} />
         <Route path="/miscitas" element={<ProtectedRoute element={<MisCitas />} />} />
         <Route path="/veterinarios" element={<ProtectedRoute element={<Veterinarios />} />} />
+        <Route path="/usuarios" element={<ProtectedRoute element={<Usuarios />} />} />
       </Routes>
     </Layout>
   );

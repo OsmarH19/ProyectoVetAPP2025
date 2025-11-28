@@ -8,12 +8,12 @@ import {
   PawPrint, 
   Calendar, 
   Stethoscope,
-  ClipboardList,
   LogOut,
   Menu,
   X,
   Heart,
-  UserCog
+  UserCog,
+  UserPlus
 } from "lucide-react";
 import {
   Sidebar,
@@ -83,6 +83,11 @@ export default function Layout({ children, currentPageName }) {
       title: "Veterinarios",
       url: createPageUrl("Veterinarios"),
       icon: UserCog,
+    },
+    {
+      title: "Usuarios",
+      url: createPageUrl("Usuarios"),
+      icon: UserPlus,
     },
   ];
 
