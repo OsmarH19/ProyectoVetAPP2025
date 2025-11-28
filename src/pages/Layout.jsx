@@ -111,7 +111,7 @@ export default function Layout({ children, currentPageName }) {
       localStorage.removeItem('auth_user')
       localStorage.removeItem('auth_token')
     } finally {
-      navigate('/Login', { replace: true })
+      navigate('/login', { replace: true })
     }
   };
 

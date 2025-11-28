@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { base44 } from "@/api/base44Client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -98,7 +99,7 @@ export default function Tratamientos() {
   const createMutation = useMutation({
     mutationFn: (data) => base44.entities.Tratamiento.create(data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['tratamientos'] });
+      queryClient.invalidateQueries({ queryKey: ['api_tratamientos'] });
       setShowForm(false);
       setEditingTratamiento(null);
     },
@@ -107,7 +108,7 @@ export default function Tratamientos() {
   const updateMutation = useMutation({
     mutationFn: ({ id, data }) => base44.entities.Tratamiento.update(id, data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['tratamientos'] });
+      queryClient.invalidateQueries({ queryKey: ['api_tratamientos'] });
       setShowForm(false);
       setEditingTratamiento(null);
     },
@@ -116,7 +117,7 @@ export default function Tratamientos() {
   const deleteMutation = useMutation({
     mutationFn: (id) => base44.entities.Tratamiento.delete(id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['tratamientos'] });
+      queryClient.invalidateQueries({ queryKey: ['api_tratamientos'] });
     },
   });
 

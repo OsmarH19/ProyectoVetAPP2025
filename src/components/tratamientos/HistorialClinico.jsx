@@ -273,7 +273,7 @@ export default function HistorialClinico({ mascotaId, onClose }) {
                             {cita.veterinario && (
                               <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
                                 <p className="text-xs text-blue-700 font-semibold mb-1">VETERINARIO RESPONSABLE</p>
-                                <p className="text-gray-900 font-medium">Dr. {cita.veterinario}</p>
+                                <p className="text-gray-900 font-medium">Dr. {typeof cita.veterinario === 'object' ? `${cita.veterinario?.nombres || ''} ${cita.veterinario?.apellidos || ''}`.trim() : cita.veterinario}</p>
                               </div>
                             )}
 

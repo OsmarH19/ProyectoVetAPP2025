@@ -66,7 +66,7 @@ export default function TratamientoCard({ tratamiento, mascota, cliente, cita, o
             </div>
             <div className="space-y-3">
               {medicamentos.map((med, index) => (
-                <div key={index} className="bg-white p-3 rounded border border-green-200">
+                <div key={med?.medicamento_id || `${med.nombre}-${index}`} className="bg-white p-3 rounded border border-green-200">
                   <p className="font-semibold text-gray-900">{med.nombre}</p>
                   <div className="grid grid-cols-2 gap-2 mt-2 text-sm text-gray-600">
                     {med.dosis && (
@@ -96,7 +96,7 @@ export default function TratamientoCard({ tratamiento, mascota, cliente, cita, o
         {tratamiento.veterinario && (
           <div className="border-t pt-3">
             <p className="text-sm text-gray-600">
-              <span className="font-semibold">Veterinario:</span> Dr. {tratamiento.veterinario}
+              <span className="font-semibold">Veterinario:</span> Dr. {typeof tratamiento.veterinario === 'object' ? `${tratamiento.veterinario?.nombres || ''} ${tratamiento.veterinario?.apellidos || ''}`.trim() : tratamiento.veterinario}
             </p>
           </div>
         )}

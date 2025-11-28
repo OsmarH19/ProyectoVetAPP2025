@@ -74,7 +74,7 @@ function PagesContent() {
   if (location.pathname.toLowerCase() === '/login') {
     return (
       <Routes>
-        <Route path="/Login" element={<Login />} />
+        <Route path="/login" element={<Login />} />
       </Routes>
     )
   }
@@ -82,16 +82,16 @@ function PagesContent() {
   return (
     <Layout currentPageName={currentPage}>
       <Routes>
-        <Route path="/" element={<Navigate to={isAuthenticated() ? "/Dashboard" : "/Login"} replace />} />
-        <Route path="/Dashboard" element={<ProtectedRoute element={<Dashboard />} />} />
-        <Route path="/Clientes" element={<ProtectedRoute element={<Clientes />} />} />
-        <Route path="/Mascotas" element={<ProtectedRoute element={<Mascotas />} />} />
-        <Route path="/Citas" element={<ProtectedRoute element={<Citas />} />} />
-        <Route path="/Tratamientos" element={<ProtectedRoute element={<Tratamientos />} />} />
-        <Route path="/ClienteDashboard" element={<ProtectedRoute element={<ClienteDashboard />} />} />
-        <Route path="/MisMascotas" element={<ProtectedRoute element={<MisMascotas />} />} />
-        <Route path="/MisCitas" element={<ProtectedRoute element={<MisCitas />} />} />
-        <Route path="/Veterinarios" element={<ProtectedRoute element={<Veterinarios />} />} />
+        <Route path="/" element={<Navigate to={isAuthenticated() ? "/dashboard" : "/login"} replace />} />
+        <Route path="/dashboard" element={<ProtectedRoute element={<Dashboard />} />} />
+        <Route path="/clientes" element={<ProtectedRoute element={<Clientes />} />} />
+        <Route path="/mascotas" element={<ProtectedRoute element={<Mascotas />} />} />
+        <Route path="/citas" element={<ProtectedRoute element={<Citas />} />} />
+        <Route path="/tratamientos" element={<ProtectedRoute element={<Tratamientos />} />} />
+        <Route path="/clientedashboard" element={<ProtectedRoute element={<ClienteDashboard />} />} />
+        <Route path="/mismascotas" element={<ProtectedRoute element={<MisMascotas />} />} />
+        <Route path="/miscitas" element={<ProtectedRoute element={<MisCitas />} />} />
+        <Route path="/veterinarios" element={<ProtectedRoute element={<Veterinarios />} />} />
       </Routes>
     </Layout>
   );

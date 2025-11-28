@@ -33,7 +33,21 @@ export default function MisCitas() {
     queryFn: async () => {
       if (!cliente?.id) return [];
       const all = await base44.entities.Cita.list('-fecha');
-      return all.filter(c => c.cliente_id === cliente.id);
+      return all
+        .filter(c => c.cliente_id === cliente.id)
+        .map(c => ({
+          id: c?.cita_id || c?.id,
+          fecha: c?.fecha,
+          hora: c?.hora,
+          motivo: c?.motivo,
+          estado: c?.estado?.nombre || c?.estado,
+          mascota_id: c?.mascota_id ?? c?.mascota?.mascota_id,
+          cliente_id: c?.cliente_id ?? c?.cliente?.cliente_id,
+          observaciones: c?.observaciones,
+          veterinario: typeof c?.veterinario === 'object'
+            ? `${c?.veterinario?.nombres || ''} ${c?.veterinario?.apellidos || ''}`.trim()
+            : (c?.veterinario || ''),
+        }));
     },
     enabled: !!cliente?.id,
   });
@@ -136,7 +150,7 @@ export default function MisCitas() {
                   <div className="space-y-2">
                     <p className="text-sm font-semibold text-gray-900">Medicamentos</p>
                     {medicamentos.map((med, idx) => (
-                      <div key={idx} className="bg-white p-2 rounded border border-green-200 text-sm">
+                      <div key={med?.medicamento_id || `${med.nombre}-${idx}`} className="bg-white p-2 rounded border border-green-200 text-sm">
                         <p className="font-semibold text-gray-900">{med.nombre}</p>
                         <div className="grid grid-cols-2 gap-2 mt-1 text-xs text-gray-600">
                           {med.dosis && (
