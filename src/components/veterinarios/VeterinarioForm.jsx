@@ -121,7 +121,7 @@ export default function VeterinarioForm({ veterinario, onSubmit, onCancel, isLoa
       const url = turno.turno_id
         ? `https://apivet.strategtic.com/api/turnos-veterinarios/${turno.turno_id}`
         : `https://apivet.strategtic.com/api/turnos-veterinarios`;
-      const method = turno.turno_id ? 'PATCH' : 'POST';
+      const method = turno.turno_id ? 'POST' : 'POST';
       const res = await fetch(url, {
         method,
         headers: { 'Content-Type': 'application/json' },

@@ -96,7 +96,7 @@ export default function Citas() {
         observaciones: data.observaciones || '',
       }
       const res = await fetch(`https://apivet.strategtic.com/api/citas/${id}`, {
-        method: 'PATCH',
+        method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
       })
@@ -151,7 +151,7 @@ export default function Citas() {
   const handleChangeStatus = async (id, newStatus) => {
     try {
       const res = await fetch(`https://apivet.strategtic.com/api/citas/${id}`, {
-        method: 'PATCH',
+        method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ estado: newStatus }),
       });

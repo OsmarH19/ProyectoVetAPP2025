@@ -67,7 +67,7 @@ export default function Veterinarios() {
         activo: data.activo ? '1' : '0',
       };
       const res = await fetch(`https://apivet.strategtic.com/api/veterinarios/${id}`, {
-        method: 'PATCH',
+        method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
       });
