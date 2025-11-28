@@ -254,20 +254,6 @@ export default function Usuarios() {
               </CardHeader>
             </Card>
 
-            {statusMessage && (
-              <div
-                role="status"
-                aria-live="polite"
-                className={`rounded-2xl border px-4 py-3 text-sm mb-4 ${
-                  statusMessage.type === "error"
-                    ? "border-destructive/60 bg-destructive/10 text-destructive"
-                    : "border-emerald-200 bg-emerald-50 text-emerald-700"
-                }`}
-              >
-                {statusMessage.message}
-              </div>
-            )}
-
             <Card className="shadow-lg">
               <CardHeader>
                 <CardTitle>Lista de usuarios ({filteredUsers.length})</CardTitle>
