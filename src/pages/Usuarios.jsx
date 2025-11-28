@@ -6,8 +6,17 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/componen
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
-import { toast } from "@/components/ui/use-toast";
+import toastr from "toastr";
 import { Edit, Plus, Save, Search, X } from "lucide-react";
+
+toastr.options = {
+  closeButton: true,
+  progressBar: true,
+  positionClass: "toast-top-right",
+  timeOut: 4000,
+  hideDuration: 300,
+  showDuration: 300,
+};
 
 const fetchUsers = async () => {
   const response = await fetch("https://apivet.strategtic.com/api/user");
@@ -143,12 +152,14 @@ export default function Usuarios() {
       return json;
     },
     onSuccess: () => {
-      toast({ title: "Usuario creado correctamente." });
+      toastr.success("Usuario creado correctamente.");
       queryClient.invalidateQueries({ queryKey: ["usuarios"] });
       setShowForm(false);
       setSelectedUser(null);
+      setStatusMessage(null);
     },
     onError: (err) => {
+      toastr.error(err.message || "Error al crear el usuario.");
       setStatusMessage({ type: "error", message: err.message || "Error al crear el usuario." });
     },
   });
@@ -167,12 +178,14 @@ export default function Usuarios() {
       return json;
     },
     onSuccess: () => {
-      toast({ title: "Usuario actualizado correctamente." });
+      toastr.success("Usuario actualizado correctamente.");
       queryClient.invalidateQueries({ queryKey: ["usuarios"] });
       setShowForm(false);
       setSelectedUser(null);
+      setStatusMessage(null);
     },
     onError: (err) => {
+      toastr.error(err.message || "Error al actualizar el usuario.");
       setStatusMessage({ type: "error", message: err.message || "Error al actualizar el usuario." });
     },
   });
