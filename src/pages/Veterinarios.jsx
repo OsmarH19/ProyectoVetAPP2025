@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Plus, Search } from "lucide-react";
+import toastr from "toastr";
 import VeterinarioCard from "../components/veterinarios/VeterinarioCard";
 import VeterinarioForm from "../components/veterinarios/VeterinarioForm";
 
@@ -46,13 +47,17 @@ export default function Veterinarios() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
       });
-      if (!res.ok) throw new Error('Error creando veterinario');
+      if (!res.ok) throw new Error('No fue posible registrar al veterinario');
       return res.json();
     },
     onSuccess: () => {
+      toastr.success("Veterinario registrado correctamente.");
       queryClient.invalidateQueries({ queryKey: ['veterinarios_api'] });
       setShowForm(false);
       setEditingVeterinario(null);
+    },
+    onError: (err) => {
+      toastr.error(err.message || "No se pudo crear el veterinario.");
     },
   });
 
@@ -71,13 +76,17 @@ export default function Veterinarios() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
       });
-      if (!res.ok) throw new Error('Error actualizando veterinario');
+      if (!res.ok) throw new Error('No fue posible actualizar el veterinario');
       return res.json();
     },
     onSuccess: () => {
+      toastr.success("Veterinario actualizado correctamente.");
       queryClient.invalidateQueries({ queryKey: ['veterinarios_api'] });
       setShowForm(false);
       setEditingVeterinario(null);
+    },
+    onError: (err) => {
+      toastr.error(err.message || "No se pudo actualizar el veterinario.");
     },
   });
 
@@ -86,7 +95,11 @@ export default function Veterinarios() {
       return Promise.resolve();
     },
     onSuccess: () => {
+      toastr.success("Veterinario eliminado correctamente.");
       queryClient.invalidateQueries({ queryKey: ['veterinarios_api'] });
+    },
+    onError: (err) => {
+      toastr.error(err.message || "No se pudo eliminar el veterinario.");
     },
   });
 

@@ -6,6 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { X, Save } from "lucide-react";
+import toastr from "toastr";
 
 export default function ClienteForm({ cliente, onSubmit, onCancel, isLoading }) {
 
@@ -33,6 +34,7 @@ export default function ClienteForm({ cliente, onSubmit, onCancel, isLoading }) 
         });
         if (!res.ok) throw new Error("error");
         const updated = await res.json();
+        toastr.success("Cliente actualizado correctamente.");
         if (onSubmit) onSubmit(updated);
       } else {
         const res = await fetch("https://apivet.strategtic.com/api/clientes", {
@@ -42,10 +44,12 @@ export default function ClienteForm({ cliente, onSubmit, onCancel, isLoading }) 
         });
         if (!res.ok) throw new Error("error");
         const created = await res.json();
+        toastr.success("Cliente creado correctamente.");
         if (onSubmit) onSubmit(created);
       }
     } catch (err) {
       console.error(err);
+      toastr.error(err?.message || "No se pudo guardar el cliente. Intenta nuevamente.");
     } finally {
       setSubmitting(false);
     }

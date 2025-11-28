@@ -56,7 +56,7 @@ export default function Citas() {
     queryFn: () => base44.entities.Veterinario.list(),
   });
 
-  const createMutation = useMutation({
+const createMutation = useMutation({
     mutationFn: async (data) => {
       const payload = {
         fecha: data.fecha,
@@ -74,13 +74,17 @@ export default function Citas() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
       })
-      if (!res.ok) throw new Error('Error creando cita')
+      if (!res.ok) throw new Error('No fue posible crear la cita')
       return res.json()
     },
     onSuccess: async () => {
+      toastr.success("Cita registrada correctamente.");
       await queryClient.invalidateQueries({ queryKey: ['api_citas'] });
       setShowForm(false);
       setEditingCita(null);
+    },
+    onError: (err) => {
+      toastr.error(err.message || "No se pudo crear la cita.");
     },
   });
 
@@ -101,13 +105,17 @@ export default function Citas() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
       })
-      if (!res.ok) throw new Error('Error actualizando cita')
+      if (!res.ok) throw new Error('No fue posible actualizar la cita')
       return res.json()
     },
     onSuccess: async () => {
+      toastr.success("Cita actualizada correctamente.");
       await queryClient.invalidateQueries({ queryKey: ['api_citas'] });
       setShowForm(false);
       setEditingCita(null);
+    },
+    onError: (err) => {
+      toastr.error(err.message || "No se pudo actualizar la cita.");
     },
   });
 
@@ -115,6 +123,10 @@ export default function Citas() {
     mutationFn: (id) => base44.entities.Cita.delete(id),
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ['api_citas'] });
+      toastr.success("Cita eliminada correctamente.");
+    },
+    onError: (err) => {
+      toastr.error(err.message || "No se pudo eliminar la cita.");
     },
   });
 
