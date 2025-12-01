@@ -47,6 +47,25 @@ export default function HistorialClinico({ mascotaId, onClose }) {
     },
   });
 
+  const { data: medicamentosPorTratamiento = {} } = useQuery({
+    queryKey: ['medicamentos_por_tratamiento', mascotaId, (Array.isArray(tratamientos) ? tratamientos.map(t => t?.tratamiento_id || t?.id).join(',') : '')],
+    queryFn: async () => {
+      const ids = (tratamientos || []).map(t => t?.tratamiento_id || t?.id).filter(Boolean);
+      const map = {};
+      await Promise.all(ids.map(async (id) => {
+        try {
+          const res = await fetch(`https://apivet.strategtic.com/api/medicamentos?tratamiento_id=${id}`);
+          const json = await res.json();
+          map[id] = Array.isArray(json?.data) ? json.data : [];
+        } catch (_) {
+          map[id] = [];
+        }
+      }));
+      return map;
+    },
+    enabled: Array.isArray(tratamientos) && tratamientos.length > 0,
+  });
+
   const handleDownloadPDF = async () => {
     setDownloading(true);
     try {
@@ -238,7 +257,10 @@ export default function HistorialClinico({ mascotaId, onClose }) {
               <div className="space-y-6">
                 {citas.map((cita, index) => {
                   const tratamiento = tratamientos.find(t => t.cita_id === cita.id);
-                  const medicamentos = tratamiento && Array.isArray(tratamiento.medicamentos) ? tratamiento.medicamentos : [];
+                  const tId = tratamiento?.tratamiento_id || tratamiento?.id;
+                  const medicamentos = tratamiento && Array.isArray(tratamiento.medicamentos)
+                    ? tratamiento.medicamentos
+                    : (tId ? (medicamentosPorTratamiento[tId] || []) : []);
                   
                   return (
                     <div key={cita.id} className="border-l-4 border-green-500 pl-6 relative">

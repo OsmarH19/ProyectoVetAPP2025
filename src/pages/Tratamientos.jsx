@@ -96,8 +96,59 @@ export default function Tratamientos() {
     },
   });
 
+  const { data: veterinarios = [] } = useQuery({
+    queryKey: ['api_veterinarios'],
+    queryFn: async () => {
+      try {
+        const res = await fetch('https://apivet.strategtic.com/api/veterinarios')
+        const json = await res.json()
+        return Array.isArray(json?.data) ? json.data : []
+      } catch (_) {
+        return []
+      }
+    },
+  });
+
   const createMutation = useMutation({
-    mutationFn: (data) => base44.entities.Tratamiento.create(data),
+    mutationFn: async (data) => {
+      const body = {
+        cita_id: Number(data.cita_id),
+        diagnostico: data.diagnostico,
+        tratamiento_indicado: data.tratamiento_indicado,
+        recomendaciones: data.recomendaciones || '',
+        veterinario_id: Number(data.veterinario_id),
+        cliente_id: Number(data.cliente_id),
+        mascota_id: Number(data.mascota_id),
+      };
+
+      const res = await fetch('https://apivet.strategtic.com/api/tratamientos', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+      });
+      const json = await res.json();
+      const created = json?.data || json;
+      const tratamientoId = created?.tratamiento_id || created?.id || created?.data?.tratamiento_id;
+
+      if (!tratamientoId) throw new Error('No se obtuvo tratamiento_id tras crear tratamiento');
+
+      const meds = Array.isArray(data.medicamentos) ? data.medicamentos.filter(m => (m.nombre || '').trim() !== '') : [];
+      await Promise.all(meds.map(async (m) => {
+        const medBody = {
+          tratamiento_id: Number(tratamientoId),
+          nombre: m.nombre,
+          dosis: m.dosis || '',
+          duracion: m.duracion || '',
+        };
+        await fetch('https://apivet.strategtic.com/api/medicamentos', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(medBody),
+        });
+      }));
+
+      return created;
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['api_tratamientos'] });
       setShowForm(false);
@@ -176,6 +227,7 @@ export default function Tratamientos() {
             citas={citas}
             mascotas={mascotas}
             clientes={clientes}
+            veterinarios={veterinarios}
             onSubmit={handleSubmit}
             onCancel={() => {
               setShowForm(false);

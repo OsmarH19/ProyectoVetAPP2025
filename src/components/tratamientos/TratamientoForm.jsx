@@ -7,14 +7,14 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { X, Save, Plus, Trash2 } from "lucide-react";
 
-export default function TratamientoForm({ tratamiento, citas, mascotas, clientes, onSubmit, onCancel, isLoading }) {
+export default function TratamientoForm({ tratamiento, citas, mascotas, clientes, veterinarios, onSubmit, onCancel, isLoading }) {
   const [formData, setFormData] = useState(tratamiento || {
     cita_id: "",
     diagnostico: "",
     tratamiento_indicado: "",
     medicamentos: [{ nombre: "", dosis: "", duracion: "" }],
     recomendaciones: "",
-    veterinario: "",
+    veterinario_id: "",
     mascota_id: "",
     cliente_id: "",
   });
@@ -33,12 +33,17 @@ export default function TratamientoForm({ tratamiento, citas, mascotas, clientes
       const newData = { ...prev, [field]: value };
       
       if (field === 'cita_id' && value) {
-        const cita = citas.find(c => c.id === value);
+        const idNum = isNaN(Number(value)) ? value : Number(value);
+        const cita = citas.find(c => c.id === idNum);
         if (cita) {
           newData.mascota_id = cita.mascota_id;
           newData.cliente_id = cita.cliente_id;
-          newData.veterinario = cita.veterinario || '';
+          newData.veterinario_id = cita.veterinario_id;
+          newData.cita_id = cita.id;
         }
+      }
+      if (field === 'veterinario_id' && value) {
+        newData.veterinario_id = isNaN(Number(value)) ? value : Number(value);
       }
       
       return newData;
@@ -67,7 +72,7 @@ export default function TratamientoForm({ tratamiento, citas, mascotas, clientes
     }));
   };
 
-  const citasCompletadas = citas.filter(c => c.estado === 'Completada');
+  const citasCompletadas = citas.filter(c => (c.estado || '').toLowerCase() === 'confirmada' || (c.estado || '').toLowerCase() === 'completada');
 
   return (
     <Card className="mb-6 shadow-lg">
@@ -90,11 +95,12 @@ export default function TratamientoForm({ tratamiento, citas, mascotas, clientes
               </SelectTrigger>
               <SelectContent>
                 {citasCompletadas.map(c => {
-                  const mascota = mascotas.find(m => m.id === c.mascota_id);
-                  const cliente = clientes.find(cl => cl.id === c.cliente_id);
+                  const mascota = mascotas.find(m => (m.mascota_id || m.id) === c.mascota_id);
+                  const cliente = clientes.find(cl => (cl.cliente_id || cl.id) === c.cliente_id);
+                  const labelCliente = `${cliente?.nombres || ''} ${cliente?.apellidos || ''}`.trim();
                   return (
-                    <SelectItem key={c.id} value={c.id}>
-                      {c.fecha} - {mascota?.nombre} ({cliente?.nombres} {cliente?.apellidos})
+                    <SelectItem key={c.id} value={String(c.id)}>
+                      {c.fecha} {c.hora} - {mascota?.nombre} {labelCliente ? `(${labelCliente})` : ''}
                     </SelectItem>
                   );
                 })}
@@ -199,12 +205,23 @@ export default function TratamientoForm({ tratamiento, citas, mascotas, clientes
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="veterinario">Veterinario</Label>
-            <Input
-              id="veterinario"
-              value={formData.veterinario}
-              onChange={(e) => handleChange('veterinario', e.target.value)}
-            />
+            <Label htmlFor="veterinario_id">Veterinario *</Label>
+            <Select
+              value={formData.veterinario_id ? String(formData.veterinario_id) : ""}
+              onValueChange={(value) => handleChange('veterinario_id', value)}
+              required
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Seleccionar veterinario" />
+              </SelectTrigger>
+              <SelectContent>
+                {(veterinarios || []).map(v => (
+                  <SelectItem key={v.veterinario_id || v.id} value={String(v.veterinario_id || v.id)}>
+                    Dr. {v.nombres} {v.apellidos}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
         </CardContent>
         <CardFooter className="flex justify-end gap-3">
