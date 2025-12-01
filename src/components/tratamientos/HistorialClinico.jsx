@@ -12,7 +12,6 @@ export default function HistorialClinico({ mascotaId, onClose, autoGeneratePdf }
   const printRef = useRef();
   const [downloading, setDownloading] = useState(false);
   const [autoRan, setAutoRan] = useState(false);
-  const [pdfUrl, setPdfUrl] = useState(null);
 
   const { data: mascota } = useQuery({
     queryKey: ['api_mascota', mascotaId],
@@ -157,51 +156,7 @@ export default function HistorialClinico({ mascotaId, onClose, autoGeneratePdf }
     }
   };
 
-  const generateInlinePDF = async () => {
-    try {
-      const html2canvas = (await import('html2canvas')).default;
-      const jsPDF = (await import('jspdf')).default;
-
-      const element = printRef.current;
-      const canvas = await html2canvas(element, {
-        scale: 2,
-        useCORS: true,
-        logging: false,
-        backgroundColor: '#ffffff'
-      });
-
-      const imgData = canvas.toDataURL('image/png');
-      const pdf = new jsPDF('p', 'mm', 'a4');
-      const pdfWidth = pdf.internal.pageSize.getWidth();
-      const pdfHeight = pdf.internal.pageSize.getHeight();
-      const imgWidth = canvas.width;
-      const imgHeight = canvas.height;
-      const ratio = Math.min(pdfWidth / imgWidth, pdfHeight / imgHeight);
-      const imgX = (pdfWidth - imgWidth * ratio) / 2;
-      const imgY = 0;
-
-      pdf.addImage(imgData, 'PNG', imgX, imgY, imgWidth * ratio, imgHeight * ratio);
-      const blob = pdf.output('blob');
-      const url = URL.createObjectURL(blob);
-      setPdfUrl(url);
-    } catch (error) {
-      console.error('Error generating inline PDF:', error);
-    }
-  };
-
-  React.useEffect(() => {
-    const ready = mascota !== undefined && Array.isArray(citas) && Array.isArray(tratamientos);
-    if (autoGeneratePdf && !autoRan && ready && printRef.current) {
-      setAutoRan(true);
-      setTimeout(() => generateInlinePDF(), 300);
-    }
-  }, [autoGeneratePdf, autoRan, printRef, mascota, citas, tratamientos]);
-
-  React.useEffect(() => {
-    return () => {
-      if (pdfUrl) URL.revokeObjectURL(pdfUrl);
-    };
-  }, [pdfUrl]);
+  
 
   const estadoColors = {
     "Pendiente": "bg-yellow-100 text-yellow-800 border-yellow-300",
@@ -249,13 +204,6 @@ export default function HistorialClinico({ mascotaId, onClose, autoGeneratePdf }
         </CardHeader>
 
         <CardContent className="p-8 space-y-6 overflow-auto flex-1 bg-gray-50">
-          {pdfUrl ? (
-            <object data={pdfUrl} type="application/pdf" className="w-full h-[72vh] rounded-lg border">
-              <p className="p-4">Tu navegador no soporta visor PDF integrado. 
-                <a href={pdfUrl} target="_blank" rel="noreferrer" className="text-blue-600 underline">Abrir en nueva pestaña</a>
-              </p>
-            </object>
-          ) : (
           <div ref={printRef} className="bg-white p-8 rounded-lg shadow-sm">
             {/* Header con logo */}
             <div className="bg-gradient-to-r from-green-600 to-blue-600 text-white p-8 rounded-t-xl mb-6">
@@ -504,7 +452,6 @@ export default function HistorialClinico({ mascotaId, onClose, autoGeneratePdf }
               </div>
             </div>
           </div>
-          )}
         </CardContent>
       </Card>
     </div>
