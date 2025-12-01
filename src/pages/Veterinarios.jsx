@@ -12,6 +12,8 @@ export default function Veterinarios() {
   const [showForm, setShowForm] = useState(false);
   const [editingVeterinario, setEditingVeterinario] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
+  const [page, setPage] = useState(1);
+  const perPage = 6;
   const queryClient = useQueryClient();
 
   const { data: veterinarios = [] } = useQuery({
@@ -128,6 +130,12 @@ export default function Veterinarios() {
     v.especialidad?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
+  const totalPages = Math.max(1, Math.ceil(filteredVeterinarios.length / perPage));
+  const currentPage = Math.min(page, totalPages);
+  const start = (currentPage - 1) * perPage;
+  const pagedVeterinarios = filteredVeterinarios.slice(start, start + perPage);
+  React.useEffect(() => { setPage(1); }, [searchTerm]);
+
   return (
     <div className="p-4 md:p-8">
       <div className="max-w-7xl mx-auto">
@@ -175,7 +183,7 @@ export default function Veterinarios() {
             </Card>
 
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {filteredVeterinarios.map((veterinario) => (
+              {pagedVeterinarios.map((veterinario) => (
                 <VeterinarioCard
                   key={veterinario.id}
                   veterinario={veterinario}
@@ -188,6 +196,13 @@ export default function Veterinarios() {
                   No se encontraron veterinarios
                 </div>
               )}
+            </div>
+            <div className="flex items-center justify-between mt-4">
+              <p className="text-sm text-gray-600">Página {currentPage} de {totalPages}</p>
+              <div className="flex gap-2">
+                <Button variant="outline" onClick={() => setPage(p => Math.max(1, p - 1))} disabled={currentPage === 1}>Anterior</Button>
+                <Button variant="outline" onClick={() => setPage(p => Math.min(totalPages, p + 1))} disabled={currentPage === totalPages}>Siguiente</Button>
+              </div>
             </div>
           </>
         )}

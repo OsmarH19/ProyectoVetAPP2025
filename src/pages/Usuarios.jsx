@@ -119,6 +119,8 @@ export default function Usuarios() {
   const [showForm, setShowForm] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
+  const [page, setPage] = useState(1);
+  const perPage = 10;
   const queryClient = useQueryClient();
 
   const { data: users = [], isFetching, error } = useQuery({
@@ -212,6 +214,12 @@ export default function Usuarios() {
     });
   }, [searchTerm, users]);
 
+  const totalPages = Math.max(1, Math.ceil(filteredUsers.length / perPage));
+  const currentPage = Math.min(page, totalPages);
+  const start = (currentPage - 1) * perPage;
+  const pagedUsers = filteredUsers.slice(start, start + perPage);
+  React.useEffect(() => { setPage(1); }, [searchTerm]);
+
   const roleLabel = (user) => {
     if (user?.profileID === 1) return "Administrador";
     if (user?.profileID === null) return "Invitado";
@@ -271,7 +279,7 @@ export default function Usuarios() {
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {filteredUsers.map((user) => (
+                      {pagedUsers.map((user) => (
                         <TableRow key={user.id} className="hover:bg-gray-50">
                           <TableCell className="font-semibold text-gray-900">{user.name}</TableCell>
                           <TableCell className="text-sm text-gray-600 break-words">{user.email}</TableCell>
@@ -303,6 +311,13 @@ export default function Usuarios() {
                       )}
                     </TableBody>
                   </Table>
+                </div>
+                <div className="flex items-center justify-between mt-4">
+                  <p className="text-sm text-gray-600">Página {currentPage} de {totalPages}</p>
+                  <div className="flex gap-2">
+                    <Button variant="outline" onClick={() => setPage(p => Math.max(1, p - 1))} disabled={currentPage === 1}>Anterior</Button>
+                    <Button variant="outline" onClick={() => setPage(p => Math.min(totalPages, p + 1))} disabled={currentPage === totalPages}>Siguiente</Button>
+                  </div>
                 </div>
               </CardContent>
             </Card>

@@ -13,6 +13,8 @@ export default function Tratamientos() {
   const [showForm, setShowForm] = useState(false);
   const [editingTratamiento, setEditingTratamiento] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
+  const [page, setPage] = useState(1);
+  const perPage = 2;
   const [selectedMascotaId, setSelectedMascotaId] = useState(null);
   const [autoPdfMascotaId, setAutoPdfMascotaId] = useState(null);
   const queryClient = useQueryClient();
@@ -362,6 +364,12 @@ export default function Tratamientos() {
     return searchMatch;
   });
 
+  const totalPages = Math.max(1, Math.ceil(filteredTratamientos.length / perPage));
+  const currentPage = Math.min(page, totalPages);
+  const start = (currentPage - 1) * perPage;
+  const pagedTratamientos = filteredTratamientos.slice(start, start + perPage);
+  React.useEffect(() => { setPage(1); }, [searchTerm]);
+
   return (
     <div className="p-4 md:p-8">
       <div className="max-w-7xl mx-auto">
@@ -421,7 +429,7 @@ export default function Tratamientos() {
             </Card>
 
             <div className="grid md:grid-cols-2 gap-6">
-              {filteredTratamientos.map((tratamiento) => (
+              {pagedTratamientos.map((tratamiento) => (
                 <TratamientoCard
                   key={tratamiento.id}
                   tratamiento={tratamiento}
@@ -438,6 +446,13 @@ export default function Tratamientos() {
                   No se encontraron tratamientos
                 </div>
               )}
+            </div>
+            <div className="flex items-center justify-between mt-4">
+              <p className="text-sm text-gray-600">Página {currentPage} de {totalPages}</p>
+              <div className="flex gap-2">
+                <Button variant="outline" onClick={() => setPage(p => Math.max(1, p - 1))} disabled={currentPage === 1}>Anterior</Button>
+                <Button variant="outline" onClick={() => setPage(p => Math.min(totalPages, p + 1))} disabled={currentPage === totalPages}>Siguiente</Button>
+              </div>
             </div>
           </>
         )}

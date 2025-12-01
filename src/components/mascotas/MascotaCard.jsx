@@ -119,15 +119,6 @@ export function MascotasApiCards({ onEdit, onDelete, searchTerm = "" }) {
       return json?.data || [];
     },
   });
-
-  if (isLoading) {
-    return <div className="p-4 text-center text-gray-600">Cargando mascotas...</div>;
-  }
-
-  if (isError) {
-    return <div className="p-4 text-center text-red-600">Error al cargar mascotas</div>;
-  }
-
   const normalize = (item) => ({
     id: item?.mascota_id,
     nombre: item?.nombre,
@@ -146,6 +137,9 @@ export function MascotasApiCards({ onEdit, onDelete, searchTerm = "" }) {
     nombre_completo: item?.cliente?.nombre_completo,
   });
 
+  const [page, setPage] = React.useState(1);
+  const perPage = 6;
+
   const filtered = (data || []).filter((item) => {
     const nombre = item?.nombre || "";
     const especieNombre = item?.especie?.nombre || "";
@@ -158,9 +152,24 @@ export function MascotasApiCards({ onEdit, onDelete, searchTerm = "" }) {
     );
   });
 
+  const totalPages = Math.max(1, Math.ceil(filtered.length / perPage));
+  const currentPage = Math.min(page, totalPages);
+  const start = (currentPage - 1) * perPage;
+  const paged = filtered.slice(start, start + perPage);
+  React.useEffect(() => { setPage(1); }, [searchTerm]);
+
+  if (isLoading) {
+    return <div className="p-4 text-center text-gray-600">Cargando mascotas...</div>;
+  }
+
+  if (isError) {
+    return <div className="p-4 text-center text-red-600">Error al cargar mascotas</div>;
+  }
+
   return (
+    <>
     <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-      {filtered.map((m) => (
+      {paged.map((m) => (
         <MascotaCard
           key={m.mascota_id}
           mascota={normalize(m)}
@@ -173,5 +182,13 @@ export function MascotasApiCards({ onEdit, onDelete, searchTerm = "" }) {
         <div className="col-span-full text-center py-12 text-gray-500">No se encontraron mascotas</div>
       )}
     </div>
+    <div className="flex items-center justify-between mt-4">
+      <p className="text-sm text-gray-600">Página {currentPage} de {totalPages}</p>
+      <div className="flex gap-2">
+        <Button variant="outline" onClick={() => setPage(p => Math.max(1, p - 1))} disabled={currentPage === 1}>Anterior</Button>
+        <Button variant="outline" onClick={() => setPage(p => Math.min(totalPages, p + 1))} disabled={currentPage === totalPages}>Siguiente</Button>
+      </div>
+    </div>
+    </>
   );
 }

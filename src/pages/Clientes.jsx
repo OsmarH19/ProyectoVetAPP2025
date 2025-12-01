@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
@@ -13,6 +13,8 @@ export default function Clientes() {
   const [showForm, setShowForm] = useState(false);
   const [editingCliente, setEditingCliente] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
+  const [page, setPage] = useState(1);
+  const perPage = 5;
   const queryClient = useQueryClient();
 
   const { data: clientes = [] } = useQuery({
@@ -59,6 +61,13 @@ export default function Clientes() {
     c.dni?.includes(searchTerm) ||
     c.email?.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  const totalPages = Math.max(1, Math.ceil(filteredClientes.length / perPage));
+  const currentPage = Math.min(page, totalPages);
+  const start = (currentPage - 1) * perPage;
+  const pagedClientes = filteredClientes.slice(start, start + perPage);
+
+  useEffect(() => { setPage(1); }, [searchTerm]);
 
   return (
     <div className="p-4 md:p-8">
@@ -123,7 +132,7 @@ export default function Clientes() {
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {filteredClientes.map((cliente) => (
+                      {pagedClientes.map((cliente) => (
                         <TableRow key={cliente.id} className="hover:bg-gray-50">
                           <TableCell>
                             <div className="flex items-center gap-3">
@@ -185,6 +194,13 @@ export default function Clientes() {
                       )}
                     </TableBody>
                   </Table>
+                </div>
+                <div className="flex items-center justify-between mt-4">
+                  <p className="text-sm text-gray-600">Página {currentPage} de {totalPages}</p>
+                  <div className="flex gap-2">
+                    <Button variant="outline" onClick={() => setPage(p => Math.max(1, p - 1))} disabled={currentPage === 1}>Anterior</Button>
+                    <Button variant="outline" onClick={() => setPage(p => Math.min(totalPages, p + 1))} disabled={currentPage === totalPages}>Siguiente</Button>
+                  </div>
                 </div>
               </CardContent>
             </Card>

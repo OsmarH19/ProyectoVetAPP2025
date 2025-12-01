@@ -10,6 +10,8 @@ import { es } from "date-fns/locale";
 
 export default function CitasList({ citas, mascotas, clientes, onEdit, onDelete, onChangeStatus }) {
   const [filterEstado, setFilterEstado] = useState("all");
+  const [page, setPage] = useState(1);
+  const perPage = 10;
 
   const estadoColors = {
     "Pendiente": "bg-yellow-100 text-yellow-800 border-yellow-300",
@@ -21,6 +23,13 @@ export default function CitasList({ citas, mascotas, clientes, onEdit, onDelete,
   const filteredCitas = filterEstado === "all" 
     ? citas 
     : citas.filter(c => c.estado === filterEstado);
+
+  const totalPages = Math.max(1, Math.ceil(filteredCitas.length / perPage));
+  const currentPage = Math.min(page, totalPages);
+  const start = (currentPage - 1) * perPage;
+  const pagedCitas = filteredCitas.slice(start, start + perPage);
+  
+  React.useEffect(() => { setPage(1); }, [filterEstado]);
 
   return (
     <Card className="shadow-lg">
@@ -55,7 +64,7 @@ export default function CitasList({ citas, mascotas, clientes, onEdit, onDelete,
               </TableRow>
             </TableHeader>
             <TableBody>
-              {filteredCitas.map((cita) => {
+              {pagedCitas.map((cita) => {
                 const mascota = mascotas.find(m => m.id === cita.mascota_id);
                 const cliente = clientes.find(c => c.id === cita.cliente_id);
                 const mascotaNombre = mascota?.nombre ?? cita?.mascota?.nombre;
@@ -146,6 +155,13 @@ export default function CitasList({ citas, mascotas, clientes, onEdit, onDelete,
               )}
             </TableBody>
           </Table>
+        </div>
+        <div className="flex items-center justify-between mt-4">
+          <p className="text-sm text-gray-600">Página {currentPage} de {totalPages}</p>
+          <div className="flex gap-2">
+            <Button variant="outline" onClick={() => setPage(p => Math.max(1, p - 1))} disabled={currentPage === 1}>Anterior</Button>
+            <Button variant="outline" onClick={() => setPage(p => Math.min(totalPages, p + 1))} disabled={currentPage === totalPages}>Siguiente</Button>
+          </div>
         </div>
       </CardContent>
     </Card>
