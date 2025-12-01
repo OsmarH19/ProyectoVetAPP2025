@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -8,16 +8,46 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { X, Save, Plus, Trash2 } from "lucide-react";
 
 export default function TratamientoForm({ tratamiento, citas, mascotas, clientes, veterinarios, onSubmit, onCancel, isLoading }) {
-  const [formData, setFormData] = useState(tratamiento || {
-    cita_id: "",
-    diagnostico: "",
-    tratamiento_indicado: "",
-    medicamentos: [{ nombre: "", dosis: "", duracion: "" }],
-    recomendaciones: "",
-    veterinario_id: "",
-    mascota_id: "",
-    cliente_id: "",
-  });
+  const [formData, setFormData] = useState(() => ({
+    cita_id: tratamiento?.cita_id ?? "",
+    diagnostico: tratamiento?.diagnostico ?? "",
+    tratamiento_indicado: tratamiento?.tratamiento_indicado ?? "",
+    medicamentos: Array.isArray(tratamiento?.medicamentos) && tratamiento.medicamentos.length > 0 
+      ? tratamiento.medicamentos.map(m => ({
+          medicamento_id: m?.medicamento_id || m?.id,
+          nombre: m?.nombre || "",
+          dosis: m?.dosis || "",
+          duracion: m?.duracion || "",
+        }))
+      : [{ nombre: "", dosis: "", duracion: "" }],
+    recomendaciones: tratamiento?.recomendaciones ?? "",
+    veterinario_id: tratamiento?.veterinario_id ?? "",
+    mascota_id: tratamiento?.mascota_id ?? "",
+    cliente_id: tratamiento?.cliente_id ?? "",
+  }));
+
+  useEffect(() => {
+    const loadMedications = async () => {
+      if (tratamiento?.id) {
+        try {
+          const res = await fetch(`https://apivet.strategtic.com/api/medicamentos?tratamiento_id=${tratamiento.id}`);
+          const json = await res.json();
+          const meds = Array.isArray(json?.data) ? json.data : [];
+          setFormData(prev => ({
+            ...prev,
+            medicamentos: meds.length > 0 ? meds.map(m => ({
+              medicamento_id: m?.medicamento_id,
+              nombre: m?.nombre || '',
+              dosis: m?.dosis || '',
+              duracion: m?.duracion || '',
+            })) : prev.medicamentos
+          }));
+        } catch (_) {
+        }
+      }
+    };
+    loadMedications();
+  }, [tratamiento?.id]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -144,7 +174,7 @@ export default function TratamientoForm({ tratamiento, citas, mascotas, clientes
               </Button>
             </div>
             
-            {formData.medicamentos.map((med, index) => (
+            {(formData.medicamentos || []).map((med, index) => (
               <Card key={index} className="p-4 bg-gray-50">
                 <div className="space-y-3">
                   <div className="flex justify-between items-center mb-2">

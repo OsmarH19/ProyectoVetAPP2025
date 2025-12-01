@@ -157,7 +157,48 @@ export default function Tratamientos() {
   });
 
   const updateMutation = useMutation({
-    mutationFn: ({ id, data }) => base44.entities.Tratamiento.update(id, data),
+    mutationFn: async ({ id, data }) => {
+      const body = {
+        cita_id: Number(data.cita_id),
+        diagnostico: data.diagnostico,
+        tratamiento_indicado: data.tratamiento_indicado,
+        recomendaciones: data.recomendaciones || '',
+        veterinario_id: Number(data.veterinario_id),
+        cliente_id: Number(data.cliente_id),
+        mascota_id: Number(data.mascota_id),
+      };
+
+      const res = await fetch(`https://apivet.strategtic.com/api/tratamientos/${id}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+      });
+      await res.json();
+
+      const meds = Array.isArray(data.medicamentos) ? data.medicamentos.filter(m => (m.nombre || '').trim() !== '') : [];
+      await Promise.all(meds.map(async (m) => {
+        const medBody = {
+          tratamiento_id: Number(id),
+          nombre: m.nombre,
+          dosis: m.dosis || '',
+          duracion: m.duracion || '',
+        };
+        if (m.medicamento_id || m.id) {
+          const medId = m.medicamento_id || m.id;
+          await fetch(`https://apivet.strategtic.com/api/medicamentos/${medId}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(medBody),
+          });
+        } else {
+          await fetch('https://apivet.strategtic.com/api/medicamentos', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ ...medBody }),
+          });
+        }
+      }));
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['api_tratamientos'] });
       setShowForm(false);
