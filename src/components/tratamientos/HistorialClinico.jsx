@@ -1,5 +1,4 @@
 import React, { useRef, useState } from "react";
-import { base44 } from "@/api/base44Client";
 import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -9,41 +8,94 @@ import toastr from "toastr";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
 
-export default function HistorialClinico({ mascotaId, onClose }) {
+export default function HistorialClinico({ mascotaId, onClose, autoGeneratePdf }) {
   const printRef = useRef();
   const [downloading, setDownloading] = useState(false);
+  const [autoRan, setAutoRan] = useState(false);
+  const [pdfUrl, setPdfUrl] = useState(null);
 
   const { data: mascota } = useQuery({
-    queryKey: ['mascota', mascotaId],
+    queryKey: ['api_mascota', mascotaId],
     queryFn: async () => {
-      const mascotas = await base44.entities.Mascota.list();
-      return mascotas.find(m => m.id === mascotaId);
+      try {
+        const res = await fetch('https://apivet.strategtic.com/api/mascotas');
+        const json = await res.json();
+        const items = Array.isArray(json?.data) ? json.data : [];
+        return items.find(m => (m?.mascota_id || m?.id) === mascotaId);
+      } catch (_) {
+        return null;
+      }
     },
   });
 
   const { data: cliente } = useQuery({
-    queryKey: ['cliente', mascota?.cliente_id],
+    queryKey: ['api_cliente', mascota?.cliente_id],
     queryFn: async () => {
-      if (!mascota?.cliente_id) return null;
-      const clientes = await base44.entities.Cliente.list();
-      return clientes.find(c => c.id === mascota.cliente_id);
+      try {
+        if (!mascota?.cliente_id) return null;
+        const res = await fetch('https://apivet.strategtic.com/api/clientes');
+        const json = await res.json();
+        const items = Array.isArray(json?.data) ? json.data : [];
+        return items.find(c => (c?.cliente_id || c?.id) === mascota.cliente_id);
+      } catch (_) {
+        return null;
+      }
     },
     enabled: !!mascota?.cliente_id,
   });
 
   const { data: citas = [] } = useQuery({
-    queryKey: ['citas', mascotaId],
+    queryKey: ['api_citas_historial', mascotaId],
     queryFn: async () => {
-      const allCitas = await base44.entities.Cita.list('-fecha');
-      return allCitas.filter(c => c.mascota_id === mascotaId);
+      try {
+        const res = await fetch('https://apivet.strategtic.com/api/citas');
+        const json = await res.json();
+        const items = Array.isArray(json?.data) ? json.data : [];
+        return items
+          .map((item) => ({
+            id: item?.cita_id,
+            fecha: item?.fecha,
+            hora: item?.hora,
+            motivo: item?.motivo,
+            estado: item?.estados?.nombre || item?.estado,
+            mascota_id: item?.mascota_id ? Number(item.mascota_id) : item?.mascota?.mascota_id,
+            cliente_id: item?.cliente_id ? Number(item.cliente_id) : item?.cliente?.cliente_id,
+            veterinario_id: item?.veterinario_id ? Number(item.veterinario_id) : (item?.veterinario?.veterinario_id ?? undefined),
+            observaciones: item?.observaciones || '',
+            mascota: item?.mascota || null,
+            cliente: item?.cliente || null,
+            veterinario: item?.veterinario || null,
+          }))
+          .filter(c => c.mascota_id === mascotaId);
+      } catch (_) {
+        return [];
+      }
     },
   });
 
   const { data: tratamientos = [] } = useQuery({
-    queryKey: ['tratamientos', mascotaId],
+    queryKey: ['api_tratamientos_historial', mascotaId],
     queryFn: async () => {
-      const allTratamientos = await base44.entities.Tratamiento.list('-created_date');
-      return allTratamientos.filter(t => t.mascota_id === mascotaId);
+      try {
+        const res = await fetch('https://apivet.strategtic.com/api/tratamientos');
+        const json = await res.json();
+        const items = Array.isArray(json?.data) ? json.data : [];
+        return items
+          .map(item => ({
+            id: item?.tratamiento_id,
+            cita_id: item?.cita_id ? Number(item.cita_id) : (item?.cita?.cita_id ?? undefined),
+            diagnostico: item?.diagnostico,
+            tratamiento_indicado: item?.tratamiento_indicado,
+            recomendaciones: item?.recomendaciones,
+            veterinario_id: item?.veterinario_id ? Number(item.veterinario_id) : (item?.veterinario?.veterinario_id ?? undefined),
+            cliente_id: item?.cliente_id ? Number(item.cliente_id) : (item?.cliente?.cliente_id ?? undefined),
+            mascota_id: item?.mascota_id ? Number(item.mascota_id) : (item?.mascota?.mascota_id ?? undefined),
+            medicamentos: item?.medicamentos || [],
+          }))
+          .filter(t => t.mascota_id === mascotaId);
+      } catch (_) {
+        return [];
+      }
     },
   });
 
@@ -66,7 +118,7 @@ export default function HistorialClinico({ mascotaId, onClose }) {
     enabled: Array.isArray(tratamientos) && tratamientos.length > 0,
   });
 
-  const handleDownloadPDF = async () => {
+  const handleDownloadPDF = async (openInNewTab = false) => {
     setDownloading(true);
     try {
       const html2canvas = (await import('html2canvas')).default;
@@ -91,7 +143,12 @@ export default function HistorialClinico({ mascotaId, onClose }) {
       const imgY = 0;
       
       pdf.addImage(imgData, 'PNG', imgX, imgY, imgWidth * ratio, imgHeight * ratio);
-      pdf.save(`Historial_Clinico_${mascota?.nombre}_${format(new Date(), 'dd-MM-yyyy')}.pdf`);
+      if (openInNewTab) {
+        const url = pdf.output('bloburl');
+        window.open(url, '_blank');
+      } else {
+        pdf.save(`Historial_Clinico_${mascota?.nombre}_${format(new Date(), 'dd-MM-yyyy')}.pdf`);
+      }
     } catch (error) {
       console.error('Error generating PDF:', error);
       toastr.error('Error al generar el PDF. Por favor, intente nuevamente.');
@@ -99,6 +156,52 @@ export default function HistorialClinico({ mascotaId, onClose }) {
       setDownloading(false);
     }
   };
+
+  const generateInlinePDF = async () => {
+    try {
+      const html2canvas = (await import('html2canvas')).default;
+      const jsPDF = (await import('jspdf')).default;
+
+      const element = printRef.current;
+      const canvas = await html2canvas(element, {
+        scale: 2,
+        useCORS: true,
+        logging: false,
+        backgroundColor: '#ffffff'
+      });
+
+      const imgData = canvas.toDataURL('image/png');
+      const pdf = new jsPDF('p', 'mm', 'a4');
+      const pdfWidth = pdf.internal.pageSize.getWidth();
+      const pdfHeight = pdf.internal.pageSize.getHeight();
+      const imgWidth = canvas.width;
+      const imgHeight = canvas.height;
+      const ratio = Math.min(pdfWidth / imgWidth, pdfHeight / imgHeight);
+      const imgX = (pdfWidth - imgWidth * ratio) / 2;
+      const imgY = 0;
+
+      pdf.addImage(imgData, 'PNG', imgX, imgY, imgWidth * ratio, imgHeight * ratio);
+      const blob = pdf.output('blob');
+      const url = URL.createObjectURL(blob);
+      setPdfUrl(url);
+    } catch (error) {
+      console.error('Error generating inline PDF:', error);
+    }
+  };
+
+  React.useEffect(() => {
+    const ready = mascota !== undefined && Array.isArray(citas) && Array.isArray(tratamientos);
+    if (autoGeneratePdf && !autoRan && ready && printRef.current) {
+      setAutoRan(true);
+      setTimeout(() => generateInlinePDF(), 300);
+    }
+  }, [autoGeneratePdf, autoRan, printRef, mascota, citas, tratamientos]);
+
+  React.useEffect(() => {
+    return () => {
+      if (pdfUrl) URL.revokeObjectURL(pdfUrl);
+    };
+  }, [pdfUrl]);
 
   const estadoColors = {
     "Pendiente": "bg-yellow-100 text-yellow-800 border-yellow-300",
@@ -146,6 +249,13 @@ export default function HistorialClinico({ mascotaId, onClose }) {
         </CardHeader>
 
         <CardContent className="p-8 space-y-6 overflow-auto flex-1 bg-gray-50">
+          {pdfUrl ? (
+            <object data={pdfUrl} type="application/pdf" className="w-full h-[72vh] rounded-lg border">
+              <p className="p-4">Tu navegador no soporta visor PDF integrado. 
+                <a href={pdfUrl} target="_blank" rel="noreferrer" className="text-blue-600 underline">Abrir en nueva pestaña</a>
+              </p>
+            </object>
+          ) : (
           <div ref={printRef} className="bg-white p-8 rounded-lg shadow-sm">
             {/* Header con logo */}
             <div className="bg-gradient-to-r from-green-600 to-blue-600 text-white p-8 rounded-t-xl mb-6">
@@ -221,7 +331,7 @@ export default function HistorialClinico({ mascotaId, onClose }) {
                   </div>
                   <div>
                     <p className="text-xs text-green-700 font-semibold">Especie</p>
-                    <p className="text-gray-900">{mascota?.especie}</p>
+                    <p className="text-gray-900">{typeof mascota?.especie === 'object' ? (mascota?.especie?.nombre || '-') : (mascota?.especie || '-')}</p>
                   </div>
                   <div>
                     <p className="text-xs text-green-700 font-semibold">Raza</p>
@@ -233,7 +343,7 @@ export default function HistorialClinico({ mascotaId, onClose }) {
                   </div>
                   <div>
                     <p className="text-xs text-green-700 font-semibold">Sexo</p>
-                    <p className="text-gray-900">{mascota?.sexo}</p>
+                    <p className="text-gray-900">{typeof mascota?.sexo === 'object' ? (mascota?.sexo?.nombre || '-') : (mascota?.sexo || '-')}</p>
                   </div>
                   <div>
                     <p className="text-xs text-green-700 font-semibold">Peso</p>
@@ -275,12 +385,15 @@ export default function HistorialClinico({ mascotaId, onClose }) {
                           <div>
                             <div className="flex items-center gap-2 text-green-700 font-bold text-lg mb-1">
                               <Calendar className="w-5 h-5" />
-                              {format(new Date(cita.fecha), "dd 'de' MMMM 'de' yyyy", { locale: es })}
+                              {(() => {
+                                const d = new Date(String(cita?.fecha || '').replace(/\//g, '-'));
+                                return isNaN(d.getTime()) ? (cita?.fecha || '-') : format(d, "dd 'de' MMMM 'de' yyyy", { locale: es });
+                              })()}
                             </div>
                             <p className="text-gray-600 text-sm">Hora: {cita.hora}</p>
                           </div>
-                          <Badge className={`${estadoColors[cita.estado]} font-semibold px-3 py-1`} variant="outline">
-                            {cita.estado}
+                          <Badge className={`${estadoColors[typeof cita.estado === 'object' ? (cita.estado?.nombre || '') : (cita.estado || '')]} font-semibold px-3 py-1`} variant="outline">
+                            {typeof cita.estado === 'object' ? (cita.estado?.nombre || '-') : (cita.estado || '-')}
                           </Badge>
                         </div>
 
@@ -391,6 +504,7 @@ export default function HistorialClinico({ mascotaId, onClose }) {
               </div>
             </div>
           </div>
+          )}
         </CardContent>
       </Card>
     </div>

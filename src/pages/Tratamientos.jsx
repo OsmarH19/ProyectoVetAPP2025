@@ -14,6 +14,7 @@ export default function Tratamientos() {
   const [editingTratamiento, setEditingTratamiento] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedMascotaId, setSelectedMascotaId] = useState(null);
+  const [autoPdfMascotaId, setAutoPdfMascotaId] = useState(null);
   const queryClient = useQueryClient();
 
   const { data: tratamientos = [] } = useQuery({
@@ -108,6 +109,125 @@ export default function Tratamientos() {
       }
     },
   });
+
+  const generateTratamientoPDF = async ({ cita_id, diagnostico, tratamiento_indicado, recomendaciones, veterinario_id, cliente_id, mascota_id, medicamentos }) => {
+    try {
+      const jsPDF = (await import('jspdf')).default;
+      const doc = new jsPDF('p', 'mm', 'a4');
+
+      const cita = (citas || []).find(c => c.id === Number(cita_id));
+      const mascota = cita?.mascota || (mascotas || []).find(m => (m.mascota_id || m.id) === (cita?.mascota_id || mascota_id));
+      const cliente = cita?.cliente || (clientes || []).find(cl => (cl.cliente_id || cl.id) === (cita?.cliente_id || cliente_id));
+      const veterinario = (veterinarios || []).find(v => (v.veterinario_id || v.id) === Number(veterinario_id));
+
+      const primario = '#5d55a3';
+      const negro = '#111111';
+      const gris = '#666666';
+
+      const margin = 14;
+      let y = margin;
+
+      doc.setTextColor(primario);
+      doc.setFontSize(18);
+      doc.text('Tratamiento Médico', margin, y);
+      y += 8;
+
+      doc.setTextColor(gris);
+      doc.setFontSize(11);
+      const fechaStr = cita?.fecha ? String(cita.fecha) : '';
+      const horaStr = cita?.hora ? String(cita.hora) : '';
+      doc.text(`Fecha: ${fechaStr || '-'}  ${horaStr ? 'Hora: ' + horaStr : ''}`, margin, y);
+      y += 10;
+
+      // Paciente y cliente
+      doc.setDrawColor(primario);
+      doc.setLineWidth(0.4);
+      doc.line(margin, y, 210 - margin, y);
+      y += 6;
+
+      doc.setTextColor(negro);
+      doc.setFontSize(12);
+      doc.text('Paciente', margin, y);
+      doc.text('Cliente', 110, y);
+      y += 6;
+
+      doc.setTextColor(gris);
+      doc.setFontSize(11);
+      doc.text(`Nombre: ${mascota?.nombre || '-'}`, margin, y);
+      doc.text(`Nombre: ${(cliente ? `${cliente.nombres || ''} ${cliente.apellidos || ''}`.trim() : '-')}`, 110, y);
+      y += 6;
+      doc.text(`Raza: ${mascota?.raza || '-'}`, margin, y);
+      doc.text(`Teléfono: ${cliente?.telefono || '-'}`, 110, y);
+      y += 10;
+
+      // Veterinario
+      doc.setTextColor(negro);
+      doc.setFontSize(12);
+      doc.text('Veterinario', margin, y);
+      y += 6;
+      doc.setTextColor(gris);
+      doc.setFontSize(11);
+      const vetNombre = veterinario ? `Dr. ${veterinario.nombres || ''} ${veterinario.apellidos || ''}`.trim() : '-';
+      doc.text(vetNombre, margin, y);
+      y += 10;
+
+      // Diagnóstico
+      doc.setTextColor(negro);
+      doc.setFontSize(12);
+      doc.text('Diagnóstico', margin, y);
+      y += 6;
+      doc.setTextColor(gris);
+      doc.setFontSize(11);
+      const diagLines = doc.splitTextToSize(diagnostico || '-', 210 - margin * 2);
+      doc.text(diagLines, margin, y);
+      y += Math.max(10, diagLines.length * 6);
+
+      // Tratamiento indicado
+      doc.setTextColor(negro);
+      doc.setFontSize(12);
+      doc.text('Tratamiento Indicado', margin, y);
+      y += 6;
+      doc.setTextColor(gris);
+      doc.setFontSize(11);
+      const tratLines = doc.splitTextToSize(tratamiento_indicado || '-', 210 - margin * 2);
+      doc.text(tratLines, margin, y);
+      y += Math.max(10, tratLines.length * 6);
+
+      // Medicamentos
+      const meds = Array.isArray(medicamentos) ? medicamentos.filter(m => (m.nombre || '').trim() !== '') : [];
+      if (meds.length > 0) {
+        doc.setTextColor(negro);
+        doc.setFontSize(12);
+        doc.text('Medicamentos', margin, y);
+        y += 6;
+        doc.setTextColor(gris);
+        doc.setFontSize(11);
+        meds.forEach((m, idx) => {
+          const linea = `${idx + 1}. ${m.nombre || '-'} | Dosis: ${m.dosis || '-'} | Duración: ${m.duracion || '-'}`;
+          const lns = doc.splitTextToSize(linea, 210 - margin * 2);
+          doc.text(lns, margin, y);
+          y += Math.max(8, lns.length * 6);
+        });
+      }
+
+      // Recomendaciones
+      doc.setTextColor(negro);
+      doc.setFontSize(12);
+      doc.text('Recomendaciones', margin, y);
+      y += 6;
+      doc.setTextColor(gris);
+      doc.setFontSize(11);
+      const recLines = doc.splitTextToSize(recomendaciones || '-', 210 - margin * 2);
+      doc.text(recLines, margin, y);
+      y += Math.max(10, recLines.length * 6);
+
+      const nombreMascota = mascota?.nombre || 'Mascota';
+      const nombreArchivo = `Tratamiento_${nombreMascota}_${fechaStr || ''}.pdf`;
+      doc.save(nombreArchivo);
+    } catch (e) {
+      console.error('PDF error', e);
+    }
+  };
 
   const createMutation = useMutation({
     mutationFn: async (data) => {
@@ -281,7 +401,8 @@ export default function Tratamientos() {
             {selectedMascotaId && (
               <HistorialClinico
                 mascotaId={selectedMascotaId}
-                onClose={() => setSelectedMascotaId(null)}
+                autoGeneratePdf={autoPdfMascotaId === selectedMascotaId}
+                onClose={() => { setSelectedMascotaId(null); setAutoPdfMascotaId(null); }}
               />
             )}
 
@@ -309,7 +430,7 @@ export default function Tratamientos() {
                   cita={tratamiento.cita}
                   onEdit={handleEdit}
                   onDelete={handleDelete}
-                  onViewHistorial={() => setSelectedMascotaId(tratamiento.mascota_id)}
+                  onViewHistorial={() => { setSelectedMascotaId(tratamiento.mascota_id); setAutoPdfMascotaId(tratamiento.mascota_id); }}
                 />
               ))}
               {filteredTratamientos.length === 0 && (
