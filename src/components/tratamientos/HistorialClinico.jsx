@@ -98,6 +98,18 @@ export default function HistorialClinico({ mascotaId, onClose, autoGeneratePdf }
     },
   });
 
+  const clienteData = React.useMemo(() => {
+    if (mascota && typeof mascota === 'object') {
+      if (mascota.cliente) return mascota.cliente;
+    }
+    if (cliente) return cliente;
+    if (Array.isArray(citas)) {
+      const c = citas.find(ci => ci && ci.cliente);
+      if (c && c.cliente) return c.cliente;
+    }
+    return null;
+  }, [mascota, cliente, citas]);
+
   const { data: medicamentosPorTratamiento = {} } = useQuery({
     queryKey: ['medicamentos_por_tratamiento', mascotaId, (Array.isArray(tratamientos) ? tratamientos.map(t => t?.tratamiento_id || t?.id).join(',') : '')],
     queryFn: async () => {
@@ -232,35 +244,35 @@ export default function HistorialClinico({ mascotaId, onClose, autoGeneratePdf }
                     <User className="w-4 h-4 text-blue-600 mt-1 flex-shrink-0" />
                     <div>
                       <p className="text-xs text-blue-700 font-semibold">Nombre Completo</p>
-                      <p className="text-gray-900 font-semibold">{cliente?.nombres} {cliente?.apellidos}</p>
+                      <p className="text-gray-900 font-semibold">{clienteData?.nombres} {clienteData?.apellidos}</p>
                     </div>
                   </div>
                   <div className="flex items-start gap-2">
                     <FileText className="w-4 h-4 text-blue-600 mt-1 flex-shrink-0" />
                     <div>
                       <p className="text-xs text-blue-700 font-semibold">DNI</p>
-                      <p className="text-gray-900">{cliente?.dni}</p>
+                      <p className="text-gray-900">{clienteData?.dni}</p>
                     </div>
                   </div>
                   <div className="flex items-start gap-2">
                     <Phone className="w-4 h-4 text-blue-600 mt-1 flex-shrink-0" />
                     <div>
                       <p className="text-xs text-blue-700 font-semibold">Teléfono</p>
-                      <p className="text-gray-900">{cliente?.telefono}</p>
+                      <p className="text-gray-900">{clienteData?.telefono}</p>
                     </div>
                   </div>
                   <div className="flex items-start gap-2">
                     <Mail className="w-4 h-4 text-blue-600 mt-1 flex-shrink-0" />
                     <div>
                       <p className="text-xs text-blue-700 font-semibold">Email</p>
-                      <p className="text-gray-900">{cliente?.email}</p>
+                      <p className="text-gray-900">{clienteData?.email}</p>
                     </div>
                   </div>
                   <div className="flex items-start gap-2">
                     <MapPin className="w-4 h-4 text-blue-600 mt-1 flex-shrink-0" />
                     <div>
                       <p className="text-xs text-blue-700 font-semibold">Dirección</p>
-                      <p className="text-gray-900">{cliente?.direccion}</p>
+                      <p className="text-gray-900">{clienteData?.direccion}</p>
                     </div>
                   </div>
                 </div>
