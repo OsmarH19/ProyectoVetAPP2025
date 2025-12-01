@@ -90,6 +90,9 @@ export default function HistorialClinico({ mascotaId, onClose, autoGeneratePdf }
             cliente_id: item?.cliente_id ? Number(item.cliente_id) : (item?.cliente?.cliente_id ?? undefined),
             mascota_id: item?.mascota_id ? Number(item.mascota_id) : (item?.mascota?.mascota_id ?? undefined),
             medicamentos: item?.medicamentos || [],
+            cliente: item?.cliente || null,
+            veterinario: item?.veterinario || null,
+            mascota: item?.mascota || null,
           }))
           .filter(t => t.mascota_id === mascotaId);
       } catch (_) {
@@ -99,16 +102,38 @@ export default function HistorialClinico({ mascotaId, onClose, autoGeneratePdf }
   });
 
   const clienteData = React.useMemo(() => {
+    if (Array.isArray(tratamientos)) {
+      const t = tratamientos.find(tr => tr && tr.cliente);
+      if (t && t.cliente) return t.cliente;
+    }
     if (mascota && typeof mascota === 'object') {
       if (mascota.cliente) return mascota.cliente;
     }
-    if (cliente) return cliente;
     if (Array.isArray(citas)) {
       const c = citas.find(ci => ci && ci.cliente);
       if (c && c.cliente) return c.cliente;
     }
+    if (cliente) return cliente;
     return null;
-  }, [mascota, cliente, citas]);
+  }, [mascota, cliente, tratamientos, citas]);
+
+  const clienteNombreCompleto = React.useMemo(() => {
+    const c = clienteData || {};
+    const nombres = c.nombres ?? '';
+    const apellidos = c.apellidos ?? '';
+    const full = `${nombres} ${apellidos}`.trim();
+    return full || (c.razon_social ?? '');
+  }, [clienteData]);
+
+  const clienteEmail = React.useMemo(() => {
+    const c = clienteData || {};
+    return c.email ?? '';
+  }, [clienteData]);
+
+  const clienteDireccion = React.useMemo(() => {
+    const c = clienteData || {};
+    return c.direccion ?? '';
+  }, [clienteData]);
 
   const { data: medicamentosPorTratamiento = {} } = useQuery({
     queryKey: ['medicamentos_por_tratamiento', mascotaId, (Array.isArray(tratamientos) ? tratamientos.map(t => t?.tratamiento_id || t?.id).join(',') : '')],
@@ -244,35 +269,35 @@ export default function HistorialClinico({ mascotaId, onClose, autoGeneratePdf }
                     <User className="w-4 h-4 text-blue-600 mt-1 flex-shrink-0" />
                     <div>
                       <p className="text-xs text-blue-700 font-semibold">Nombre Completo</p>
-                      <p className="text-gray-900 font-semibold">{clienteData?.nombres} {clienteData?.apellidos}</p>
+                      <p className="text-gray-900 font-semibold">{clienteNombreCompleto || '-'}</p>
                     </div>
                   </div>
                   <div className="flex items-start gap-2">
                     <FileText className="w-4 h-4 text-blue-600 mt-1 flex-shrink-0" />
                     <div>
                       <p className="text-xs text-blue-700 font-semibold">DNI</p>
-                      <p className="text-gray-900">{clienteData?.dni}</p>
+                      <p className="text-gray-900">{clienteData?.dni || '-'}</p>
                     </div>
                   </div>
                   <div className="flex items-start gap-2">
                     <Phone className="w-4 h-4 text-blue-600 mt-1 flex-shrink-0" />
                     <div>
                       <p className="text-xs text-blue-700 font-semibold">Teléfono</p>
-                      <p className="text-gray-900">{clienteData?.telefono}</p>
+                      <p className="text-gray-900">{clienteData?.telefono || '-'}</p>
                     </div>
                   </div>
                   <div className="flex items-start gap-2">
                     <Mail className="w-4 h-4 text-blue-600 mt-1 flex-shrink-0" />
                     <div>
                       <p className="text-xs text-blue-700 font-semibold">Email</p>
-                      <p className="text-gray-900">{clienteData?.email}</p>
+                      <p className="text-gray-900">{clienteEmail || '-'}</p>
                     </div>
                   </div>
                   <div className="flex items-start gap-2">
                     <MapPin className="w-4 h-4 text-blue-600 mt-1 flex-shrink-0" />
                     <div>
                       <p className="text-xs text-blue-700 font-semibold">Dirección</p>
-                      <p className="text-gray-900">{clienteData?.direccion}</p>
+                      <p className="text-gray-900">{clienteDireccion || '-'}</p>
                     </div>
                   </div>
                 </div>
