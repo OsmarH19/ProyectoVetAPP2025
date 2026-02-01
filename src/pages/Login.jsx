@@ -46,11 +46,11 @@ export default function Login() {
         <div className="absolute inset-0 bg-gradient-to-b from-black/30 to-black/30 z-10 pointer-events-none" />
         <img
           src="/img/login.jpg"
-          alt="VetCare"
+          alt="VetApp"
           className="absolute inset-0 w-full h-full object-cover object-center md:object-left"
         />
         <div className="absolute z-20 bottom-8 left-8 text-white">
-          <p className="text-lg font-medium">Bienvenido a VetCare</p>
+          <p className="text-lg font-medium">Bienvenido a VetApp</p>
           <p className="text-sm opacity-80">Gestión veterinaria moderna</p>
         </div>
       </div>
@@ -98,7 +98,7 @@ export default function Login() {
               </Button>
             </form>
             <div className="text-center">
-              <p className="text-xs text-gray-500">© {new Date().getFullYear()} VetCare</p>
+              <p className="text-xs text-gray-500">© {new Date().getFullYear()} VetApp</p>
             </div>
           </CardContent>
         </Card>
