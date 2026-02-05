@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+﻿import React, { useEffect, useMemo, useState } from "react";
 import { base44 } from "@/api/base44Client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
@@ -176,11 +176,11 @@ export default function Mascotas() {
                   <Table>
                     <TableHeader>
                       <TableRow>
-                        <TableHead>Mascota</TableHead>
-                        <TableHead>Especie / Raza</TableHead>
-                        <TableHead>Dueño</TableHead>
-                        <TableHead>Detalles</TableHead>
-                        <TableHead className="text-right">Acciones</TableHead>
+                        <TableHead className="text-center">Mascota</TableHead>
+                        <TableHead className="text-center">Especie / Raza</TableHead>
+                        <TableHead className="text-center">Dueño</TableHead>
+                        <TableHead className="text-center">Detalles</TableHead>
+                        <TableHead className="text-center">Acciones</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+﻿import React, { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
@@ -55,12 +55,12 @@ export default function CitasList({ citas, mascotas, clientes, onEdit, onDelete,
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Fecha y Hora</TableHead>
-                <TableHead>Mascota</TableHead>
-                <TableHead>Cliente</TableHead>
-                <TableHead>Motivo</TableHead>
-                <TableHead>Estado</TableHead>
-                <TableHead className="text-right">Acciones</TableHead>
+                <TableHead className="text-center">Fecha y Hora</TableHead>
+                <TableHead className="text-center">Mascota</TableHead>
+                <TableHead className="text-center">Cliente</TableHead>
+                <TableHead className="text-center">Motivo</TableHead>
+                <TableHead className="text-center">Estado</TableHead>
+                <TableHead className="text-center">Acciones</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>

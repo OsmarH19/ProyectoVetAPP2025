@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+﻿import React, { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
@@ -124,11 +124,11 @@ export default function Clientes() {
                   <Table>
                     <TableHeader>
                       <TableRow>
-                        <TableHead>Cliente</TableHead>
-                        <TableHead>DNI</TableHead>
-                        <TableHead>Contacto</TableHead>
-                        <TableHead>Dirección</TableHead>
-                        <TableHead className="text-right">Acciones</TableHead>
+                        <TableHead className="text-center">Cliente</TableHead>
+                        <TableHead className="text-center">DNI</TableHead>
+                        <TableHead className="text-center">Contacto</TableHead>
+                        <TableHead className="text-center">Dirección</TableHead>
+                        <TableHead className="text-center">Acciones</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>

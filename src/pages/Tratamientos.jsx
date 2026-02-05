@@ -437,13 +437,13 @@ export default function Tratamientos() {
                   <Table>
                     <TableHeader>
                       <TableRow>
-                        <TableHead>Mascota</TableHead>
-                        <TableHead>Cliente</TableHead>
-                        <TableHead>Diagnóstico</TableHead>
-                        <TableHead>Tratamiento</TableHead>
-                        <TableHead>Veterinario</TableHead>
-                        <TableHead>Fecha</TableHead>
-                        <TableHead className="text-right">Acciones</TableHead>
+                        <TableHead className="text-center">Mascota</TableHead>
+                        <TableHead className="text-center">Cliente</TableHead>
+                        <TableHead className="text-center">Diagnóstico</TableHead>
+                        <TableHead className="text-center">Tratamiento</TableHead>
+                        <TableHead className="text-center">Veterinario</TableHead>
+                        <TableHead className="text-center">Fecha</TableHead>
+                        <TableHead className="text-center">Acciones</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -529,7 +529,7 @@ export default function Tratamientos() {
                   </Table>
                 </div>
                 <div className="flex items-center justify-between mt-4">
-                  <p className="text-sm text-gray-600">P—gina {currentPage} de {totalPages}</p>
+                  <p className="text-sm text-gray-600">Página {currentPage} de {totalPages}</p>
                   <div className="flex gap-2">
                     <Button variant="outline" onClick={() => setPage(p => Math.max(1, p - 1))} disabled={currentPage === 1}>Anterior</Button>
                     <Button variant="outline" onClick={() => setPage(p => Math.min(totalPages, p + 1))} disabled={currentPage === totalPages}>Siguiente</Button>

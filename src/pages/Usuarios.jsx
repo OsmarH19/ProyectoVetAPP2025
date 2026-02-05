@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+﻿import React, { useEffect, useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -305,11 +305,11 @@ export default function Usuarios() {
                   <Table>
                     <TableHeader>
                       <TableRow>
-                        <TableHead>Nombre</TableHead>
-                        <TableHead>Correo</TableHead>
-                        <TableHead>Rol</TableHead>
-                        <TableHead>Creado</TableHead>
-                        <TableHead className="text-right">Acciones</TableHead>
+                        <TableHead className="text-center">Nombre</TableHead>
+                        <TableHead className="text-center">Correo</TableHead>
+                        <TableHead className="text-center">Rol</TableHead>
+                        <TableHead className="text-center">Creado</TableHead>
+                        <TableHead className="text-center">Acciones</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
