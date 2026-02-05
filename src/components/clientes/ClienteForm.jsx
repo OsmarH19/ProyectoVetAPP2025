@@ -72,27 +72,6 @@ export default function ClienteForm({ cliente, onSubmit, onCancel, isLoading }) 
         <CardContent className="space-y-4">
           <div className="grid md:grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="nombres">Nombres *</Label>
-              <Input
-                id="nombres"
-                value={formData.nombres}
-                onChange={(e) => handleChange('nombres', e.target.value)}
-                required
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="apellidos">Apellidos *</Label>
-              <Input
-                id="apellidos"
-                value={formData.apellidos}
-                onChange={(e) => handleChange('apellidos', e.target.value)}
-                required
-              />
-            </div>
-          </div>
-
-          <div className="grid md:grid-cols-2 gap-4">
-            <div className="space-y-2">
               <Label htmlFor="dni">DNI *</Label>
               <Input
                 id="dni"
@@ -101,6 +80,27 @@ export default function ClienteForm({ cliente, onSubmit, onCancel, isLoading }) 
                 required
               />
             </div>
+            <div className="space-y-2">
+              <Label htmlFor="nombres">Nombres *</Label>
+              <Input
+                id="nombres"
+                value={formData.nombres}
+                onChange={(e) => handleChange('nombres', e.target.value)}
+                required
+              />
+            </div>
+          </div>
+
+          <div className="grid md:grid-cols-2 gap-4">            
+            <div className="space-y-2">
+              <Label htmlFor="apellidos">Apellidos *</Label>
+              <Input
+                id="apellidos"
+                value={formData.apellidos}
+                onChange={(e) => handleChange('apellidos', e.target.value)}
+                required
+              />
+            </div>            
             <div className="space-y-2">
               <Label htmlFor="telefono">Teléfono *</Label>
               <Input
