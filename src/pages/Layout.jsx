@@ -128,7 +128,7 @@ export default function Layout({ children, currentPageName }) {
   
   return (
     <SidebarProvider>
-      <div className="min-h-screen flex w-full bg-gradient-to-br from-primary/5 via-primary/10 to-white">
+      <div className="min-h-screen flex w-full bg-white">
         <Sidebar className="border-r border-border bg-sidebar/80 backdrop-blur-sm">
           <SidebarHeader className="border-b border-border p-6">
             <div className="flex items-center gap-3">
@@ -203,7 +203,7 @@ export default function Layout({ children, currentPageName }) {
           </SidebarFooter>
         </Sidebar>
 
-        <main className="flex-1 flex flex-col overflow-hidden">
+        <main className="flex-1 flex flex-col overflow-hidden bg-white">
           <header className="bg-card/80 backdrop-blur-sm border-b border-border px-6 py-4 lg:hidden shadow-sm">
             <div className="flex items-center gap-4">
               <SidebarTrigger className="hover:bg-gray-100 p-2 rounded-lg transition-colors duration-200" />
@@ -214,7 +214,7 @@ export default function Layout({ children, currentPageName }) {
             </div>
           </header>
 
-          <div className="flex-1 overflow-auto">
+          <div className="flex-1 overflow-auto bg-white">
             {children}
           </div>
         </main>
