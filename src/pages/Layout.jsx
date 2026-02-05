@@ -135,7 +135,7 @@ export default function Layout({ children, currentPageName }) {
                 <Heart className="w-7 h-7 text-white fill-white" />
               </div>
               <div>
-                <h2 className="font-bold text-xl text-gray-900">VetCare</h2>
+                <h2 className="font-bold text-xl text-gray-900">VetApp</h2>
                 <p className="text-xs text-gray-500">Sistema Veterinario</p>
               </div>
             </div>
@@ -204,7 +204,7 @@ export default function Layout({ children, currentPageName }) {
               <SidebarTrigger className="hover:bg-gray-100 p-2 rounded-lg transition-colors duration-200" />
               <div className="flex items-center gap-2">
                 <Heart className="w-6 h-6 text-green-500 fill-green-500" />
-                <h1 className="text-xl font-bold text-gray-900">VetCare</h1>
+                <h1 className="text-xl font-bold text-gray-900">VetApp</h1>
               </div>
             </div>
           </header>

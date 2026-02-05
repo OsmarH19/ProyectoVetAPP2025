@@ -3,9 +3,9 @@ import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Edit, Trash2, Mail, Phone, Stethoscope, Clock } from "lucide-react";
+import { Edit, Power, Mail, Phone, Stethoscope, Clock } from "lucide-react";
 
-export default function VeterinarioCard({ veterinario, onEdit, onDelete }) {
+export default function VeterinarioCard({ veterinario, onEdit, onToggleActive }) {
   const { data: diasMaestros = [] } = useQuery({
     queryKey: ["dias_maestros"],
     queryFn: async () => {
@@ -99,11 +99,11 @@ export default function VeterinarioCard({ veterinario, onEdit, onDelete }) {
         <Button
           variant="outline"
           size="sm"
-          onClick={() => onDelete(veterinario.id)}
-          className="text-red-600 hover:bg-red-50"
+          onClick={() => onToggleActive(veterinario)}
+          className={veterinario.activo ? "text-red-600 hover:bg-red-50" : "text-green-600 hover:bg-green-50"}
         >
-          <Trash2 className="w-4 h-4 mr-1" />
-          Eliminar
+          <Power className="w-4 h-4 mr-1" />
+          {veterinario.activo ? "Desactivar" : "Activar"}
         </Button>
       </CardFooter>
     </Card>

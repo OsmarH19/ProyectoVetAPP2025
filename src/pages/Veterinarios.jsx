@@ -120,8 +120,10 @@ export default function Veterinarios() {
       if (!res.ok) throw new Error('No fue posible actualizar el veterinario');
       return res.json();
     },
-    onSuccess: () => {
-      toastr.success("Veterinario actualizado correctamente.");
+    onSuccess: (_data, variables) => {
+      if (!variables?.skipToast) {
+        toastr.success("Veterinario actualizado correctamente.");
+      }
       queryClient.invalidateQueries({ queryKey: ['veterinarios_api'] });
       setShowForm(false);
       setEditingVeterinario(null);
@@ -131,18 +133,6 @@ export default function Veterinarios() {
     },
   });
 
-  const deleteMutation = useMutation({
-    mutationFn: async (id) => {
-      return Promise.resolve();
-    },
-    onSuccess: () => {
-      toastr.success("Veterinario eliminado correctamente.");
-      queryClient.invalidateQueries({ queryKey: ['veterinarios_api'] });
-    },
-    onError: (err) => {
-      toastr.error(err.message || "No se pudo eliminar el veterinario.");
-    },
-  });
 
   const handleSubmit = (data) => {
     if (editingVeterinario) {
@@ -157,10 +147,31 @@ export default function Veterinarios() {
     setShowForm(true);
   };
 
-  const handleDelete = async (id) => {
-    if (window.confirm('¿Está seguro de eliminar este veterinario?')) {
-      deleteMutation.mutate(id);
-    }
+  const handleToggleActive = (veterinario) => {
+    const nextActivo = !veterinario.activo;
+    updateMutation.mutate(
+      {
+        id: veterinario.id,
+        data: {
+          nombres: veterinario.nombres,
+          apellidos: veterinario.apellidos,
+          especialidad: veterinario.especialidad,
+          telefono: veterinario.telefono,
+          email: veterinario.email,
+          activo: nextActivo,
+        },
+        skipToast: true,
+      },
+      {
+        onSuccess: () => {
+          toastr.success(nextActivo ? "Veterinario activado." : "Veterinario desactivado.");
+          queryClient.invalidateQueries({ queryKey: ['veterinarios_api'] });
+        },
+        onError: (err) => {
+          toastr.error(err.message || "No se pudo actualizar el estado.");
+        },
+      }
+    );
   };
 
   const filteredVeterinarios = veterinarios.filter(v =>
@@ -227,7 +238,7 @@ export default function Veterinarios() {
                   key={veterinario.id}
                   veterinario={veterinario}
                   onEdit={handleEdit}
-                  onDelete={handleDelete}
+                  onToggleActive={handleToggleActive}
                 />
               ))}
               {filteredVeterinarios.length === 0 && (

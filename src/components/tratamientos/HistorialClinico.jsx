@@ -246,7 +246,7 @@ export default function HistorialClinico({ mascotaId, onClose, autoGeneratePdf }
             <div className="bg-gradient-to-r from-green-600 to-blue-600 text-white p-8 rounded-t-xl mb-6">
               <div className="flex justify-between items-start">
                 <div>
-                  <h1 className="text-3xl font-bold mb-2">VetCare</h1>
+                  <h1 className="text-3xl font-bold mb-2">VetApp</h1>
                   <p className="text-lg opacity-90">Historial Clínico Veterinario</p>
                 </div>
                 <div className="text-right text-sm opacity-90">
@@ -482,9 +482,9 @@ export default function HistorialClinico({ mascotaId, onClose, autoGeneratePdf }
                   <p className="font-bold text-gray-900">Firma del Veterinario</p>
                 </div>
                 <div className="text-right">
-                  <p className="font-bold text-green-700 text-lg">VetCare</p>
+                  <p className="font-bold text-green-700 text-lg">VetApp</p>
                   <p className="text-gray-600 text-sm">Sistema Veterinario Profesional</p>
-                  <p className="text-gray-500 text-xs">www.vetcare.com</p>
+                  <p className="text-gray-500 text-xs">www.vetApp.com</p>
                 </div>
               </div>
             </div>
