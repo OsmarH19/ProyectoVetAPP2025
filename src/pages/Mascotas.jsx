@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { Plus, Search, Edit, Trash2, PawPrint, User } from "lucide-react";
+import { Plus, Search, Edit, Trash2, PawPrint, User, Weight } from "lucide-react";
 import MascotaForm from "../components/mascotas/MascotaForm";
 
 export default function Mascotas() {
@@ -222,12 +222,12 @@ export default function Mascotas() {
                             </div>
                           </TableCell>
                           <TableCell>
-                            <div className="space-y-1">
+                            <div className="flex flex-wrap items-center gap-2">
                               {mascota.especie && (
                                 <Badge variant="outline">{mascota.especie}</Badge>
-                              )}
+                              )}/
                               {mascota.raza && (
-                                <p className="text-sm text-gray-600">{mascota.raza}</p>
+                                <span className="text-sm text-gray-600">{mascota.raza}</span>
                               )}
                             </div>
                           </TableCell>
@@ -238,7 +238,7 @@ export default function Mascotas() {
                             </div>
                           </TableCell>
                           <TableCell>
-                            <div className="text-sm text-gray-600 space-y-1">
+                            <div className="flex flex-wrap items-center gap-4 text-sm text-gray-600">
                               {mascota.edad ? (
                                 <div className="flex items-center gap-2">
                                   <PawPrint className="w-4 h-4 text-primary" />
@@ -246,8 +246,13 @@ export default function Mascotas() {
                                 </div>
                               ) : (
                                 <span>—</span>
+                              )}/
+                              {mascota.peso && (
+                                <div className="flex items-center gap-2">
+                                  <Weight className="w-4 h-4 text-gray-400" />
+                                  <span>{mascota.peso} kg</span>
+                                </div>
                               )}
-                              {mascota.peso && <div>{mascota.peso} kg</div>}
                             </div>
                           </TableCell>
                           <TableCell className="text-right">
