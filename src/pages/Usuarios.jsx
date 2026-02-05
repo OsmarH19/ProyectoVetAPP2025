@@ -6,6 +6,7 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/componen
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import toastr from "toastr";
 import { Edit, Plus, Save, Search, X } from "lucide-react";
 
@@ -19,17 +20,21 @@ const fetchUsers = async () => {
 };
 
 function UserForm({ user, onSubmit, onCancel, isLoading }) {
+  const profileValue = user?.profileID ?? user?.profile?.id ?? "";
   const [formData, setFormData] = useState({
     name: user?.name ?? "",
     email: user?.email ?? "",
     password: "",
+    profileID: profileValue === "" ? "" : String(profileValue),
   });
 
   useEffect(() => {
+    const nextProfileValue = user?.profileID ?? user?.profile?.id ?? "";
     setFormData({
       name: user?.name ?? "",
       email: user?.email ?? "",
       password: "",
+      profileID: nextProfileValue === "" ? "" : String(nextProfileValue),
     });
   }, [user]);
 
@@ -41,6 +46,7 @@ function UserForm({ user, onSubmit, onCancel, isLoading }) {
     event.preventDefault();
     if (!formData.name || !formData.email) return;
     if (!user && !formData.password) return;
+    if (!user && !formData.profileID) return;
     onSubmit(formData);
   };
 
@@ -75,23 +81,43 @@ function UserForm({ user, onSubmit, onCancel, isLoading }) {
             </div>
           </div>
 
-          <div className="space-y-1">
-            <Label htmlFor="user-password">
-              {user ? "Contraseña (opcional)" : "Contraseña"}
-            </Label>
-            <Input
-              id="user-password"
-              type="password"
-              placeholder={user ? "Dejar en blanco para mantenerla" : "123456"}
-              value={formData.password}
-              onChange={(event) => handleChange("password", event.target.value)}
-              required={!user}
-            />
-            {user && (
-              <p className="text-xs text-muted-foreground">
-                Solo completa este campo si deseas cambiar la contraseña.
-              </p>
-            )}
+          <div className="grid gap-4 md:grid-cols-2">
+            <div className="space-y-1">
+              <Label htmlFor="user-password">
+                {user ? "Contraseña (opcional)" : "Contraseña"}
+              </Label>
+              <Input
+                id="user-password"
+                type="password"
+                placeholder={user ? "Dejar en blanco para mantenerla" : "123456"}
+                value={formData.password}
+                onChange={(event) => handleChange("password", event.target.value)}
+                required={!user}
+              />
+              {user && (
+                <p className="text-xs text-muted-foreground">
+                  Solo completa este campo si deseas cambiar la contraseña.
+                </p>
+              )}
+            </div>
+
+            <div className="space-y-1">
+              <Label>Rol</Label>
+              <Select
+                value={formData.profileID}
+                onValueChange={(value) => handleChange("profileID", value)}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Selecciona un rol" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="1">Administrador</SelectItem>
+                  <SelectItem value="2">Veterinario</SelectItem>
+                  <SelectItem value="3">Asistente</SelectItem>
+                  <SelectItem value="4">Doctor</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
           </div>
         </CardContent>
         <CardFooter className="flex flex-wrap justify-end gap-3">
@@ -185,6 +211,7 @@ export default function Usuarios() {
         payload: {
           name: formData.name,
           email: formData.email,
+          ...(formData.profileID ? { profileID: Number(formData.profileID) } : {}),
           ...(formData.password ? { password: formData.password } : {}),
         },
       });
@@ -193,6 +220,7 @@ export default function Usuarios() {
         name: formData.name,
         email: formData.email,
         password: formData.password,
+        profileID: Number(formData.profileID),
       });
     }
   };
@@ -221,7 +249,13 @@ export default function Usuarios() {
   React.useEffect(() => { setPage(1); }, [searchTerm]);
 
   const roleLabel = (user) => {
-    if (user?.profileID === 1) return "Administrador";
+    const profileName = user?.profile?.nombre;
+    if (profileName) return profileName;
+    const id = Number(user?.profileID);
+    if (id === 1) return "Administrador";
+    if (id === 2) return "Veterinario";
+    if (id === 3) return "Asistente";
+    if (id === 4) return "Doctor";
     if (user?.profileID === null) return "Invitado";
     return "Usuario";
   };
