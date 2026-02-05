@@ -80,7 +80,7 @@ export default function Mascotas() {
               setEditingMascota(null);
               setShowForm(true);
             }}
-            className="bg-green-600 hover:bg-green-700"
+            className="bg-primary hover:bg-primary/90"
           >
             <Plus className="w-4 h-4 mr-2" />
             Nueva Mascota

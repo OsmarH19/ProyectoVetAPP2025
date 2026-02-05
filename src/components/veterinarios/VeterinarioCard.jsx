@@ -38,13 +38,13 @@ export default function VeterinarioCard({ veterinario, onEdit, onToggleActive })
 
   return (
     <Card className="shadow-lg hover:shadow-xl transition-shadow">
-      <CardHeader className="bg-gradient-to-r from-blue-50 to-green-50 border-b">
+      <CardHeader className="bg-gradient-to-r from-primary/5 to-secondary/5 border-b">
         <CardTitle className="text-xl flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <Stethoscope className="w-5 h-5 text-blue-600" />
+            <Stethoscope className="w-5 h-5 text-secondary" />
             <span>Dr. {veterinario.nombres} {veterinario.apellidos}</span>
           </div>
-          <Badge variant={veterinario.activo ? "default" : "secondary"} className={veterinario.activo ? "bg-green-500" : ""}>
+          <Badge variant={veterinario.activo ? "default" : "secondary"} className={veterinario.activo ? "bg-primary text-primary-foreground" : ""}>
             {veterinario.activo ? "Activo" : "Inactivo"}
           </Badge>
         </CardTitle>
@@ -70,12 +70,12 @@ export default function VeterinarioCard({ veterinario, onEdit, onToggleActive })
         {normalizedTurnos.length > 0 && (
           <div className="mt-4 pt-4 border-t">
             <div className="flex items-center gap-2 mb-2">
-              <Clock className="w-4 h-4 text-green-600" />
+              <Clock className="w-4 h-4 text-primary" />
               <h4 className="font-semibold text-sm">Turnos</h4>
             </div>
             <div className="space-y-2">
               {normalizedTurnos.map((turno, index) => (
-                <div key={index} className="bg-green-50 p-2 rounded text-sm">
+                <div key={index} className="bg-primary/5 p-2 rounded text-sm">
                   <p className="font-semibold text-gray-900">{turno.diaNombre}</p>
                   <p className="text-gray-600">
                     {turno.hora_inicio} - {turno.hora_fin}
@@ -100,7 +100,7 @@ export default function VeterinarioCard({ veterinario, onEdit, onToggleActive })
           variant="outline"
           size="sm"
           onClick={() => onToggleActive(veterinario)}
-          className={veterinario.activo ? "text-red-600 hover:bg-red-50" : "text-green-600 hover:bg-green-50"}
+          className={veterinario.activo ? "text-red-600 hover:bg-red-50" : "text-primary hover:bg-primary/10"}
         >
           <Power className="w-4 h-4 mr-1" />
           {veterinario.activo ? "Desactivar" : "Activar"}

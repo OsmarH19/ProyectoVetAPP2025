@@ -278,7 +278,7 @@ export default function VeterinarioForm({ veterinario, onSubmit, onCancel, isLoa
                     size="sm"
                     onClick={() => saveTurno(index)}
                     disabled={savingTurnoIndex === index || !veterinario?.id}
-                    className="bg-green-600 hover:bg-green-700"
+                    className="bg-primary hover:bg-primary/90"
                   >
                     Guardar turno
                   </Button>
@@ -299,7 +299,7 @@ export default function VeterinarioForm({ veterinario, onSubmit, onCancel, isLoa
           </Button>
           <Button
             type="submit"
-            className="bg-green-600 hover:bg-green-700"
+            className="bg-primary hover:bg-primary/90"
             disabled={isLoading}
           >
             <Save className="w-4 h-4 mr-2" />
@@ -310,3 +310,4 @@ export default function VeterinarioForm({ veterinario, onSubmit, onCancel, isLoa
     </Card>
   );
 }
+

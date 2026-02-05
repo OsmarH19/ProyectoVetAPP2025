@@ -131,7 +131,7 @@ function UserForm({ user, onSubmit, onCancel, isLoading }) {
             <X className="w-4 h-4 mr-2" />
             Cancelar
           </Button>
-          <Button type="submit" disabled={isLoading} className="bg-primary-600 hover:bg-primary-700">
+          <Button type="submit" disabled={isLoading} className="bg-primary hover:bg-primary/90">
             <Save className="w-4 h-4 mr-2" />
             {user ? "Actualizar" : "Guardar"}
           </Button>
@@ -269,7 +269,7 @@ export default function Usuarios() {
             <p className="text-gray-600 mt-1">Administra las cuentas que acceden al sistema.</p>
           </div>
             <Button
-              className="bg-green-600 hover:bg-green-700"
+              className="bg-primary hover:bg-primary/90"
               onClick={() => {
                 setSelectedUser(null);
                 setShowForm(true);
@@ -331,7 +331,7 @@ export default function Usuarios() {
                           </TableCell>
                           <TableCell className="text-right">
                             <Button variant="ghost" size="icon" onClick={() => handleEdit(user)}>
-                              <Edit className="w-4 h-4 text-primary-600" />
+                              <Edit className="w-4 h-4 text-secondary" />
                             </Button>
                           </TableCell>
                         </TableRow>
@@ -371,3 +371,4 @@ export default function Usuarios() {
     </div>
   );
 }
+

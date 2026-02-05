@@ -284,7 +284,7 @@ export default function MascotaForm({ mascota, onCancel, isLoading }) {
           </Button>
           <Button
             type="submit"
-            className="bg-green-600 hover:bg-green-700"
+            className="bg-primary hover:bg-primary/90"
             disabled={isLoading || uploading || submitting}
           >
             <Save className="w-4 h-4 mr-2" />

@@ -91,7 +91,7 @@ export default function Login() {
               )}
               <Button
                 type="submit"
-                className="w-full bg-green-600 hover:bg-green-700"
+                className="w-full bg-primary hover:bg-primary/90"
                 disabled={!canSubmit}
               >
                 {isLoading ? "Ingresando..." : "Iniciar Sesión"}
@@ -106,3 +106,4 @@ export default function Login() {
     </div>
   )
 }
+

@@ -197,15 +197,15 @@ export default function HistorialClinico({ mascotaId, onClose, autoGeneratePdf }
 
   const estadoColors = {
     "Pendiente": "bg-yellow-100 text-yellow-800 border-yellow-300",
-    "Confirmada": "bg-blue-100 text-blue-800 border-blue-300",
-    "Completada": "bg-green-100 text-green-800 border-green-300",
+    "Confirmada": "bg-secondary/10 text-secondary border-secondary/30",
+    "Completada": "bg-primary/10 text-primary border-primary/30",
     "Cancelada": "bg-red-100 text-red-800 border-red-300",
   };
 
   return (
     <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4 overflow-auto">
       <Card className="w-full max-w-6xl bg-white shadow-2xl my-8 max-h-[92vh] flex flex-col">
-        <CardHeader className="bg-gradient-to-r from-green-600 via-green-500 to-blue-600 text-white flex-shrink-0 border-b-4 border-green-700">
+        <CardHeader className="bg-gradient-to-r from-primary via-primary/90 to-secondary text-white flex-shrink-0 border-b-4 border-primary/90">
           <div className="flex justify-between items-start">
             <div>
               <CardTitle className="text-3xl font-bold flex items-center gap-3">
@@ -223,7 +223,7 @@ export default function HistorialClinico({ mascotaId, onClose, autoGeneratePdf }
                 size="sm"
                 onClick={handleDownloadPDF}
                 disabled={downloading}
-                className="bg-white hover:bg-gray-100 text-green-700 font-semibold"
+                className="bg-white hover:bg-gray-100 text-primary font-semibold"
               >
                 <Download className="w-4 h-4 mr-2" />
                 {downloading ? 'Generando...' : 'Descargar PDF'}
@@ -243,7 +243,7 @@ export default function HistorialClinico({ mascotaId, onClose, autoGeneratePdf }
         <CardContent className="p-8 space-y-6 overflow-auto flex-1 bg-gray-50">
           <div ref={printRef} className="bg-white p-8 rounded-lg shadow-sm">
             {/* Header con logo */}
-            <div className="bg-gradient-to-r from-green-600 to-blue-600 text-white p-8 rounded-t-xl mb-6">
+            <div className="bg-gradient-to-r from-primary to-secondary text-white p-8 rounded-t-xl mb-6">
               <div className="flex justify-between items-start">
                 <div>
                   <h1 className="text-3xl font-bold mb-2">VetApp</h1>
@@ -259,44 +259,44 @@ export default function HistorialClinico({ mascotaId, onClose, autoGeneratePdf }
             {/* Información en dos columnas */}
             <div className="grid md:grid-cols-2 gap-6 mb-8">
               {/* Información del Cliente */}
-              <div className="bg-gradient-to-br from-blue-50 to-blue-100 p-6 rounded-xl border-2 border-blue-200 shadow-sm">
-                <div className="flex items-center gap-3 mb-4 pb-3 border-b-2 border-blue-300">
-                  <User className="w-6 h-6 text-blue-700" />
-                  <h3 className="text-xl font-bold text-blue-900">Información del Cliente</h3>
+              <div className="bg-gradient-to-br from-secondary/5 to-secondary/10 p-6 rounded-xl border-2 border-secondary/20 shadow-sm">
+                <div className="flex items-center gap-3 mb-4 pb-3 border-b-2 border-secondary/30">
+                  <User className="w-6 h-6 text-secondary" />
+                  <h3 className="text-xl font-bold text-secondary">Información del Cliente</h3>
                 </div>
                 <div className="space-y-3">
                   <div className="flex items-start gap-2">
-                    <User className="w-4 h-4 text-blue-600 mt-1 flex-shrink-0" />
+                    <User className="w-4 h-4 text-secondary mt-1 flex-shrink-0" />
                     <div>
-                      <p className="text-xs text-blue-700 font-semibold">Nombre Completo</p>
+                      <p className="text-xs text-secondary font-semibold">Nombre Completo</p>
                       <p className="text-gray-900 font-semibold">{clienteNombreCompleto || '-'}</p>
                     </div>
                   </div>
                   <div className="flex items-start gap-2">
-                    <FileText className="w-4 h-4 text-blue-600 mt-1 flex-shrink-0" />
+                    <FileText className="w-4 h-4 text-secondary mt-1 flex-shrink-0" />
                     <div>
-                      <p className="text-xs text-blue-700 font-semibold">DNI</p>
+                      <p className="text-xs text-secondary font-semibold">DNI</p>
                       <p className="text-gray-900">{clienteData?.dni || '-'}</p>
                     </div>
                   </div>
                   <div className="flex items-start gap-2">
-                    <Phone className="w-4 h-4 text-blue-600 mt-1 flex-shrink-0" />
+                    <Phone className="w-4 h-4 text-secondary mt-1 flex-shrink-0" />
                     <div>
-                      <p className="text-xs text-blue-700 font-semibold">Teléfono</p>
+                      <p className="text-xs text-secondary font-semibold">Teléfono</p>
                       <p className="text-gray-900">{clienteData?.telefono || '-'}</p>
                     </div>
                   </div>
                   <div className="flex items-start gap-2">
-                    <Mail className="w-4 h-4 text-blue-600 mt-1 flex-shrink-0" />
+                    <Mail className="w-4 h-4 text-secondary mt-1 flex-shrink-0" />
                     <div>
-                      <p className="text-xs text-blue-700 font-semibold">Email</p>
+                      <p className="text-xs text-secondary font-semibold">Email</p>
                       <p className="text-gray-900">{clienteEmail || '-'}</p>
                     </div>
                   </div>
                   <div className="flex items-start gap-2">
-                    <MapPin className="w-4 h-4 text-blue-600 mt-1 flex-shrink-0" />
+                    <MapPin className="w-4 h-4 text-secondary mt-1 flex-shrink-0" />
                     <div>
-                      <p className="text-xs text-blue-700 font-semibold">Dirección</p>
+                      <p className="text-xs text-secondary font-semibold">Dirección</p>
                       <p className="text-gray-900">{clienteDireccion || '-'}</p>
                     </div>
                   </div>
@@ -304,38 +304,38 @@ export default function HistorialClinico({ mascotaId, onClose, autoGeneratePdf }
               </div>
 
               {/* Información de la Mascota */}
-              <div className="bg-gradient-to-br from-green-50 to-green-100 p-6 rounded-xl border-2 border-green-200 shadow-sm">
-                <div className="flex items-center gap-3 mb-4 pb-3 border-b-2 border-green-300">
-                  <PawPrint className="w-6 h-6 text-green-700" />
-                  <h3 className="text-xl font-bold text-green-900">Información de la Mascota</h3>
+              <div className="bg-gradient-to-br from-primary/5 to-primary/10 p-6 rounded-xl border-2 border-primary/20 shadow-sm">
+                <div className="flex items-center gap-3 mb-4 pb-3 border-b-2 border-primary/30">
+                  <PawPrint className="w-6 h-6 text-primary" />
+                  <h3 className="text-xl font-bold text-primary">Información de la Mascota</h3>
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <p className="text-xs text-green-700 font-semibold">Nombre</p>
+                    <p className="text-xs text-primary font-semibold">Nombre</p>
                     <p className="text-gray-900 font-bold text-lg">{mascota?.nombre}</p>
                   </div>
                   <div>
-                    <p className="text-xs text-green-700 font-semibold">Especie</p>
+                    <p className="text-xs text-primary font-semibold">Especie</p>
                     <p className="text-gray-900">{typeof mascota?.especie === 'object' ? (mascota?.especie?.nombre || '-') : (mascota?.especie || '-')}</p>
                   </div>
                   <div>
-                    <p className="text-xs text-green-700 font-semibold">Raza</p>
+                    <p className="text-xs text-primary font-semibold">Raza</p>
                     <p className="text-gray-900">{mascota?.raza}</p>
                   </div>
                   <div>
-                    <p className="text-xs text-green-700 font-semibold">Edad</p>
+                    <p className="text-xs text-primary font-semibold">Edad</p>
                     <p className="text-gray-900">{mascota?.edad} años</p>
                   </div>
                   <div>
-                    <p className="text-xs text-green-700 font-semibold">Sexo</p>
+                    <p className="text-xs text-primary font-semibold">Sexo</p>
                     <p className="text-gray-900">{typeof mascota?.sexo === 'object' ? (mascota?.sexo?.nombre || '-') : (mascota?.sexo || '-')}</p>
                   </div>
                   <div>
-                    <p className="text-xs text-green-700 font-semibold">Peso</p>
+                    <p className="text-xs text-primary font-semibold">Peso</p>
                     <p className="text-gray-900">{mascota?.peso} kg</p>
                   </div>
                   <div className="col-span-2">
-                    <p className="text-xs text-green-700 font-semibold">Color/Descripción</p>
+                    <p className="text-xs text-primary font-semibold">Color/Descripción</p>
                     <p className="text-gray-900">{mascota?.color}</p>
                   </div>
                 </div>
@@ -345,7 +345,7 @@ export default function HistorialClinico({ mascotaId, onClose, autoGeneratePdf }
             {/* Historial Cronológico */}
             <div className="mb-6">
               <div className="flex items-center gap-3 mb-6 pb-3 border-b-2 border-gray-300">
-                <Stethoscope className="w-7 h-7 text-green-600" />
+                <Stethoscope className="w-7 h-7 text-primary" />
                 <h2 className="text-2xl font-bold text-gray-900">Historial Cronológico de Consultas</h2>
               </div>
               
@@ -358,9 +358,9 @@ export default function HistorialClinico({ mascotaId, onClose, autoGeneratePdf }
                     : (tId ? (medicamentosPorTratamiento[tId] || []) : []);
                   
                   return (
-                    <div key={cita.id} className="border-l-4 border-green-500 pl-6 relative">
+                    <div key={cita.id} className="border-l-4 border-primary pl-6 relative">
                       {/* Número de consulta */}
-                      <div className="absolute -left-8 top-0 w-12 h-12 bg-green-600 text-white rounded-full flex items-center justify-center font-bold shadow-lg">
+                      <div className="absolute -left-8 top-0 w-12 h-12 bg-primary text-white rounded-full flex items-center justify-center font-bold shadow-lg">
                         {index + 1}
                       </div>
 
@@ -368,7 +368,7 @@ export default function HistorialClinico({ mascotaId, onClose, autoGeneratePdf }
                         {/* Header de la cita */}
                         <div className="flex justify-between items-start mb-4 pb-4 border-b-2 border-gray-200">
                           <div>
-                            <div className="flex items-center gap-2 text-green-700 font-bold text-lg mb-1">
+                            <div className="flex items-center gap-2 text-primary font-bold text-lg mb-1">
                               <Calendar className="w-5 h-5" />
                               {(() => {
                                 const d = new Date(String(cita?.fecha || '').replace(/\//g, '-'));
@@ -392,8 +392,8 @@ export default function HistorialClinico({ mascotaId, onClose, autoGeneratePdf }
                             </div>
                             
                             {cita.veterinario && (
-                              <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
-                                <p className="text-xs text-blue-700 font-semibold mb-1">VETERINARIO RESPONSABLE</p>
+                              <div className="bg-secondary/5 p-4 rounded-lg border border-secondary/20">
+                                <p className="text-xs text-secondary font-semibold mb-1">VETERINARIO RESPONSABLE</p>
                                 <p className="text-gray-900 font-medium">Dr. {typeof cita.veterinario === 'object' ? `${cita.veterinario?.nombres || ''} ${cita.veterinario?.apellidos || ''}`.trim() : cita.veterinario}</p>
                               </div>
                             )}
@@ -417,30 +417,30 @@ export default function HistorialClinico({ mascotaId, onClose, autoGeneratePdf }
                                 <p className="text-gray-900 font-semibold">{tratamiento.diagnostico}</p>
                               </div>
 
-                              <div className="bg-green-50 p-4 rounded-lg border-2 border-green-300">
-                                <p className="text-xs text-green-700 font-bold mb-2 uppercase">Tratamiento Indicado</p>
+                              <div className="bg-primary/5 p-4 rounded-lg border-2 border-primary/30">
+                                <p className="text-xs text-primary font-bold mb-2 uppercase">Tratamiento Indicado</p>
                                 <p className="text-gray-900">{tratamiento.tratamiento_indicado}</p>
                               </div>
 
                               {medicamentos.length > 0 && (
-                                <div className="bg-purple-50 p-4 rounded-lg border-2 border-purple-300">
+                                <div className="bg-secondary/5 p-4 rounded-lg border-2 border-secondary/30">
                                   <div className="flex items-center gap-2 mb-3">
-                                    <Pill className="w-5 h-5 text-purple-600" />
-                                    <p className="text-xs text-purple-700 font-bold uppercase">Medicamentos Recetados</p>
+                                    <Pill className="w-5 h-5 text-secondary" />
+                                    <p className="text-xs text-secondary font-bold uppercase">Medicamentos Recetados</p>
                                   </div>
                                   <div className="space-y-2">
                                     {medicamentos.map((med, idx) => (
-                                      <div key={idx} className="bg-white p-3 rounded-lg border border-purple-200">
-                                        <p className="font-bold text-purple-900 mb-1">{med.nombre}</p>
+                                      <div key={idx} className="bg-white p-3 rounded-lg border border-secondary/20">
+                                        <p className="font-bold text-secondary mb-1">{med.nombre}</p>
                                         <div className="grid grid-cols-2 gap-2 text-xs text-gray-700">
                                           {med.dosis && (
                                             <div>
-                                              <span className="font-semibold text-purple-700">Dosis:</span> {med.dosis}
+                                              <span className="font-semibold text-secondary">Dosis:</span> {med.dosis}
                                             </div>
                                           )}
                                           {med.duracion && (
                                             <div>
-                                              <span className="font-semibold text-purple-700">Duración:</span> {med.duracion}
+                                              <span className="font-semibold text-secondary">Duración:</span> {med.duracion}
                                             </div>
                                           )}
                                         </div>
@@ -451,8 +451,8 @@ export default function HistorialClinico({ mascotaId, onClose, autoGeneratePdf }
                               )}
 
                               {tratamiento.recomendaciones && (
-                                <div className="bg-indigo-50 p-4 rounded-lg border border-indigo-200">
-                                  <p className="text-xs text-indigo-700 font-bold mb-2 uppercase">Recomendaciones</p>
+                                <div className="bg-primary/5 p-4 rounded-lg border border-primary/20">
+                                  <p className="text-xs text-primary font-bold mb-2 uppercase">Recomendaciones</p>
                                   <p className="text-gray-900 text-sm">{tratamiento.recomendaciones}</p>
                                 </div>
                               )}
@@ -482,7 +482,7 @@ export default function HistorialClinico({ mascotaId, onClose, autoGeneratePdf }
                   <p className="font-bold text-gray-900">Firma del Veterinario</p>
                 </div>
                 <div className="text-right">
-                  <p className="font-bold text-green-700 text-lg">VetApp</p>
+                  <p className="font-bold text-primary text-lg">VetApp</p>
                   <p className="text-gray-600 text-sm">Sistema Veterinario Profesional</p>
                   <p className="text-gray-500 text-xs">www.vetApp.com</p>
                 </div>
@@ -494,3 +494,4 @@ export default function HistorialClinico({ mascotaId, onClose, autoGeneratePdf }
     </div>
   );
 }
+

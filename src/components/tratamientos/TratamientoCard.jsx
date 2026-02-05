@@ -24,11 +24,11 @@ export default function TratamientoCard({ tratamiento, mascota, cliente, cita, o
   
   return (
     <Card className="shadow-lg hover:shadow-xl transition-shadow">
-      <CardHeader className="bg-gradient-to-r from-green-50 to-blue-50 border-b">
+      <CardHeader className="bg-gradient-to-r from-primary/5 to-secondary/5 border-b">
         <div className="flex justify-between items-start">
           <div>
             <CardTitle className="text-xl flex items-center gap-2">
-              <FileText className="w-5 h-5 text-green-600" />
+              <FileText className="w-5 h-5 text-primary" />
               {mascota?.nombre}
             </CardTitle>
             <p className="text-sm text-gray-600 mt-1">
@@ -55,18 +55,18 @@ export default function TratamientoCard({ tratamiento, mascota, cliente, cita, o
 
         <div>
           <h4 className="font-semibold text-gray-900 mb-2">Tratamiento Indicado</h4>
-          <p className="text-gray-700 bg-blue-50 p-3 rounded-lg">{tratamiento.tratamiento_indicado}</p>
+          <p className="text-gray-700 bg-secondary/5 p-3 rounded-lg">{tratamiento.tratamiento_indicado}</p>
         </div>
 
         {medicamentos.length > 0 && (
-          <div className="bg-green-50 p-4 rounded-lg">
+          <div className="bg-primary/5 p-4 rounded-lg">
             <div className="flex items-center gap-2 mb-3">
-              <Pill className="w-4 h-4 text-green-600" />
+              <Pill className="w-4 h-4 text-primary" />
               <h4 className="font-semibold text-gray-900">Medicamentos Recetados</h4>
             </div>
             <div className="space-y-3">
               {medicamentos.map((med, index) => (
-                <div key={med?.medicamento_id || `${med.nombre}-${index}`} className="bg-white p-3 rounded border border-green-200">
+                <div key={med?.medicamento_id || `${med.nombre}-${index}`} className="bg-white p-3 rounded border border-primary/20">
                   <p className="font-semibold text-gray-900">{med.nombre}</p>
                   <div className="grid grid-cols-2 gap-2 mt-2 text-sm text-gray-600">
                     {med.dosis && (
@@ -107,7 +107,7 @@ export default function TratamientoCard({ tratamiento, mascota, cliente, cita, o
           variant="outline"
           size="sm"
           onClick={onViewHistorial}
-          className="text-blue-600"
+          className="text-secondary"
         >
           <FileText className="w-4 h-4 mr-1" />
           Ver Historial

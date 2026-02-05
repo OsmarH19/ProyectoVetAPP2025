@@ -30,7 +30,7 @@ export default function MascotaCard({ mascota, cliente, onEdit, onDelete }) {
             className="w-full h-48 object-cover"
           />
         ) : (
-          <div className="w-full h-48 bg-gradient-to-br from-green-400 to-blue-500 flex items-center justify-center">
+          <div className="w-full h-48 bg-gradient-to-br from-primary to-secondary flex items-center justify-center">
             <span className="text-6xl text-white">
               {especieLabel === 'Perro' ? '🐕' : especieLabel === 'Gato' ? '🐈' : '🐾'}
             </span>

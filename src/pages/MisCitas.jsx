@@ -90,11 +90,11 @@ export default function MisCitas() {
 
     return (
       <Card className="shadow-md hover:shadow-lg transition-shadow">
-        <CardHeader className="bg-gradient-to-r from-green-50 to-blue-50 border-b">
+        <CardHeader className="bg-gradient-to-r from-primary/5 to-secondary/5 border-b">
           <div className="flex justify-between items-start">
             <div>
               <CardTitle className="text-lg flex items-center gap-2">
-                <Calendar className="w-5 h-5 text-green-600" />
+                <Calendar className="w-5 h-5 text-primary" />
                 {format(new Date(cita.fecha), "dd 'de' MMMM 'de' yyyy", { locale: es })}
               </CardTitle>
               <p className="text-sm text-gray-600 mt-1 flex items-center gap-1">
@@ -110,7 +110,7 @@ export default function MisCitas() {
         <CardContent className="p-6 space-y-4">
           <div>
             <div className="flex items-center gap-2 mb-2">
-              <PawPrint className="w-4 h-4 text-green-600" />
+              <PawPrint className="w-4 h-4 text-primary" />
               <p className="font-semibold text-gray-900">{mascota?.nombre}</p>
             </div>
             <p className="text-sm text-gray-600">{mascota?.especie} - {mascota?.raza}</p>
@@ -129,9 +129,9 @@ export default function MisCitas() {
           )}
 
           {tratamiento && (
-            <div className="mt-4 pt-4 border-t bg-green-50 -m-6 p-6">
+            <div className="mt-4 pt-4 border-t bg-primary/5 -m-6 p-6">
               <div className="flex items-center gap-2 mb-3">
-                <FileText className="w-5 h-5 text-green-600" />
+                <FileText className="w-5 h-5 text-primary" />
                 <h4 className="font-semibold text-gray-900">Tratamiento</h4>
               </div>
               
@@ -150,7 +150,7 @@ export default function MisCitas() {
                   <div className="space-y-2">
                     <p className="text-sm font-semibold text-gray-900">Medicamentos</p>
                     {medicamentos.map((med, idx) => (
-                      <div key={med?.medicamento_id || `${med.nombre}-${idx}`} className="bg-white p-2 rounded border border-green-200 text-sm">
+                      <div key={med?.medicamento_id || `${med.nombre}-${idx}`} className="bg-white p-2 rounded border border-primary/20 text-sm">
                         <p className="font-semibold text-gray-900">{med.nombre}</p>
                         <div className="grid grid-cols-2 gap-2 mt-1 text-xs text-gray-600">
                           {med.dosis && (

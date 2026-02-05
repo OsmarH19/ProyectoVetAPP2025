@@ -78,11 +78,11 @@ export default function CitasCalendar({ citas, mascotas, clientes, onEdit }) {
               <div
                 key={idx}
                 className={`min-h-[100px] p-2 border rounded-lg ${
-                  isToday ? 'bg-green-50 border-green-300' : 'bg-white'
+                  isToday ? 'bg-primary/5 border-primary/30' : 'bg-white'
                 } ${!isCurrentMonth ? 'opacity-40' : ''}`}
               >
                 <div className={`text-sm font-semibold mb-1 ${
-                  isToday ? 'text-green-700' : 'text-gray-700'
+                  isToday ? 'text-primary' : 'text-gray-700'
                 }`}>
                   {format(day, 'd')}
                 </div>

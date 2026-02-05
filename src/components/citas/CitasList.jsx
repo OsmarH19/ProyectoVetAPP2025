@@ -75,7 +75,7 @@ export default function CitasList({ citas, mascotas, clientes, onEdit, onDelete,
                     <TableCell>
                       <div className="space-y-1">
                         <div className="flex items-center gap-2 font-semibold text-gray-900">
-                          <Calendar className="w-4 h-4 text-blue-600" />
+                          <Calendar className="w-4 h-4 text-secondary" />
                           {cita.fecha && format(new Date(cita.fecha), "dd MMM yyyy", { locale: es })}
                         </div>
                         <div className="flex items-center gap-2 text-sm text-gray-600">
@@ -86,7 +86,7 @@ export default function CitasList({ citas, mascotas, clientes, onEdit, onDelete,
                     </TableCell>
                     <TableCell>
                       <div className="flex items-center gap-2">
-                        <PawPrint className="w-4 h-4 text-green-600" />
+                        <PawPrint className="w-4 h-4 text-primary" />
                         <div>
                           <p className="font-semibold">{mascotaNombre}</p>
                           {mascota?.especie && (
@@ -132,7 +132,7 @@ export default function CitasList({ citas, mascotas, clientes, onEdit, onDelete,
                           size="icon"
                           onClick={() => onEdit(cita)}
                         >
-                          <Edit className="w-4 h-4 text-blue-600" />
+                          <Edit className="w-4 h-4 text-secondary" />
                         </Button>
                         <Button
                           variant="ghost"

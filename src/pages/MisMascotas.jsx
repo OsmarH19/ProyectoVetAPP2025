@@ -77,7 +77,7 @@ export default function MisMascotas() {
                       className="w-full h-48 object-cover"
                     />
                   ) : (
-                    <div className="w-full h-48 bg-gradient-to-br from-green-400 to-blue-500 flex items-center justify-center">
+                    <div className="w-full h-48 bg-gradient-to-br from-primary to-secondary flex items-center justify-center">
                       <span className="text-6xl text-white">
                         {mascota.especie === 'Perro' ? '🐕' : mascota.especie === 'Gato' ? '🐈' : '🐾'}
                       </span>
@@ -126,10 +126,10 @@ export default function MisMascotas() {
                       </h4>
                       <div className="space-y-2">
                         {mascotaTratamientos.slice(0, 2).map(t => (
-                          <div key={t.id} className="text-sm bg-blue-50 p-2 rounded">
-                            <p className="font-semibold text-gray-900">{t.diagnostico}</p>
-                            <p className="text-gray-600 text-xs mt-1">{t.tratamiento_indicado}</p>
-                          </div>
+                        <div key={t.id} className="text-sm bg-secondary/5 p-2 rounded">
+                          <p className="font-semibold text-gray-900">{t.diagnostico}</p>
+                          <p className="text-gray-600 text-xs mt-1">{t.tratamiento_indicado}</p>
+                        </div>
                         ))}
                       </div>
                     </div>

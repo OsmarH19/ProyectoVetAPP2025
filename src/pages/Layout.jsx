@@ -127,11 +127,11 @@ export default function Layout({ children, currentPageName }) {
 
   return (
     <SidebarProvider>
-      <div className="min-h-screen flex w-full bg-gradient-to-br from-blue-50 via-green-50 to-orange-50">
-        <Sidebar className="border-r border-gray-200 bg-white/80 backdrop-blur-sm">
-          <SidebarHeader className="border-b border-gray-200 p-6">
+      <div className="min-h-screen flex w-full bg-gradient-to-br from-primary/5 via-primary/10 to-white">
+        <Sidebar className="border-r border-border bg-sidebar/80 backdrop-blur-sm">
+          <SidebarHeader className="border-b border-border p-6">
             <div className="flex items-center gap-3">
-              <div className="w-12 h-12 bg-gradient-to-br from-green-400 to-blue-500 rounded-xl flex items-center justify-center shadow-lg">
+              <div className="w-12 h-12 bg-gradient-to-br from-primary to-secondary rounded-xl flex items-center justify-center shadow-lg">
                 <Heart className="w-7 h-7 text-white fill-white" />
               </div>
               <div>
@@ -152,8 +152,8 @@ export default function Layout({ children, currentPageName }) {
                     <SidebarMenuItem key={item.title}>
                       <SidebarMenuButton 
                         asChild 
-                        className={`hover:bg-green-50 hover:text-green-700 transition-all duration-200 rounded-lg mb-1 ${
-                          location.pathname === item.url ? 'bg-green-100 text-green-700 shadow-sm' : ''
+                        className={`hover:bg-primary/10 hover:text-primary transition-all duration-200 rounded-lg mb-1 ${
+                          location.pathname === item.url ? 'bg-primary/15 text-primary shadow-sm' : ''
                         }`}
                       >
                         <Link to={item.url} className="flex items-center gap-3 px-3 py-2.5">
@@ -168,9 +168,9 @@ export default function Layout({ children, currentPageName }) {
             </SidebarGroup>
           </SidebarContent>
 
-          <SidebarFooter className="border-t border-gray-200 p-4">
+          <SidebarFooter className="border-t border-border p-4">
             <div className="flex items-center gap-3 mb-3">
-                <Avatar className="w-10 h-10 bg-gradient-to-br from-green-400 to-blue-500">
+                <Avatar className="w-10 h-10 bg-gradient-to-br from-primary to-secondary">
                   <AvatarFallback className="bg-transparent text-white font-semibold">
                   {getInitials(user?.name)}
                   </AvatarFallback>
@@ -181,7 +181,7 @@ export default function Layout({ children, currentPageName }) {
                 </p>
                 <p className="text-xs text-gray-500 truncate">{user?.email}</p>
                 {user && (
-                  <p className="text-xs text-green-600 font-medium">
+                  <p className="text-xs text-primary font-medium">
                     {isAdmin ? 'Administrador' : 'Usuario'}
                   </p>
                 )}
@@ -199,11 +199,11 @@ export default function Layout({ children, currentPageName }) {
         </Sidebar>
 
         <main className="flex-1 flex flex-col overflow-hidden">
-          <header className="bg-white/80 backdrop-blur-sm border-b border-gray-200 px-6 py-4 lg:hidden shadow-sm">
+          <header className="bg-card/80 backdrop-blur-sm border-b border-border px-6 py-4 lg:hidden shadow-sm">
             <div className="flex items-center gap-4">
               <SidebarTrigger className="hover:bg-gray-100 p-2 rounded-lg transition-colors duration-200" />
               <div className="flex items-center gap-2">
-                <Heart className="w-6 h-6 text-green-500 fill-green-500" />
+                <Heart className="w-6 h-6 text-primary fill-primary" />
                 <h1 className="text-xl font-bold text-gray-900">VetApp</h1>
               </div>
             </div>
@@ -215,14 +215,6 @@ export default function Layout({ children, currentPageName }) {
         </main>
       </div>
 
-      <style>{`
-        :root {
-          --primary: 142 71% 45%;
-          --primary-foreground: 0 0% 100%;
-          --secondary: 210 40% 96%;
-          --accent: 142 71% 45%;
-        }
-      `}</style>
     </SidebarProvider>
   );
 }

@@ -82,7 +82,7 @@ export default function Clientes() {
               setEditingCliente(null);
               setShowForm(true);
             }}
-            className="bg-green-600 hover:bg-green-700"
+            className="bg-primary hover:bg-primary/90"
           >
             <Plus className="w-4 h-4 mr-2" />
             Nuevo Cliente
@@ -136,7 +136,7 @@ export default function Clientes() {
                         <TableRow key={cliente.id} className="hover:bg-gray-50">
                           <TableCell>
                             <div className="flex items-center gap-3">
-                              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-green-400 to-blue-500 flex items-center justify-center text-white font-semibold">
+                              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center text-white font-semibold">
                                 {cliente.nombres?.[0]}{cliente.apellidos?.[0]}
                               </div>
                               <div>
@@ -172,7 +172,7 @@ export default function Clientes() {
                                 size="icon"
                                 onClick={() => handleEdit(cliente)}
                               >
-                                <Edit className="w-4 h-4 text-blue-600" />
+                                <Edit className="w-4 h-4 text-secondary" />
                               </Button>
                               <Button
                                 variant="ghost"
@@ -210,3 +210,4 @@ export default function Clientes() {
     </div>
   );
 }
+

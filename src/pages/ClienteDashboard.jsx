@@ -72,46 +72,46 @@ export default function ClienteDashboard() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-          <Card className="bg-gradient-to-br from-green-500 to-green-600 text-white border-none shadow-lg">
+          <Card className="bg-gradient-to-br from-primary to-primary/90 text-white border-none shadow-lg">
             <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium text-green-100">
+              <CardTitle className="text-sm font-medium text-white/80">
                 Mis Mascotas
               </CardTitle>
-              <PawPrint className="h-5 w-5 text-green-100" />
+              <PawPrint className="h-5 w-5 text-white/80" />
             </CardHeader>
             <CardContent>
               <div className="text-3xl font-bold">{mascotas.length}</div>
-              <p className="text-xs text-green-100 mt-1">
+              <p className="text-xs text-white/80 mt-1">
                 Mascotas registradas
               </p>
             </CardContent>
           </Card>
 
-          <Card className="bg-gradient-to-br from-blue-500 to-blue-600 text-white border-none shadow-lg">
+          <Card className="bg-gradient-to-br from-secondary to-secondary/90 text-white border-none shadow-lg">
             <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium text-blue-100">
+              <CardTitle className="text-sm font-medium text-white/80">
                 Citas Totales
               </CardTitle>
-              <Calendar className="h-5 w-5 text-blue-100" />
+              <Calendar className="h-5 w-5 text-white/80" />
             </CardHeader>
             <CardContent>
               <div className="text-3xl font-bold">{citas.length}</div>
-              <p className="text-xs text-blue-100 mt-1">
+              <p className="text-xs text-white/80 mt-1">
                 Historial de citas
               </p>
             </CardContent>
           </Card>
 
-          <Card className="bg-gradient-to-br from-orange-500 to-orange-600 text-white border-none shadow-lg">
+          <Card className="bg-gradient-to-br from-accent to-accent/90 text-white border-none shadow-lg">
             <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium text-orange-100">
+              <CardTitle className="text-sm font-medium text-white/80">
                 Citas Pendientes
               </CardTitle>
-              <Activity className="h-5 w-5 text-orange-100" />
+              <Activity className="h-5 w-5 text-white/80" />
             </CardHeader>
             <CardContent>
               <div className="text-3xl font-bold">{citasPendientes.length}</div>
-              <p className="text-xs text-orange-100 mt-1">
+              <p className="text-xs text-white/80 mt-1">
                 Por atender
               </p>
             </CardContent>
@@ -119,12 +119,12 @@ export default function ClienteDashboard() {
         </div>
 
         {proximaCita && (
-          <Card className="mb-6 shadow-lg border-l-4 border-l-green-500">
+          <Card className="mb-6 shadow-lg border-l-4 border-l-primary">
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Calendar className="w-5 h-5 text-green-600" />
-                Próxima Cita
-              </CardTitle>
+            <CardTitle className="flex items-center gap-2">
+              <Calendar className="w-5 h-5 text-primary" />
+              Próxima Cita
+            </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="grid md:grid-cols-2 gap-4">
@@ -153,7 +153,7 @@ export default function ClienteDashboard() {
           <Card className="shadow-lg">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <PawPrint className="w-5 h-5 text-green-600" />
+                <PawPrint className="w-5 h-5 text-primary" />
                 Mis Mascotas
               </CardTitle>
             </CardHeader>
@@ -162,7 +162,7 @@ export default function ClienteDashboard() {
                 <div className="space-y-3">
                   {mascotas.map(mascota => (
                     <div key={mascota.id} className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
-                      <div className="w-12 h-12 rounded-full bg-gradient-to-br from-green-400 to-blue-500 flex items-center justify-center text-white text-xl">
+                      <div className="w-12 h-12 rounded-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center text-white text-xl">
                         {mascota.especie === 'Perro' ? '🐕' : mascota.especie === 'Gato' ? '🐈' : '🐾'}
                       </div>
                       <div>
@@ -183,7 +183,7 @@ export default function ClienteDashboard() {
           <Card className="shadow-lg">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <Calendar className="w-5 h-5 text-blue-600" />
+                <Calendar className="w-5 h-5 text-secondary" />
                 Últimas Citas
               </CardTitle>
             </CardHeader>

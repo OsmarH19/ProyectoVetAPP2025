@@ -99,7 +99,7 @@ export default function Dashboard() {
 
   const pieData = Object.entries(especiesData).map(([name, value]) => ({ name, value }));
 
-  const COLORS = ['#10b981', '#3b82f6', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899'];
+  const COLORS = ['#5E56A3', '#2D6CDF', '#F4B740', '#2EAE6B', '#2D9CDB', '#E24A4A'];
 
   const estadoNombre = (c) => {
     if (typeof c.estado === 'string' && c.estado) return c.estado
@@ -167,61 +167,61 @@ export default function Dashboard() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          <Card className="bg-gradient-to-br from-blue-500 to-blue-600 text-white border-none shadow-lg hover:shadow-xl transition-shadow">
+          <Card className="bg-gradient-to-br from-primary to-primary/90 text-white border-none shadow-lg hover:shadow-xl transition-shadow">
             <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium text-blue-100">
+              <CardTitle className="text-sm font-medium text-white/80">
                 Total Clientes
               </CardTitle>
-              <Users className="h-5 w-5 text-blue-100" />
+              <Users className="h-5 w-5 text-white/80" />
             </CardHeader>
             <CardContent>
               <div className="text-3xl font-bold">{clientes.length}</div>
-              <p className="text-xs text-blue-100 mt-1">
+              <p className="text-xs text-white/80 mt-1">
                 Clientes registrados
               </p>
             </CardContent>
           </Card>
 
-          <Card className="bg-gradient-to-br from-green-500 to-green-600 text-white border-none shadow-lg hover:shadow-xl transition-shadow">
+          <Card className="bg-gradient-to-br from-secondary to-secondary/90 text-white border-none shadow-lg hover:shadow-xl transition-shadow">
             <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium text-green-100">
+              <CardTitle className="text-sm font-medium text-white/80">
                 Total Mascotas
               </CardTitle>
-              <PawPrint className="h-5 w-5 text-green-100" />
+              <PawPrint className="h-5 w-5 text-white/80" />
             </CardHeader>
             <CardContent>
               <div className="text-3xl font-bold">{mascotas.length}</div>
-              <p className="text-xs text-green-100 mt-1">
+              <p className="text-xs text-white/80 mt-1">
                 Mascotas registradas
               </p>
             </CardContent>
           </Card>
 
-          <Card className="bg-gradient-to-br from-orange-500 to-orange-600 text-white border-none shadow-lg hover:shadow-xl transition-shadow">
+          <Card className="bg-gradient-to-br from-accent to-accent/90 text-white border-none shadow-lg hover:shadow-xl transition-shadow">
             <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium text-orange-100">
+              <CardTitle className="text-sm font-medium text-white/80">
                 Citas Pendientes
               </CardTitle>
-              <Calendar className="h-5 w-5 text-orange-100" />
+              <Calendar className="h-5 w-5 text-white/80" />
             </CardHeader>
             <CardContent>
               <div className="text-3xl font-bold">{citasPendientes}</div>
-              <p className="text-xs text-orange-100 mt-1">
+              <p className="text-xs text-white/80 mt-1">
                 Por atender
               </p>
             </CardContent>
           </Card>
 
-          <Card className="bg-gradient-to-br from-purple-500 to-purple-600 text-white border-none shadow-lg hover:shadow-xl transition-shadow">
+          <Card className="bg-gradient-to-br from-[#403875] to-primary text-white border-none shadow-lg hover:shadow-xl transition-shadow">
             <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium text-purple-100">
+              <CardTitle className="text-sm font-medium text-white/80">
                 Citas Hoy
               </CardTitle>
-              <Activity className="h-5 w-5 text-purple-100" />
+              <Activity className="h-5 w-5 text-white/80" />
             </CardHeader>
             <CardContent>
               <div className="text-3xl font-bold">{citasHoy}</div>
-              <p className="text-xs text-purple-100 mt-1">
+              <p className="text-xs text-white/80 mt-1">
                 Para hoy
               </p>
             </CardContent>
@@ -231,7 +231,7 @@ export default function Dashboard() {
         <Card className="shadow-lg mb-8">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <Calendar className="w-5 h-5 text-green-600" />
+              <Calendar className="w-5 h-5 text-primary" />
               Próximas Citas
             </CardTitle>
           </CardHeader>
@@ -271,10 +271,10 @@ export default function Dashboard() {
         <div className="grid lg:grid-cols-2 gap-6 mb-6">
           <Card className="shadow-lg">
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <TrendingUp className="w-5 h-5 text-green-600" />
-                Citas por Estado
-              </CardTitle>
+            <CardTitle className="flex items-center gap-2">
+              <TrendingUp className="w-5 h-5 text-primary" />
+              Citas por Estado
+            </CardTitle>
             </CardHeader>
             <CardContent>
               <ResponsiveContainer width="100%" height={300}>
@@ -283,7 +283,7 @@ export default function Dashboard() {
                   <XAxis dataKey="name" />
                   <YAxis />
                   <Tooltip />
-                  <Bar dataKey="value" fill="#10b981" radius={[8, 8, 0, 0]} />
+                  <Bar dataKey="value" fill="#5E56A3" radius={[8, 8, 0, 0]} />
                 </BarChart>
               </ResponsiveContainer>
             </CardContent>
@@ -291,10 +291,10 @@ export default function Dashboard() {
 
           <Card className="shadow-lg">
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <PawPrint className="w-5 h-5 text-blue-600" />
-                Distribución por Especie
-              </CardTitle>
+            <CardTitle className="flex items-center gap-2">
+              <PawPrint className="w-5 h-5 text-secondary" />
+              Distribución por Especie
+            </CardTitle>
             </CardHeader>
             <CardContent>
               <ResponsiveContainer width="100%" height={300}>
@@ -323,7 +323,7 @@ export default function Dashboard() {
         <Card className="shadow-lg">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <Calendar className="w-5 h-5 text-purple-600" />
+              <Calendar className="w-5 h-5 text-primary" />
               Evolución de Citas
             </CardTitle>
           </CardHeader>
@@ -338,7 +338,7 @@ export default function Dashboard() {
                 <Line 
                   type="monotone" 
                   dataKey="value" 
-                  stroke="#8b5cf6" 
+                  stroke="#5E56A3" 
                   strokeWidth={3}
                   name="Citas"
                 />
