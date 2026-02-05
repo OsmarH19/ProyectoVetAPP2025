@@ -9,7 +9,7 @@ import { X, Save, Plus, Trash2 } from "lucide-react";
 
 export default function TratamientoForm({ tratamiento, citas, mascotas, clientes, veterinarios, onSubmit, onCancel, isLoading }) {
   const [formData, setFormData] = useState(() => ({
-    cita_id: tratamiento?.cita_id ?? "",
+    cita_id: tratamiento?.cita_id ? String(tratamiento.cita_id) : "",
     diagnostico: tratamiento?.diagnostico ?? "",
     tratamiento_indicado: tratamiento?.tratamiento_indicado ?? "",
     medicamentos: Array.isArray(tratamiento?.medicamentos) && tratamiento.medicamentos.length > 0 
@@ -69,7 +69,7 @@ export default function TratamientoForm({ tratamiento, citas, mascotas, clientes
           newData.mascota_id = cita.mascota_id;
           newData.cliente_id = cita.cliente_id;
           newData.veterinario_id = cita.veterinario_id;
-          newData.cita_id = cita.id;
+          newData.cita_id = String(cita.id);
         }
       }
       if (field === 'veterinario_id' && value) {
@@ -116,7 +116,7 @@ export default function TratamientoForm({ tratamiento, citas, mascotas, clientes
           <div className="space-y-2">
             <Label htmlFor="cita_id">Cita Asociada *</Label>
             <Select
-              value={formData.cita_id}
+              value={formData.cita_id ? String(formData.cita_id) : ""}
               onValueChange={(value) => handleChange('cita_id', value)}
               required
             >
