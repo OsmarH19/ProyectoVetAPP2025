@@ -125,6 +125,7 @@ export default function Layout({ children, currentPageName }) {
     return name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
   };
 
+  
   return (
     <SidebarProvider>
       <div className="min-h-screen flex w-full bg-gradient-to-br from-primary/5 via-primary/10 to-white">
