@@ -370,6 +370,18 @@ export default function Tratamientos() {
   const pagedTratamientos = filteredTratamientos.slice(start, start + perPage);
   React.useEffect(() => { setPage(1); }, [searchTerm]);
 
+  const formatVeterinario = (value) => {
+    if (!value) return '—';
+    if (typeof value === 'string') return value.trim() || '—';
+    if (typeof value === 'object') {
+      const nombres = value.nombres ?? '';
+      const apellidos = value.apellidos ?? '';
+      const full = `${nombres} ${apellidos}`.trim();
+      return full || '—';
+    }
+    return String(value);
+  };
+
   return (
     <div className="p-4 md:p-8">
       <div className="max-w-7xl mx-auto">
@@ -450,7 +462,7 @@ export default function Tratamientos() {
                       {pagedTratamientos.map((tratamiento) => {
                         const mascotaNombre = tratamiento?.mascota?.nombre || '—';
                         const clienteNombre = `${tratamiento?.cliente?.nombres || ''} ${tratamiento?.cliente?.apellidos || ''}`.trim() || '—';
-                        const vetNombre = tratamiento?.veterinario || '—';
+                        const vetNombre = formatVeterinario(tratamiento?.veterinario);
                         const fechaCita = tratamiento?.cita?.fecha || '—';
                         return (
                           <TableRow key={tratamiento.id} className="hover:bg-gray-50">
