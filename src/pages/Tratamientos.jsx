@@ -1,11 +1,11 @@
-import React, { useState } from "react";
+﻿import React, { useState } from "react";
 import { base44 } from "@/api/base44Client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { Plus, Search } from "lucide-react";
-import TratamientoCard from "../components/tratamientos/TratamientoCard";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Plus, Search, FileText, Edit, Trash2, User, PawPrint, Stethoscope, Calendar } from "lucide-react";
 import TratamientoForm from "../components/tratamientos/TratamientoForm";
 import HistorialClinico from "../components/tratamientos/HistorialClinico";
 
@@ -14,7 +14,7 @@ export default function Tratamientos() {
   const [editingTratamiento, setEditingTratamiento] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [page, setPage] = useState(1);
-  const perPage = 2;
+  const perPage = 6;
   const [selectedMascotaId, setSelectedMascotaId] = useState(null);
   const [autoPdfMascotaId, setAutoPdfMascotaId] = useState(null);
   const queryClient = useQueryClient();
@@ -428,36 +428,123 @@ export default function Tratamientos() {
               </CardHeader>
             </Card>
 
-            <div className="grid md:grid-cols-2 gap-6">
-              {pagedTratamientos.map((tratamiento) => (
-                <TratamientoCard
-                  key={tratamiento.id}
-                  tratamiento={tratamiento}
-                  mascota={tratamiento.mascota}
-                  cliente={tratamiento.cliente}
-                  cita={tratamiento.cita}
-                  onEdit={handleEdit}
-                  onDelete={handleDelete}
-                  onViewHistorial={() => { setSelectedMascotaId(tratamiento.mascota_id); setAutoPdfMascotaId(tratamiento.mascota_id); }}
-                />
-              ))}
-              {filteredTratamientos.length === 0 && (
-                <div className="col-span-full text-center py-12 text-gray-500">
-                  No se encontraron tratamientos
+            <Card className="shadow-lg">
+              <CardHeader>
+                <CardTitle>Lista de Tratamientos ({filteredTratamientos.length})</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="overflow-x-auto">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Mascota</TableHead>
+                        <TableHead>Cliente</TableHead>
+                        <TableHead>Diagnóstico</TableHead>
+                        <TableHead>Tratamiento</TableHead>
+                        <TableHead>Veterinario</TableHead>
+                        <TableHead>Fecha</TableHead>
+                        <TableHead className="text-right">Acciones</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {pagedTratamientos.map((tratamiento) => {
+                        const mascotaNombre = tratamiento?.mascota?.nombre || '—';
+                        const clienteNombre = `${tratamiento?.cliente?.nombres || ''} ${tratamiento?.cliente?.apellidos || ''}`.trim() || '—';
+                        const vetNombre = tratamiento?.veterinario || '—';
+                        const fechaCita = tratamiento?.cita?.fecha || '—';
+                        return (
+                          <TableRow key={tratamiento.id} className="hover:bg-gray-50">
+                            <TableCell>
+                              <div className="flex items-center gap-2">
+                                <PawPrint className="w-4 h-4 text-primary" />
+                                <span className="font-semibold text-gray-900">{mascotaNombre}</span>
+                              </div>
+                            </TableCell>
+                            <TableCell>
+                              <div className="flex items-center gap-2 text-sm text-gray-700">
+                                <User className="w-4 h-4 text-gray-400" />
+                                <span>{clienteNombre}</span>
+                              </div>
+                            </TableCell>
+                            <TableCell>
+                              <p className="text-sm text-gray-700 truncate max-w-[240px]">
+                                {tratamiento.diagnostico || '—'}
+                              </p>
+                            </TableCell>
+                            <TableCell>
+                              <div className="flex items-center gap-2 text-sm text-gray-700 truncate max-w-[240px]">
+                                <Stethoscope className="w-4 h-4 text-secondary" />
+                                <span>{tratamiento.tratamiento_indicado || '—'}</span>
+                              </div>
+                            </TableCell>
+                            <TableCell>
+                              <div className="flex items-center gap-2 text-sm text-gray-700">
+                                <User className="w-4 h-4 text-gray-400" />
+                                <span>{vetNombre}</span>
+                              </div>
+                            </TableCell>
+                            <TableCell>
+                              <div className="flex items-center gap-2 text-sm text-gray-700">
+                                <Calendar className="w-4 h-4 text-gray-400" />
+                                <span>{fechaCita}</span>
+                              </div>
+                            </TableCell>
+                            <TableCell className="text-right">
+                              <div className="flex justify-end gap-2">
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  onClick={() => { setSelectedMascotaId(tratamiento.mascota_id); setAutoPdfMascotaId(tratamiento.mascota_id); }}
+                                  title="Ver historial"
+                                >
+                                  <FileText className="w-4 h-4 text-secondary" />
+                                </Button>
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  onClick={() => handleEdit(tratamiento)}
+                                >
+                                  <Edit className="w-4 h-4 text-secondary" />
+                                </Button>
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  onClick={() => handleDelete(tratamiento.id)}
+                                >
+                                  <Trash2 className="w-4 h-4 text-red-600" />
+                                </Button>
+                              </div>
+                            </TableCell>
+                          </TableRow>
+                        );
+                      })}
+                      {filteredTratamientos.length === 0 && (
+                        <TableRow>
+                          <TableCell colSpan={7} className="text-center py-12 text-gray-500">
+                            No se encontraron tratamientos
+                          </TableCell>
+                        </TableRow>
+                      )}
+                    </TableBody>
+                  </Table>
                 </div>
-              )}
-            </div>
-            <div className="flex items-center justify-between mt-4">
-              <p className="text-sm text-gray-600">Página {currentPage} de {totalPages}</p>
-              <div className="flex gap-2">
-                <Button variant="outline" onClick={() => setPage(p => Math.max(1, p - 1))} disabled={currentPage === 1}>Anterior</Button>
-                <Button variant="outline" onClick={() => setPage(p => Math.min(totalPages, p + 1))} disabled={currentPage === totalPages}>Siguiente</Button>
-              </div>
-            </div>
+                <div className="flex items-center justify-between mt-4">
+                  <p className="text-sm text-gray-600">P—gina {currentPage} de {totalPages}</p>
+                  <div className="flex gap-2">
+                    <Button variant="outline" onClick={() => setPage(p => Math.max(1, p - 1))} disabled={currentPage === 1}>Anterior</Button>
+                    <Button variant="outline" onClick={() => setPage(p => Math.min(totalPages, p + 1))} disabled={currentPage === totalPages}>Siguiente</Button>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
           </>
         )}
       </div>
     </div>
   );
 }
+
+
+
+
 
