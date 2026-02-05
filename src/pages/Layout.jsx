@@ -131,8 +131,12 @@ export default function Layout({ children, currentPageName }) {
         <Sidebar className="border-r border-border bg-sidebar/80 backdrop-blur-sm">
           <SidebarHeader className="border-b border-border p-6">
             <div className="flex items-center gap-3">
-              <div className="w-12 h-12 bg-gradient-to-br from-primary to-secondary rounded-xl flex items-center justify-center shadow-lg">
-                <Heart className="w-7 h-7 text-white fill-white" />
+              <div className="w-12 h-12 rounded-xl bg-white/90 ring-1 ring-black/5 shadow-md flex items-center justify-center">
+                <img
+                  src="/logos/logoico.png"
+                  alt="Logo VetApp"
+                  className="w-9 h-9 object-contain"
+                />
               </div>
               <div>
                 <h2 className="font-bold text-xl text-gray-900">VetApp</h2>

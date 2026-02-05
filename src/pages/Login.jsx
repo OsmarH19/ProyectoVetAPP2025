@@ -61,13 +61,9 @@ export default function Login() {
               <img
                 src="/logos/logoVetApp.png"
                 alt="Logo VetApp"
-                className="h-14 w-auto"
+                className="h-20 w-auto"
               />
-            </div>
-            <div className="space-y-2 text-center">
-              <h1 className="text-2xl font-bold tracking-tight text-gray-900">Iniciar Sesión</h1>
-              <p className="text-sm text-gray-600">Ingresa tus credenciales para continuar</p>
-            </div>
+            </div>            
             <form onSubmit={handleSubmit} className="space-y-5">
               <div className="space-y-2">
                 <Label htmlFor="email">Email</Label>
