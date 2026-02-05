@@ -1,15 +1,16 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import PropTypes from "prop-types";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { X, Save } from "lucide-react";
+import { Search, X, Save } from "lucide-react";
 import toastr from "toastr";
 
 export default function ClienteForm({ cliente, onSubmit, onCancel, isLoading }) {
-
+  const isEditing = Boolean(cliente?.cliente_id ?? cliente?.id);
+  const FACTILIZA_TOKEN = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI1ODEiLCJuYW1lIjoiQ29ycG9yYWNpb24gQUNNRSIsImVtYWlsIjoicmZsb3JlekBhY21ldGljLmNvbS5wZSIsImh0dHA6Ly9zY2hlbWFzLm1pY3Jvc29mdC5jb20vd3MvMjAwOC8wNi9pZGVudGl0eS9jbGFpbXMvcm9sZSI6ImNvbnN1bHRvciJ9.06GySJlpTrqWUQA5EI3tDHvLn8LNzZ2m5VBSIy_SbF4";
   const [formData, setFormData] = useState(cliente || {
     nombres: "",
     apellidos: "",
@@ -19,6 +20,44 @@ export default function ClienteForm({ cliente, onSubmit, onCancel, isLoading }) 
     email: "",
   });
   const [submitting, setSubmitting] = useState(false);
+  const [dniLoading, setDniLoading] = useState(false);
+  const [dniError, setDniError] = useState("");
+  const lastLookupRef = useRef("");
+
+  const runDniLookup = async (dni, { signal, force = false } = {}) => {
+    if (!dni) return;
+    if (!force && lastLookupRef.current === dni) return;
+    setDniLoading(true);
+    setDniError("");
+    try {
+      const res = await fetch(`https://api.factiliza.com/v1/dni/info/${dni}`, {
+        headers: {
+          Authorization: `Bearer ${FACTILIZA_TOKEN}`,
+          Accept: "application/json",
+        },
+        signal,
+      });
+      const json = await res.json();
+      if (!res.ok || json?.success === false) {
+        throw new Error(json?.message || "No se pudo validar el DNI.");
+      }
+      const data = json?.data || {};
+      const apellidos = `${data.apellido_paterno || ""} ${data.apellido_materno || ""}`.trim();
+      setFormData(prev => ({
+        ...prev,
+        nombres: data.nombres || prev.nombres,
+        apellidos: apellidos || prev.apellidos,
+        direccion: data.direccion_completa || prev.direccion,
+      }));
+      lastLookupRef.current = dni;
+    } catch (err) {
+      if (err?.name !== "AbortError") {
+        setDniError(err?.message || "No se pudo consultar el DNI.");
+      }
+    } finally {
+      setDniLoading(false);
+    }
+  };
 
 
   const handleSubmit = async (e) => {
@@ -59,6 +98,15 @@ export default function ClienteForm({ cliente, onSubmit, onCancel, isLoading }) 
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
+  const handleDniSearch = () => {
+    if (isEditing) return;
+    const dni = (formData.dni || "").trim();
+    if (dni.length !== 8) {
+      setDniError("Ingresa 8 dígitos para buscar.");
+      return;
+    }
+    runDniLookup(dni, { force: true });
+  };
 
 
   return (
@@ -73,12 +121,30 @@ export default function ClienteForm({ cliente, onSubmit, onCancel, isLoading }) 
           <div className="grid md:grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="dni">DNI *</Label>
-              <Input
-                id="dni"
-                value={formData.dni}
-                onChange={(e) => handleChange('dni', e.target.value)}
-                required
-              />
+              <div className="flex gap-2">
+                <Input
+                  id="dni"
+                  value={formData.dni}
+                  onChange={(e) => handleChange('dni', e.target.value.replace(/\D/g, '').slice(0, 8))}
+                  required
+                />
+                {!isEditing && (
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={handleDniSearch}
+                    disabled={dniLoading || (formData.dni || "").trim().length !== 8}
+                  >
+                    <Search className="w-4 h-4 mr-1" />
+                    Buscar
+                  </Button>
+                )}
+              </div>
+              {!isEditing && (
+                <div className="text-xs text-muted-foreground">
+                  {dniLoading ? "Buscando DNI..." : dniError ? <span className="text-red-600">{dniError}</span> : "Presiona Buscar para autocompletar."}
+                </div>
+              )}
             </div>
             <div className="space-y-2">
               <Label htmlFor="nombres">Nombres *</Label>
