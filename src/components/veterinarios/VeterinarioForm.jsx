@@ -74,6 +74,7 @@ export default function VeterinarioForm({ veterinario, onSubmit, onCancel, isLoa
       telefono: formData.telefono,
       email: formData.email,
       activo: formData.activo,
+      turnos: formData.turnos,
     };
     onSubmit(payload);
   };

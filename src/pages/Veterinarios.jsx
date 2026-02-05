@@ -36,13 +36,14 @@ export default function Veterinarios() {
 
   const createMutation = useMutation({
     mutationFn: async (data) => {
+      const { turnos = [], ...vetData } = data || {};
       const payload = {
-        nombres: data.nombres,
-        apellidos: data.apellidos,
-        especialidad: data.especialidad,
-        telefono: data.telefono,
-        email: data.email,
-        activo: data.activo ? '1' : '0',
+        nombres: vetData.nombres,
+        apellidos: vetData.apellidos,
+        especialidad: vetData.especialidad,
+        telefono: vetData.telefono,
+        email: vetData.email,
+        activo: vetData.activo ? '1' : '0',
       };
       const res = await fetch('https://apivet.strategtic.com/api/veterinarios', {
         method: 'POST',
@@ -50,10 +51,48 @@ export default function Veterinarios() {
         body: JSON.stringify(payload),
       });
       if (!res.ok) throw new Error('No fue posible registrar al veterinario');
-      return res.json();
+      const json = await res.json();
+      const vetId =
+        json?.data?.veterinario_id ??
+        json?.data?.id ??
+        json?.veterinario_id ??
+        json?.id;
+      if (!vetId) {
+        return { vetId: null, turnosGuardados: 0, turnosFallidos: 0 };
+      }
+
+      const validTurnos = (turnos || []).filter(t => t?.dia && t?.hora_inicio && t?.hora_fin);
+      if (validTurnos.length === 0) {
+        return { vetId, turnosGuardados: 0, turnosFallidos: 0 };
+      }
+
+      const results = await Promise.allSettled(
+        validTurnos.map((turno) =>
+          fetch('https://apivet.strategtic.com/api/turnos-veterinarios', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              veterinario_id: vetId,
+              dia: parseInt(turno.dia),
+              hora_inicio: turno.hora_inicio,
+              hora_fin: turno.hora_fin,
+            }),
+          })
+        )
+      );
+
+      const turnosGuardados = results.filter(r => r.status === 'fulfilled' && r.value.ok).length;
+      const turnosFallidos = results.length - turnosGuardados;
+      return { vetId, turnosGuardados, turnosFallidos };
     },
-    onSuccess: () => {
-      toastr.success("Veterinario registrado correctamente.");
+    onSuccess: (result) => {
+      if (result?.turnosFallidos > 0) {
+        toastr.warning("Veterinario creado, pero algunos turnos no se pudieron guardar.");
+      } else if (result?.turnosGuardados > 0) {
+        toastr.success(`Veterinario registrado y ${result.turnosGuardados} turno(s) guardado(s).`);
+      } else {
+        toastr.success("Veterinario registrado correctamente.");
+      }
       queryClient.invalidateQueries({ queryKey: ['veterinarios_api'] });
       setShowForm(false);
       setEditingVeterinario(null);
