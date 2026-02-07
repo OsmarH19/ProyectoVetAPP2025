@@ -7,6 +7,22 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 
+function extractApiErrorMessage(json, fallback = "No se pudo completar el perfil.") {
+  const baseMessage = (json?.message || fallback || "").trim();
+  const errors = json?.errors;
+  if (!errors || typeof errors !== "object") return baseMessage;
+
+  const details = Object.entries(errors).flatMap(([field, fieldErrors]) => {
+    const list = Array.isArray(fieldErrors) ? fieldErrors : [fieldErrors];
+    return list
+      .filter(Boolean)
+      .map((msg) => `${field}: ${String(msg).trim()}`);
+  });
+
+  if (details.length === 0) return baseMessage;
+  return `${baseMessage} - ${details.join(" | ")}`;
+}
+
 function safeParseUser() {
   const raw = localStorage.getItem("auth_user");
   if (!raw) return null;
@@ -82,7 +98,9 @@ export default function CompletarCliente() {
       });
       const data = await res.json().catch(() => ({}));
       if (!res.ok || data?.status === false || data?.success === false) {
-        throw new Error(data?.message || "No se pudo guardar los datos del cliente.");
+        throw new Error(
+          extractApiErrorMessage(data, "No se pudo guardar los datos del cliente.")
+        );
       }
 
       const clienteId =
@@ -110,7 +128,9 @@ export default function CompletarCliente() {
       toastr.success("Perfil cliente completado.");
       navigate("/clientedashboard", { replace: true });
     } catch (err) {
-      setError(err?.message || "No se pudo completar el perfil.");
+      const message = err?.message || "No se pudo completar el perfil.";
+      setError(message);
+      toastr.error(message);
     } finally {
       setIsSaving(false);
     }
@@ -212,4 +232,3 @@ export default function CompletarCliente() {
     </div>
   );
 }
-

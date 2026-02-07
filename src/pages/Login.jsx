@@ -38,6 +38,9 @@ export default function Login() {
 
   const googleClientId = import.meta.env.VITE_GOOGLE_CLIENT_ID || "";
   const googleAuthEndpoint = import.meta.env.VITE_GOOGLE_AUTH_ENDPOINT || "";
+  const clientesEndpoint =
+    import.meta.env.VITE_CLIENTE_CREATE_ENDPOINT ||
+    "https://apivet.strategtic.com/api/clientes";
 
   const canSubmit = email.trim() && password.trim() && !isLoading;
   const canUseGoogle = useMemo(
@@ -75,6 +78,52 @@ export default function Login() {
       ["/login", "/completar-cliente"].includes((last || "").toLowerCase());
     const defaultRoute = user.profileID === 1 ? "/dashboard" : "/clientedashboard";
     navigate(isForbiddenLast ? defaultRoute : last, { replace: true });
+  };
+
+  const isClienteRegisteredByEmail = async (email) => {
+    const normalizedEmail = (email || "").trim().toLowerCase();
+    if (!normalizedEmail) return false;
+
+    try {
+      const res = await fetch(clientesEndpoint, { method: "GET" });
+      const json = await res.json().catch(() => ({}));
+      const items = Array.isArray(json?.data)
+        ? json.data
+        : Array.isArray(json)
+          ? json
+          : [];
+
+      return items.some((cliente) => {
+        const cliEmail = String(cliente?.email || "").trim().toLowerCase();
+        return cliEmail && cliEmail === normalizedEmail;
+      });
+    } catch {
+      return false;
+    }
+  };
+
+  const resolveClienteProfileCompleted = async ({ email, responseData, userFromApi }) => {
+    if (typeof responseData?.needs_cliente_profile === "boolean") {
+      return !responseData.needs_cliente_profile;
+    }
+    if (typeof userFromApi?.needs_cliente_profile === "boolean") {
+      return !userFromApi.needs_cliente_profile;
+    }
+    if (typeof responseData?.cliente_profile_completed === "boolean") {
+      return responseData.cliente_profile_completed;
+    }
+    if (typeof userFromApi?.cliente_profile_completed === "boolean") {
+      return userFromApi.cliente_profile_completed;
+    }
+
+    const hasClienteId =
+      Boolean(responseData?.cliente_id) ||
+      Boolean(userFromApi?.cliente_id) ||
+      Boolean(responseData?.cliente?.cliente_id) ||
+      Boolean(userFromApi?.cliente?.cliente_id);
+    if (hasClienteId) return true;
+
+    return isClienteRegisteredByEmail(email);
   };
 
   const handleSubmit = async (e) => {
@@ -150,24 +199,35 @@ export default function Login() {
         }
 
         const userFromApi = data?.user || data?.data?.user || data?.data || {};
+        const profileCompleted = await resolveClienteProfileCompleted({
+          email: userFromApi?.email || fallbackUser.email,
+          responseData: data,
+          userFromApi,
+        });
         const normalizedUser = {
           ...fallbackUser,
           ...userFromApi,
           name: userFromApi?.name || fallbackUser.name,
           email: userFromApi?.email || fallbackUser.email,
           profileID: Number(userFromApi?.profileID ?? userFromApi?.profile_id ?? 5),
-          needs_cliente_profile: Boolean(
-            data?.needs_cliente_profile ??
-              userFromApi?.needs_cliente_profile ??
-              userFromApi?.cliente_profile_completed === false
-          ),
+          needs_cliente_profile: !profileCompleted,
+          cliente_profile_completed: profileCompleted,
         };
         const token = data?.token || data?.access_token || data?.data?.token || "";
         saveSessionAndRedirect(normalizedUser, token);
         return;
       }
 
-      saveSessionAndRedirect(fallbackUser);
+      const profileCompleted = await resolveClienteProfileCompleted({
+        email: fallbackUser.email,
+        responseData: null,
+        userFromApi: null,
+      });
+      saveSessionAndRedirect({
+        ...fallbackUser,
+        needs_cliente_profile: !profileCompleted,
+        cliente_profile_completed: profileCompleted,
+      });
     } catch (err) {
       setGoogleError(err?.message || "No se pudo iniciar sesion con Google.");
     } finally {
