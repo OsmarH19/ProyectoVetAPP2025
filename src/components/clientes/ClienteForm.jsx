@@ -8,6 +8,28 @@ import { Textarea } from "@/components/ui/textarea";
 import { Search, X, Save } from "lucide-react";
 import toastr from "toastr";
 
+const extractApiErrorMessage = (json, fallback = "Ocurrio un error en la solicitud.") => {
+  const baseMessage = (json?.message || fallback || "").trim();
+  const errors = json?.errors;
+
+  if (!errors || typeof errors !== "object") {
+    return baseMessage;
+  }
+
+  const details = Object.entries(errors).flatMap(([field, fieldErrors]) => {
+    const list = Array.isArray(fieldErrors) ? fieldErrors : [fieldErrors];
+    return list
+      .filter(Boolean)
+      .map((msg) => `${field}: ${String(msg).trim()}`);
+  });
+
+  if (details.length === 0) {
+    return baseMessage;
+  }
+
+  return `${baseMessage} - ${details.join(" | ")}`;
+};
+
 export default function ClienteForm({ cliente, onSubmit, onCancel, isLoading }) {
   const isEditing = Boolean(cliente?.cliente_id ?? cliente?.id);
   const FACTILIZA_TOKEN = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI1ODEiLCJuYW1lIjoiQ29ycG9yYWNpb24gQUNNRSIsImVtYWlsIjoicmZsb3JlekBhY21ldGljLmNvbS5wZSIsImh0dHA6Ly9zY2hlbWFzLm1pY3Jvc29mdC5jb20vd3MvMjAwOC8wNi9pZGVudGl0eS9jbGFpbXMvcm9sZSI6ImNvbnN1bHRvciJ9.06GySJlpTrqWUQA5EI3tDHvLn8LNzZ2m5VBSIy_SbF4";
@@ -71,8 +93,12 @@ export default function ClienteForm({ cliente, onSubmit, onCancel, isLoading }) 
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(formData),
         });
-        if (!res.ok) throw new Error("error");
-        const updated = await res.json();
+        const updated = await res.json().catch(() => ({}));
+        if (!res.ok || updated?.success === false || updated?.status === false) {
+          throw new Error(
+            extractApiErrorMessage(updated, "No se pudo actualizar el cliente.")
+          );
+        }
         toastr.success("Cliente actualizado correctamente.");
         if (onSubmit) onSubmit(updated);
       } else {
@@ -81,8 +107,12 @@ export default function ClienteForm({ cliente, onSubmit, onCancel, isLoading }) 
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(formData),
         });
-        if (!res.ok) throw new Error("error");
-        const created = await res.json();
+        const created = await res.json().catch(() => ({}));
+        if (!res.ok || created?.success === false || created?.status === false) {
+          throw new Error(
+            extractApiErrorMessage(created, "No se pudo crear el cliente.")
+          );
+        }
         toastr.success("Cliente creado correctamente.");
         if (onSubmit) onSubmit(created);
       }
