@@ -5,6 +5,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
+import { notifyAuthChanged, renewSessionWindow } from "@/lib/session";
 
 function parseJwtPayload(token) {
   try {
@@ -60,6 +61,8 @@ export default function Login() {
     } else {
       localStorage.removeItem("auth_token");
     }
+    renewSessionWindow();
+    notifyAuthChanged();
 
     if (user.needs_cliente_profile) {
       navigate("/completar-cliente", { replace: true });
@@ -325,4 +328,3 @@ export default function Login() {
     </div>
   );
 }
-

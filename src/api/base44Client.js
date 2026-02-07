@@ -3,6 +3,8 @@
 const API_URL = import.meta.env.VITE_API_URL || ''
 const API_BASE = import.meta.env.VITE_API_BASE_PATH || '/api'
 const tokenKey = 'auth_token'
+const sessionStartedAtKey = 'auth_session_started_at'
+const sessionLastConfirmedAtKey = 'auth_session_last_confirmed_at'
 
 const getToken = () => localStorage.getItem(tokenKey)
 
@@ -49,7 +51,10 @@ const auth = {
     }
   },
   logout: () => {
+    localStorage.removeItem('auth_user')
     localStorage.removeItem(tokenKey)
+    localStorage.removeItem(sessionStartedAtKey)
+    localStorage.removeItem(sessionLastConfirmedAtKey)
     window.location.href = '/'
   }
 }

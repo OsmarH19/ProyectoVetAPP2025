@@ -31,6 +31,7 @@ import {
 } from "@/components/ui/sidebar";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { clearAuthData } from "@/lib/session";
 
 export default function Layout({ children, currentPageName }) {
   const location = useLocation();
@@ -113,8 +114,7 @@ export default function Layout({ children, currentPageName }) {
 
   const handleLogout = () => {
     try {
-      localStorage.removeItem('auth_user')
-      localStorage.removeItem('auth_token')
+      clearAuthData()
     } finally {
       navigate('/login', { replace: true })
     }
