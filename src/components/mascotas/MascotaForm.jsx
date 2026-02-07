@@ -4,9 +4,76 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/componen
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { X, Save } from "lucide-react";
+import { Bold, Italic, List, ListOrdered, Redo2, Save, Underline, Undo2, X } from "lucide-react";
+
+const containsHtml = (value) => /<\/?[a-z][\s\S]*>/i.test(value || "");
+
+const escapeHtml = (value = "") =>
+  value
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+
+function RichTextEditor({ value, onChange, id }) {
+  const editorRef = React.useRef(null);
+
+  React.useEffect(() => {
+    if (!editorRef.current) return;
+    const next = value || "";
+    const current = editorRef.current.innerHTML;
+    if (current === next) return;
+
+    editorRef.current.innerHTML = containsHtml(next)
+      ? next
+      : escapeHtml(next).replace(/\n/g, "<br>");
+  }, [value]);
+
+  const runCommand = (command) => {
+    if (!editorRef.current) return;
+    editorRef.current.focus();
+    document.execCommand(command, false);
+    onChange(editorRef.current.innerHTML || "");
+  };
+
+  return (
+    <div className="border rounded-md overflow-hidden">
+      <div className="flex flex-wrap gap-1 p-2 border-b bg-muted/30">
+        <Button type="button" size="icon" variant="outline" className="h-8 w-8" onClick={() => runCommand("bold")}>
+          <Bold className="h-4 w-4" />
+        </Button>
+        <Button type="button" size="icon" variant="outline" className="h-8 w-8" onClick={() => runCommand("italic")}>
+          <Italic className="h-4 w-4" />
+        </Button>
+        <Button type="button" size="icon" variant="outline" className="h-8 w-8" onClick={() => runCommand("underline")}>
+          <Underline className="h-4 w-4" />
+        </Button>
+        <Button type="button" size="icon" variant="outline" className="h-8 w-8" onClick={() => runCommand("insertUnorderedList")}>
+          <List className="h-4 w-4" />
+        </Button>
+        <Button type="button" size="icon" variant="outline" className="h-8 w-8" onClick={() => runCommand("insertOrderedList")}>
+          <ListOrdered className="h-4 w-4" />
+        </Button>
+        <Button type="button" size="icon" variant="outline" className="h-8 w-8" onClick={() => runCommand("undo")}>
+          <Undo2 className="h-4 w-4" />
+        </Button>
+        <Button type="button" size="icon" variant="outline" className="h-8 w-8" onClick={() => runCommand("redo")}>
+          <Redo2 className="h-4 w-4" />
+        </Button>
+      </div>
+      <div
+        id={id}
+        ref={editorRef}
+        contentEditable
+        suppressContentEditableWarning
+        className="min-h-[120px] p-3 text-sm outline-none bg-background"
+        onInput={() => onChange(editorRef.current?.innerHTML || "")}
+      />
+    </div>
+  );
+}
 
 export default function MascotaForm({ mascota, onCancel, isLoading }) {
   const [formData, setFormData] = useState({
@@ -264,11 +331,10 @@ export default function MascotaForm({ mascota, onCancel, isLoading }) {
 
           <div className="space-y-2">
             <Label htmlFor="observaciones">Observaciones</Label>
-            <Textarea
+            <RichTextEditor
               id="observaciones"
               value={formData.observaciones}
-              onChange={(e) => handleChange('observaciones', e.target.value)}
-              rows={3}
+              onChange={(html) => handleChange('observaciones', html)}
             />
           </div>
         </CardContent>
