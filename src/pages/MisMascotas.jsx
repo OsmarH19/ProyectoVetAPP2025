@@ -1,8 +1,9 @@
-import React, { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Calendar, Weight, Heart } from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { PawPrint, Weight } from "lucide-react";
 
 export default function MisMascotas() {
   const [clienteId, setClienteId] = useState(null);
@@ -51,10 +52,12 @@ export default function MisMascotas() {
   const normalizedClienteId = useMemo(() => Number(clienteId ?? 0) || null, [clienteId]);
 
   const { data: mascotas = [] } = useQuery({
-    queryKey: ['mis-mascotas', normalizedClienteId],
+    queryKey: ["mis-mascotas", normalizedClienteId],
     queryFn: async () => {
       if (!normalizedClienteId) return [];
-      const res = await fetch(`https://apivet.strategtic.com/api/mascotas/filtrar?cliente_id=${normalizedClienteId}`);
+      const res = await fetch(
+        `https://apivet.strategtic.com/api/mascotas/filtrar?cliente_id=${normalizedClienteId}`
+      );
       const json = await res.json();
       const items = Array.isArray(json?.data) ? json.data : [];
       return items.map((m) => ({
@@ -75,7 +78,7 @@ export default function MisMascotas() {
   });
 
   const { data: tratamientos = [] } = useQuery({
-    queryKey: ['mis-tratamientos', normalizedClienteId],
+    queryKey: ["mis-tratamientos", normalizedClienteId],
     queryFn: async () => {
       if (!normalizedClienteId) return [];
       const res = await fetch(
@@ -88,120 +91,114 @@ export default function MisMascotas() {
   });
 
   const especieColors = {
-    "Perro": "bg-blue-100 text-blue-800",
-    "Gato": "bg-orange-100 text-orange-800",
-    "Ave": "bg-yellow-100 text-yellow-800",
-    "Conejo": "bg-pink-100 text-pink-800",
-    "Hamster": "bg-purple-100 text-purple-800",
-    "Reptil": "bg-green-100 text-green-800",
-    "Otro": "bg-gray-100 text-gray-800"
+    Perro: "bg-blue-100 text-blue-800",
+    Gato: "bg-orange-100 text-orange-800",
+    Ave: "bg-yellow-100 text-yellow-800",
+    Conejo: "bg-pink-100 text-pink-800",
+    Hamster: "bg-purple-100 text-purple-800",
+    Reptil: "bg-green-100 text-green-800",
+    Otro: "bg-gray-100 text-gray-800",
   };
+
+  const getTratamientosCount = (mascotaId) =>
+    (tratamientos || []).filter(
+      (t) => Number(t?.mascota_id ?? t?.mascota?.mascota_id ?? 0) === mascotaId
+    ).length;
 
   return (
     <div className="p-4 md:p-8">
       <div className="max-w-7xl mx-auto">
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900">Mis Mascotas</h1>
-          <p className="text-gray-600 mt-1">Información de tus mascotas y sus tratamientos</p>
+          <p className="text-gray-600 mt-1">Lista de tus mascotas registradas</p>
         </div>
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {mascotas.map((mascota) => {
-            const mascotaTratamientos = tratamientos.filter(t => {
-              const mascotaId = Number(t?.mascota_id ?? t?.mascota?.mascota_id ?? 0);
-              return mascotaId === mascota.id;
-            });
-            
-            return (
-              <Card key={mascota.id} className="shadow-lg hover:shadow-xl transition-shadow overflow-hidden">
-                <CardHeader className="p-0">
-                  {mascota.foto_url ? (
-                    <img
-                      src={mascota.foto_url}
-                      alt={mascota.nombre}
-                      className="w-full h-48 object-cover"
-                    />
-                  ) : (
-                    <div className="w-full h-48 bg-gradient-to-br from-primary to-secondary flex items-center justify-center">
-                      <span className="text-6xl text-white">
-                        {mascota.especie === 'Perro' ? '🐕' : mascota.especie === 'Gato' ? '🐈' : '🐾'}
-                      </span>
-                    </div>
-                  )}
-                </CardHeader>
-                <CardContent className="p-6">
-                  <div className="flex justify-between items-start mb-3">
-                    <h3 className="text-2xl font-bold text-gray-900">{mascota.nombre}</h3>
-                    <Badge className={especieColors[mascota.especie] || especieColors["Otro"]}>
-                      {mascota.especie}
-                    </Badge>
-                  </div>
-
-                  <div className="space-y-2 text-sm text-gray-600 mb-4">
-                    {mascota.raza && (
-                      <p><span className="font-semibold">Raza:</span> {mascota.raza}</p>
-                    )}
-                    <div className="flex items-center gap-4">
-                      {mascota.edad && (
-                        <div className="flex items-center gap-1">
-                          <Calendar className="w-4 h-4" />
-                          {mascota.edad} {mascota.edad === 1 ? 'año' : 'años'}
+        <Card className="shadow-lg">
+          <CardHeader>
+            <CardTitle>Mascotas ({mascotas.length})</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="overflow-x-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead className="text-center">Mascota</TableHead>
+                    <TableHead className="text-center">Especie / Raza</TableHead>
+                    <TableHead className="text-center">Edad / Sexo</TableHead>
+                    <TableHead className="text-center">Peso / Color</TableHead>
+                    <TableHead className="text-center">Observaciones</TableHead>
+                    <TableHead className="text-center">Tratamientos</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {mascotas.map((mascota) => (
+                    <TableRow key={mascota.id} className="hover:bg-gray-50">
+                      <TableCell>
+                        <div className="flex items-center gap-2">
+                          {mascota.foto_url ? (
+                            <img
+                              src={mascota.foto_url}
+                              alt={mascota.nombre}
+                              className="w-10 h-10 rounded-full object-cover"
+                            />
+                          ) : (
+                            <div className="w-10 h-10 rounded-full bg-primary/10 text-primary flex items-center justify-center">
+                              <PawPrint className="w-4 h-4" />
+                            </div>
+                          )}
+                          <span className="font-semibold text-gray-900">{mascota.nombre || "—"}</span>
                         </div>
-                      )}
-                      {mascota.peso && (
-                        <div className="flex items-center gap-1">
-                          <Weight className="w-4 h-4" />
-                          {mascota.peso} kg
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex flex-col text-sm text-gray-700">
+                          <Badge className={especieColors[mascota.especie] || especieColors.Otro}>
+                            {mascota.especie || "—"}
+                          </Badge>
+                          <span className="text-gray-600">{mascota.raza || "—"}</span>
                         </div>
-                      )}
-                    </div>
-                    {mascota.sexo && (
-                      <p><span className="font-semibold">Sexo:</span> {mascota.sexo}</p>
-                    )}
-                    {mascota.color && (
-                      <p><span className="font-semibold">Color:</span> {mascota.color}</p>
-                    )}
-                  </div>
-
-                  {mascotaTratamientos.length > 0 && (
-                    <div className="mt-4 pt-4 border-t">
-                      <h4 className="font-semibold text-gray-900 mb-2 flex items-center gap-2">
-                        <Heart className="w-4 h-4 text-red-500" />
-                        Últimos Tratamientos
-                      </h4>
-                      <div className="space-y-2">
-                        {mascotaTratamientos.slice(0, 2).map(t => (
-                        <div key={t.id} className="text-sm bg-secondary/5 p-2 rounded">
-                          <p className="font-semibold text-gray-900">{t.diagnostico}</p>
-                          <p className="text-gray-600 text-xs mt-1">{t.tratamiento_indicado}</p>
+                      </TableCell>
+                      <TableCell>
+                        <div className="text-sm text-gray-700">
+                          <div>{mascota.edad ?? "—"}</div>
+                          <div className="text-gray-600">{mascota.sexo || "—"}</div>
                         </div>
-                        ))}
-                      </div>
-                    </div>
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex items-center gap-2 text-sm text-gray-700">
+                          <Weight className="w-4 h-4 text-gray-400" />
+                          <div>
+                            <div>{mascota.peso ? `${mascota.peso} kg` : "—"}</div>
+                            <div className="text-gray-600">{mascota.color || "—"}</div>
+                          </div>
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        {mascota.observaciones ? (
+                          <div
+                            className="text-sm text-gray-700 max-w-[260px]"
+                            dangerouslySetInnerHTML={{ __html: mascota.observaciones }}
+                          />
+                        ) : (
+                          <span className="text-sm text-gray-500">—</span>
+                        )}
+                      </TableCell>
+                      <TableCell className="text-center">
+                        {getTratamientosCount(mascota.id)}
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                  {mascotas.length === 0 && (
+                    <TableRow>
+                      <TableCell colSpan={6} className="text-center py-12 text-gray-500">
+                        No tienes mascotas registradas
+                      </TableCell>
+                    </TableRow>
                   )}
-
-          {mascota.observaciones && (
-                    <div className="mt-4 pt-4 border-t">
-                      <p className="text-sm text-gray-600">
-                        <span className="font-semibold">Observaciones:</span>{" "}
-                        <span
-                          className="text-gray-700"
-                          dangerouslySetInnerHTML={{ __html: mascota.observaciones }}
-                        />
-                      </p>
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
-            );
-          })}
-          
-          {mascotas.length === 0 && (
-            <div className="col-span-full text-center py-12 text-gray-500">
-              No tienes mascotas registradas
+                </TableBody>
+              </Table>
             </div>
-          )}
-        </div>
+          </CardContent>
+        </Card>
       </div>
     </div>
   );
