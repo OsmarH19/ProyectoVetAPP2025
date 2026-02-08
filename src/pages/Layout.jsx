@@ -45,6 +45,7 @@ export default function Layout({ children, currentPageName }) {
     const id = Number(user?.profileID ?? user?.profile_id);
     return id === 1 || id === 2 || id === 3 || id === 4;
   });
+  const [clienteProfile, setClienteProfile] = useState(null);
 
   useEffect(() => {
     const u = localStorage.getItem('auth_user')
@@ -54,6 +55,32 @@ export default function Layout({ children, currentPageName }) {
     const id = Number(parsed?.profileID ?? parsed?.profile_id);
     setIsStaff(id === 1 || id === 2 || id === 3 || id === 4)
   }, [])
+
+  useEffect(() => {
+    const email = String(user?.email || "").trim().toLowerCase();
+    if (!email) {
+      setClienteProfile(null);
+      return;
+    }
+    const controller = new AbortController();
+    const loadCliente = async () => {
+      try {
+        const res = await fetch("https://apivet.strategtic.com/api/clientes", {
+          signal: controller.signal,
+        });
+        const json = await res.json().catch(() => ({}));
+        const items = Array.isArray(json?.data) ? json.data : [];
+        const found = items.find(
+          (c) => String(c?.email || "").trim().toLowerCase() === email
+        );
+        setClienteProfile(found || null);
+      } catch {
+        setClienteProfile(null);
+      }
+    };
+    loadCliente();
+    return () => controller.abort();
+  }, [user?.email]);
 
   useEffect(() => {
     if (user && location.pathname.toLowerCase() !== '/login') {
@@ -132,6 +159,20 @@ export default function Layout({ children, currentPageName }) {
     return name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
   };
 
+  const getDisplayName = (data) => {
+    if (!data) return "Cliente VetApp";
+    const fullName = data?.name?.trim();
+    if (fullName) return fullName;
+    const nombres = data?.nombres?.trim() || "";
+    const composed = `${nombres}`.trim();
+    if (composed) return composed;
+    const cliente = data?.cliente || {};
+    const clienteNombre =
+      `${(cliente?.nombres || "").trim()} ${(cliente?.apellidos || "").trim()}`.trim();
+    if (clienteNombre) return clienteNombre;
+    return "Cliente VetApp";
+  };
+
   
   return (
     <SidebarProvider>
@@ -189,12 +230,12 @@ export default function Layout({ children, currentPageName }) {
                 </Avatar>
               <div className="flex-1 min-w-0">
                 <p className="font-semibold text-gray-900 text-sm truncate">
-                  {user?.name || "Usuario"}
+                  {getDisplayName(clienteProfile || user)}
                 </p>
                 <p className="text-xs text-gray-500 truncate">{user?.email}</p>
                 {user && (
                   <p className="text-xs text-primary font-medium">
-                    {isAdmin ? 'Administrador' : 'Usuario'}
+                    {isAdmin ? 'Administrador' : 'Cliente VetApp'}
                   </p>
                 )}
               </div>
