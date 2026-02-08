@@ -41,11 +41,18 @@ export default function Layout({ children, currentPageName }) {
     return u ? JSON.parse(u) : null
   });
   const [isAdmin, setIsAdmin] = useState(() => (user?.profileID === 1));
+  const [isStaff, setIsStaff] = useState(() => {
+    const id = Number(user?.profileID ?? user?.profile_id);
+    return id === 1 || id === 2 || id === 3 || id === 4;
+  });
 
   useEffect(() => {
     const u = localStorage.getItem('auth_user')
-    setUser(u ? JSON.parse(u) : null)
-    setIsAdmin(u ? JSON.parse(u)?.profileID === 1 : false)
+    const parsed = u ? JSON.parse(u) : null
+    setUser(parsed)
+    setIsAdmin(parsed ? parsed?.profileID === 1 : false)
+    const id = Number(parsed?.profileID ?? parsed?.profile_id);
+    setIsStaff(id === 1 || id === 2 || id === 3 || id === 4)
   }, [])
 
   useEffect(() => {
@@ -94,11 +101,6 @@ export default function Layout({ children, currentPageName }) {
 
   const clientNavigation = [
     {
-      title: "Mi Dashboard",
-      url: createPageUrl("ClienteDashboard"),
-      icon: LayoutDashboard,
-    },
-    {
       title: "Mis Mascotas",
       url: createPageUrl("MisMascotas"),
       icon: PawPrint,
@@ -108,9 +110,14 @@ export default function Layout({ children, currentPageName }) {
       url: createPageUrl("MisCitas"),
       icon: Calendar,
     },
+    {
+      title: "Mis Tratamientos",
+      url: createPageUrl("MisTratamientos"),
+      icon: Stethoscope,
+    },
   ];
 
-  const navigation = isAdmin ? adminNavigation : clientNavigation;
+  const navigation = isStaff ? adminNavigation : clientNavigation;
 
   const handleLogout = () => {
     try {

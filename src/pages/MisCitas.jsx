@@ -1,5 +1,4 @@
-import React, { useEffect, useState } from "react";
-import { base44 } from "@/api/base44Client";
+import React, { useEffect, useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -9,67 +8,123 @@ import { es } from "date-fns/locale";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 
 export default function MisCitas() {
-  const [user, setUser] = useState(null);
-  const [cliente, setCliente] = useState(null);
+  const [clienteId, setClienteId] = useState(null);
 
   useEffect(() => {
-    async function loadUser() {
-      try {
-        const currentUser = await base44.auth.me();
-        setUser(currentUser);
-        
-        const clientes = await base44.entities.Cliente.list();
-        const myCliente = clientes.find(c => c.email === currentUser.email);
-        setCliente(myCliente);
-      } catch (error) {
-        console.error("Error:", error);
-      }
+    const raw = localStorage.getItem("auth_user");
+    if (!raw) return;
+
+    let email = "";
+    let id = null;
+    try {
+      const parsed = JSON.parse(raw);
+      email = parsed?.email || "";
+      const rawId = parsed?.cliente_id ?? parsed?.cliente?.cliente_id;
+      const numId = Number(rawId);
+      if (Number.isFinite(numId) && numId > 0) id = numId;
+    } catch {
+      return;
     }
-    loadUser();
+
+    if (id) {
+      setClienteId(id);
+      return;
+    }
+
+    if (!email) return;
+
+    const loadClienteId = async () => {
+      try {
+        const res = await fetch("https://apivet.strategtic.com/api/clientes");
+        const json = await res.json();
+        const items = Array.isArray(json?.data) ? json.data : [];
+        const found = items.find(
+          (c) => String(c?.email || "").trim().toLowerCase() === email.trim().toLowerCase()
+        );
+        const resolvedId = Number(found?.cliente_id ?? found?.id ?? 0) || null;
+        setClienteId(resolvedId);
+      } catch {
+        setClienteId(null);
+      }
+    };
+
+    loadClienteId();
   }, []);
 
+  const normalizedClienteId = useMemo(() => Number(clienteId ?? 0) || null, [clienteId]);
+
   const { data: citas = [] } = useQuery({
-    queryKey: ['mis-citas', cliente?.id],
+    queryKey: ['mis-citas', normalizedClienteId],
     queryFn: async () => {
-      if (!cliente?.id) return [];
-      const all = await base44.entities.Cita.list('-fecha');
-      return all
-        .filter(c => c.cliente_id === cliente.id)
-        .map(c => ({
-          id: c?.cita_id || c?.id,
-          fecha: c?.fecha,
-          hora: c?.hora,
-          motivo: c?.motivo,
-          estado: c?.estado?.nombre || c?.estado,
-          mascota_id: c?.mascota_id ?? c?.mascota?.mascota_id,
-          cliente_id: c?.cliente_id ?? c?.cliente?.cliente_id,
-          observaciones: c?.observaciones,
-          veterinario: typeof c?.veterinario === 'object'
-            ? `${c?.veterinario?.nombres || ''} ${c?.veterinario?.apellidos || ''}`.trim()
-            : (c?.veterinario || ''),
-        }));
+      if (!normalizedClienteId) return [];
+      const res = await fetch(`https://apivet.strategtic.com/api/citas?cliente_id=${normalizedClienteId}`);
+      const json = await res.json();
+      const items = Array.isArray(json?.data) ? json.data : [];
+      return items.map((c) => ({
+        id: c?.cita_id || c?.id,
+        fecha: c?.fecha,
+        hora: c?.hora,
+        motivo: c?.motivo,
+        estado: c?.estados?.nombre || c?.estado,
+        mascota_id: c?.mascota_id ?? c?.mascota?.mascota_id,
+        cliente_id: c?.cliente_id ?? c?.cliente?.cliente_id,
+        observaciones: c?.observaciones,
+        tratamientos: Array.isArray(c?.tratamientos) ? c.tratamientos : [],
+        mascota: c?.mascota
+          ? {
+              id: c?.mascota?.mascota_id ?? c?.mascota?.id,
+              nombre: c?.mascota?.nombre,
+              especie: typeof c?.mascota?.especie === "object" ? c?.mascota?.especie?.nombre : c?.mascota?.especie,
+              raza: c?.mascota?.raza,
+              edad: c?.mascota?.edad,
+              sexo: typeof c?.mascota?.sexo === "object" ? c?.mascota?.sexo?.nombre : c?.mascota?.sexo,
+              peso: c?.mascota?.peso,
+              color: c?.mascota?.color,
+              foto_url: c?.mascota?.foto_url_completa || c?.mascota?.foto_url,
+              observaciones: c?.mascota?.observaciones,
+            }
+          : null,
+        cliente: c?.cliente || null,
+        veterinario: c?.veterinario || null,
+      }));
     },
-    enabled: !!cliente?.id,
+    enabled: !!normalizedClienteId,
   });
 
   const { data: mascotas = [] } = useQuery({
-    queryKey: ['mis-mascotas', cliente?.id],
+    queryKey: ['mis-mascotas', normalizedClienteId],
     queryFn: async () => {
-      if (!cliente?.id) return [];
-      const all = await base44.entities.Mascota.list();
-      return all.filter(m => m.cliente_id === cliente.id);
+      if (!normalizedClienteId) return [];
+      const res = await fetch(`https://apivet.strategtic.com/api/mascotas/filtrar?cliente_id=${normalizedClienteId}`);
+      const json = await res.json();
+      const items = Array.isArray(json?.data) ? json.data : [];
+      return items.map((m) => ({
+        id: m?.mascota_id ?? m?.id,
+        nombre: m?.nombre,
+        especie: typeof m?.especie === "object" ? m?.especie?.nombre : m?.especie,
+        raza: m?.raza,
+        edad: m?.edad,
+        sexo: typeof m?.sexo === "object" ? m?.sexo?.nombre : m?.sexo,
+        peso: m?.peso,
+        color: m?.color,
+        foto_url: m?.foto_url_completa || m?.foto_url,
+        observaciones: m?.observaciones,
+      }));
     },
-    enabled: !!cliente?.id,
+    enabled: !!normalizedClienteId,
   });
 
   const { data: tratamientos = [] } = useQuery({
-    queryKey: ['mis-tratamientos', cliente?.id],
+    queryKey: ['mis-tratamientos', normalizedClienteId],
     queryFn: async () => {
-      if (!cliente?.id) return [];
-      const all = await base44.entities.Tratamiento.list();
-      return all.filter(t => t.cliente_id === cliente.id);
+      if (!normalizedClienteId) return [];
+      const res = await fetch(
+        `https://apivet.strategtic.com/api/tratamientos?cliente_id=${normalizedClienteId}`
+      );
+      const json = await res.json();
+      return Array.isArray(json?.data) ? json.data : [];
     },
-    enabled: !!cliente?.id,
+    enabled: !!normalizedClienteId,
   });
 
   const estadoColors = {
@@ -84,8 +139,11 @@ export default function MisCitas() {
   const citasCanceladas = citas.filter(c => c.estado === 'Cancelada');
 
   const CitaCard = ({ cita }) => {
-    const mascota = mascotas.find(m => m.id === cita.mascota_id);
-    const tratamiento = tratamientos.find(t => t.cita_id === cita.id);
+    const mascota = cita?.mascota || mascotas.find(m => m.id === cita.mascota_id);
+    const tratamientosDeCita = Array.isArray(cita?.tratamientos) && cita.tratamientos.length > 0
+      ? cita.tratamientos
+      : tratamientos.filter(t => t.cita_id === cita.id);
+    const tratamiento = tratamientosDeCita[0];
     const medicamentos = tratamiento && Array.isArray(tratamiento.medicamentos) ? tratamiento.medicamentos : [];
 
     return (
@@ -124,7 +182,11 @@ export default function MisCitas() {
           {cita.veterinario && (
             <div className="flex items-center gap-2 text-sm text-gray-600">
               <User className="w-4 h-4" />
-              <span>Dr. {cita.veterinario}</span>
+              <span>
+                Dr. {typeof cita.veterinario === "object"
+                  ? `${cita.veterinario?.nombres || ""} ${cita.veterinario?.apellidos || ""}`.trim()
+                  : cita.veterinario}
+              </span>
             </div>
           )}
 

@@ -1,48 +1,90 @@
-import React, { useEffect, useState } from "react";
-import { base44 } from "@/api/base44Client";
+import React, { useEffect, useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Calendar, Weight, Heart } from "lucide-react";
 
 export default function MisMascotas() {
-  const [user, setUser] = useState(null);
-  const [cliente, setCliente] = useState(null);
+  const [clienteId, setClienteId] = useState(null);
 
   useEffect(() => {
-    async function loadUser() {
-      try {
-        const currentUser = await base44.auth.me();
-        setUser(currentUser);
-        
-        const clientes = await base44.entities.Cliente.list();
-        const myCliente = clientes.find(c => c.email === currentUser.email);
-        setCliente(myCliente);
-      } catch (error) {
-        console.error("Error:", error);
-      }
+    const raw = localStorage.getItem("auth_user");
+    if (!raw) return;
+
+    let email = "";
+    let id = null;
+    try {
+      const parsed = JSON.parse(raw);
+      email = parsed?.email || "";
+      const rawId = parsed?.cliente_id ?? parsed?.cliente?.cliente_id;
+      const numId = Number(rawId);
+      if (Number.isFinite(numId) && numId > 0) id = numId;
+    } catch {
+      return;
     }
-    loadUser();
+
+    if (id) {
+      setClienteId(id);
+      return;
+    }
+
+    if (!email) return;
+
+    const loadClienteId = async () => {
+      try {
+        const res = await fetch("https://apivet.strategtic.com/api/clientes");
+        const json = await res.json();
+        const items = Array.isArray(json?.data) ? json.data : [];
+        const found = items.find(
+          (c) => String(c?.email || "").trim().toLowerCase() === email.trim().toLowerCase()
+        );
+        const resolvedId = Number(found?.cliente_id ?? found?.id ?? 0) || null;
+        setClienteId(resolvedId);
+      } catch {
+        setClienteId(null);
+      }
+    };
+
+    loadClienteId();
   }, []);
 
+  const normalizedClienteId = useMemo(() => Number(clienteId ?? 0) || null, [clienteId]);
+
   const { data: mascotas = [] } = useQuery({
-    queryKey: ['mis-mascotas', cliente?.id],
+    queryKey: ['mis-mascotas', normalizedClienteId],
     queryFn: async () => {
-      if (!cliente?.id) return [];
-      const all = await base44.entities.Mascota.list();
-      return all.filter(m => m.cliente_id === cliente.id);
+      if (!normalizedClienteId) return [];
+      const res = await fetch(`https://apivet.strategtic.com/api/mascotas/filtrar?cliente_id=${normalizedClienteId}`);
+      const json = await res.json();
+      const items = Array.isArray(json?.data) ? json.data : [];
+      return items.map((m) => ({
+        id: m?.mascota_id ?? m?.id,
+        nombre: m?.nombre,
+        especie: typeof m?.especie === "object" ? m?.especie?.nombre : m?.especie,
+        raza: m?.raza,
+        edad: m?.edad,
+        sexo: typeof m?.sexo === "object" ? m?.sexo?.nombre : m?.sexo,
+        peso: m?.peso,
+        color: m?.color,
+        foto_url: m?.foto_url_completa || m?.foto_url,
+        observaciones: m?.observaciones,
+        cliente: m?.cliente || null,
+      }));
     },
-    enabled: !!cliente?.id,
+    enabled: !!normalizedClienteId,
   });
 
   const { data: tratamientos = [] } = useQuery({
-    queryKey: ['mis-tratamientos', cliente?.id],
+    queryKey: ['mis-tratamientos', normalizedClienteId],
     queryFn: async () => {
-      if (!cliente?.id) return [];
-      const all = await base44.entities.Tratamiento.list('-created_date');
-      return all.filter(t => t.cliente_id === cliente.id);
+      if (!normalizedClienteId) return [];
+      const res = await fetch(
+        `https://apivet.strategtic.com/api/tratamientos?cliente_id=${normalizedClienteId}`
+      );
+      const json = await res.json();
+      return Array.isArray(json?.data) ? json.data : [];
     },
-    enabled: !!cliente?.id,
+    enabled: !!normalizedClienteId,
   });
 
   const especieColors = {
@@ -65,7 +107,10 @@ export default function MisMascotas() {
 
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
           {mascotas.map((mascota) => {
-            const mascotaTratamientos = tratamientos.filter(t => t.mascota_id === mascota.id);
+            const mascotaTratamientos = tratamientos.filter(t => {
+              const mascotaId = Number(t?.mascota_id ?? t?.mascota?.mascota_id ?? 0);
+              return mascotaId === mascota.id;
+            });
             
             return (
               <Card key={mascota.id} className="shadow-lg hover:shadow-xl transition-shadow overflow-hidden">
@@ -135,10 +180,14 @@ export default function MisMascotas() {
                     </div>
                   )}
 
-                  {mascota.observaciones && (
+          {mascota.observaciones && (
                     <div className="mt-4 pt-4 border-t">
                       <p className="text-sm text-gray-600">
-                        <span className="font-semibold">Observaciones:</span> {mascota.observaciones}
+                        <span className="font-semibold">Observaciones:</span>{" "}
+                        <span
+                          className="text-gray-700"
+                          dangerouslySetInnerHTML={{ __html: mascota.observaciones }}
+                        />
                       </p>
                     </div>
                   )}
