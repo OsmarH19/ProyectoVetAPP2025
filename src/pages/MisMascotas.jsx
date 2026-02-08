@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+﻿import { useEffect, useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -116,109 +116,121 @@ export default function MisMascotas() {
           <p className="text-gray-600 mt-1">Lista de tus mascotas registradas</p>
         </div>
 
-        <Card className="shadow-lg">
-          <CardHeader>
-            <CardTitle>Mascotas ({mascotas.length})</CardTitle>
-          </CardHeader>
-          <CardContent>
-            {selectedMascotaId && (
+        <div
+          className={`grid gap-6 items-start ${
+            selectedMascotaId
+              ? "grid-cols-1 xl:grid-cols-[minmax(0,1fr)_520px]"
+              : "grid-cols-1"
+          }`}
+        >
+          <Card className="shadow-lg">
+            <CardHeader>
+              <CardTitle>Mascotas ({mascotas.length})</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="overflow-x-auto">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead className="text-center">Mascota</TableHead>
+                      <TableHead className="text-center">Especie / Raza</TableHead>
+                      <TableHead className="text-center">Edad / Sexo</TableHead>
+                      <TableHead className="text-center">Peso / Color</TableHead>
+                      <TableHead className="text-center">Observaciones</TableHead>
+                      <TableHead className="text-center">Tratamientos</TableHead>
+                      <TableHead className="text-center">Historial</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {mascotas.map((mascota) => (
+                      <TableRow key={mascota.id} className="hover:bg-gray-50">
+                        <TableCell>
+                          <div className="flex items-center gap-2">
+                            {mascota.foto_url ? (
+                              <img
+                                src={mascota.foto_url}
+                                alt={mascota.nombre}
+                                className="w-10 h-10 rounded-full object-cover"
+                              />
+                            ) : (
+                              <div className="w-10 h-10 rounded-full bg-primary/10 text-primary flex items-center justify-center">
+                                <PawPrint className="w-4 h-4" />
+                              </div>
+                            )}
+                            <span className="font-semibold text-gray-900">{mascota.nombre || "â€”"}</span>
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          <div className="flex flex-col text-sm text-gray-700">
+                            <Badge className={especieColors[mascota.especie] || especieColors.Otro}>
+                              {mascota.especie || "â€”"}
+                            </Badge>
+                            <span className="text-gray-600">{mascota.raza || "â€”"}</span>
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          <div className="text-sm text-gray-700">
+                            <div>{mascota.edad ?? "â€”"}</div>
+                            <div className="text-gray-600">{mascota.sexo || "â€”"}</div>
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          <div className="flex items-center gap-2 text-sm text-gray-700">
+                            <Weight className="w-4 h-4 text-gray-400" />
+                            <div>
+                              <div>{mascota.peso ? `${mascota.peso} kg` : "â€”"}</div>
+                              <div className="text-gray-600">{mascota.color || "â€”"}</div>
+                            </div>
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          {mascota.observaciones ? (
+                            <div
+                              className="text-sm text-gray-700 max-w-[260px]"
+                              dangerouslySetInnerHTML={{ __html: mascota.observaciones }}
+                            />
+                          ) : (
+                            <span className="text-sm text-gray-500">â€”</span>
+                          )}
+                        </TableCell>
+                        <TableCell className="text-center">
+                          {getTratamientosCount(mascota.id)}
+                        </TableCell>
+                        <TableCell className="text-center">
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => setSelectedMascotaId(mascota.id)}
+                            title="Ver historial clinico"
+                          >
+                            <FileText className="w-4 h-4 text-secondary" />
+                          </Button>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                    {mascotas.length === 0 && (
+                      <TableRow>
+                        <TableCell colSpan={7} className="text-center py-12 text-gray-500">
+                          No tienes mascotas registradas
+                        </TableCell>
+                      </TableRow>
+                    )}
+                  </TableBody>
+                </Table>
+              </div>
+            </CardContent>
+          </Card>
+
+          {selectedMascotaId && (
+            <div className="xl:sticky xl:top-24">
               <HistorialClinico
                 mascotaId={selectedMascotaId}
                 onClose={() => setSelectedMascotaId(null)}
+                className="h-[70vh] xl:h-[calc(100vh-220px)] min-h-[480px]"
               />
-            )}
-            <div className="overflow-x-auto">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead className="text-center">Mascota</TableHead>
-                    <TableHead className="text-center">Especie / Raza</TableHead>
-                    <TableHead className="text-center">Edad / Sexo</TableHead>
-                    <TableHead className="text-center">Peso / Color</TableHead>
-                    <TableHead className="text-center">Observaciones</TableHead>
-                    <TableHead className="text-center">Tratamientos</TableHead>
-                    <TableHead className="text-center">Historial</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {mascotas.map((mascota) => (
-                    <TableRow key={mascota.id} className="hover:bg-gray-50">
-                      <TableCell>
-                        <div className="flex items-center gap-2">
-                          {mascota.foto_url ? (
-                            <img
-                              src={mascota.foto_url}
-                              alt={mascota.nombre}
-                              className="w-10 h-10 rounded-full object-cover"
-                            />
-                          ) : (
-                            <div className="w-10 h-10 rounded-full bg-primary/10 text-primary flex items-center justify-center">
-                              <PawPrint className="w-4 h-4" />
-                            </div>
-                          )}
-                          <span className="font-semibold text-gray-900">{mascota.nombre || "—"}</span>
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex flex-col text-sm text-gray-700">
-                          <Badge className={especieColors[mascota.especie] || especieColors.Otro}>
-                            {mascota.especie || "—"}
-                          </Badge>
-                          <span className="text-gray-600">{mascota.raza || "—"}</span>
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        <div className="text-sm text-gray-700">
-                          <div>{mascota.edad ?? "—"}</div>
-                          <div className="text-gray-600">{mascota.sexo || "—"}</div>
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex items-center gap-2 text-sm text-gray-700">
-                          <Weight className="w-4 h-4 text-gray-400" />
-                          <div>
-                            <div>{mascota.peso ? `${mascota.peso} kg` : "—"}</div>
-                            <div className="text-gray-600">{mascota.color || "—"}</div>
-                          </div>
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        {mascota.observaciones ? (
-                          <div
-                            className="text-sm text-gray-700 max-w-[260px]"
-                            dangerouslySetInnerHTML={{ __html: mascota.observaciones }}
-                          />
-                        ) : (
-                          <span className="text-sm text-gray-500">—</span>
-                        )}
-                      </TableCell>
-                      <TableCell className="text-center">
-                        {getTratamientosCount(mascota.id)}
-                      </TableCell>
-                      <TableCell className="text-center">
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={() => setSelectedMascotaId(mascota.id)}
-                          title="Ver historial clinico"
-                        >
-                          <FileText className="w-4 h-4 text-secondary" />
-                        </Button>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                  {mascotas.length === 0 && (
-                    <TableRow>
-                      <TableCell colSpan={7} className="text-center py-12 text-gray-500">
-                        No tienes mascotas registradas
-                      </TableCell>
-                    </TableRow>
-                  )}
-                </TableBody>
-              </Table>
             </div>
-          </CardContent>
-        </Card>
+          )}
+        </div>
       </div>
     </div>
   );

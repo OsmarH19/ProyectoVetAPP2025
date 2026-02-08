@@ -440,137 +440,150 @@ export default function Tratamientos() {
           />
         ) : (
           <>
-            {selectedMascotaId && (
-              <HistorialClinico
-                mascotaId={selectedMascotaId}
-                autoGeneratePdf={autoPdfMascotaId === selectedMascotaId}
-                onClose={() => { setSelectedMascotaId(null); setAutoPdfMascotaId(null); }}
-              />
-            )}
+            <div
+              className={`grid gap-6 items-start ${
+                selectedMascotaId
+                  ? "grid-cols-1 xl:grid-cols-[minmax(0,1fr)_520px]"
+                  : "grid-cols-1"
+              }`}
+            >
+              <div className="space-y-6">
+                <Card className="shadow-lg">
+                  <CardHeader>
+                    <div className="flex items-center gap-3">
+                      <Search className="w-5 h-5 text-gray-400" />
+                      <Input
+                        placeholder="Buscar por mascota, diagnóstico o cliente..."
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                        className="max-w-md"
+                      />
+                    </div>
+                  </CardHeader>
+                </Card>
 
-            <Card className="shadow-lg mb-6">
-              <CardHeader>
-                <div className="flex items-center gap-3">
-                  <Search className="w-5 h-5 text-gray-400" />
-                  <Input
-                    placeholder="Buscar por mascota, diagnóstico o cliente..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className="max-w-md"
+                <Card className="shadow-lg">
+                  <CardHeader>
+                    <CardTitle>Lista de Tratamientos ({filteredTratamientos.length})</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="overflow-x-auto">
+                      <Table>
+                        <TableHeader>
+                          <TableRow>
+                            <TableHead className="text-center">Mascota</TableHead>
+                            <TableHead className="text-center">Cliente</TableHead>
+                            <TableHead className="text-center">Diagnóstico</TableHead>
+                            <TableHead className="text-center">Tratamiento</TableHead>
+                            <TableHead className="text-center">Veterinario</TableHead>
+                            <TableHead className="text-center">Fecha</TableHead>
+                            <TableHead className="text-center">Acciones</TableHead>
+                          </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                          {pagedTratamientos.map((tratamiento) => {
+                            const mascotaNombre = tratamiento?.mascota?.nombre || '—';
+                            const clienteNombre = `${tratamiento?.cliente?.nombres || ''} ${tratamiento?.cliente?.apellidos || ''}`.trim() || '—';
+                            const vetNombre = formatVeterinario(tratamiento?.veterinario);
+                            const fechaCita = tratamiento?.cita?.fecha || '—';
+                            return (
+                              <TableRow key={tratamiento.id} className="hover:bg-gray-50">
+                                <TableCell>
+                                  <div className="flex items-center gap-2">
+                                    <PawPrint className="w-4 h-4 text-primary" />
+                                    <span className="font-semibold text-gray-900">{mascotaNombre}</span>
+                                  </div>
+                                </TableCell>
+                                <TableCell>
+                                  <div className="flex items-center gap-2 text-sm text-gray-700">
+                                    <User className="w-4 h-4 text-gray-400" />
+                                    <span>{clienteNombre}</span>
+                                  </div>
+                                </TableCell>
+                                <TableCell>
+                                  <p className="text-sm text-gray-700 truncate max-w-[240px]">
+                                    {tratamiento.diagnostico || '—'}
+                                  </p>
+                                </TableCell>
+                                <TableCell>
+                                  <div className="flex items-center gap-2 text-sm text-gray-700 truncate max-w-[240px]">
+                                    <Stethoscope className="w-4 h-4 text-secondary" />
+                                    <span>{tratamiento.tratamiento_indicado || '—'}</span>
+                                  </div>
+                                </TableCell>
+                                <TableCell>
+                                  <div className="flex items-center gap-2 text-sm text-gray-700">
+                                    <User className="w-4 h-4 text-gray-400" />
+                                    <span>{vetNombre}</span>
+                                  </div>
+                                </TableCell>
+                                <TableCell>
+                                  <div className="flex items-center gap-2 text-sm text-gray-700">
+                                    <Calendar className="w-4 h-4 text-gray-400" />
+                                    <span>{fechaCita}</span>
+                                  </div>
+                                </TableCell>
+                                <TableCell className="text-right">
+                                  <div className="flex justify-end gap-2">
+                                    <Button
+                                      variant="ghost"
+                                      size="icon"
+                                      onClick={() => { setSelectedMascotaId(tratamiento.mascota_id); setAutoPdfMascotaId(tratamiento.mascota_id); }}
+                                      title="Ver historial"
+                                    >
+                                      <FileText className="w-4 h-4 text-secondary" />
+                                    </Button>
+                                    <Button
+                                      variant="ghost"
+                                      size="icon"
+                                      onClick={() => handleEdit(tratamiento)}
+                                    >
+                                      <Edit className="w-4 h-4 text-secondary" />
+                                    </Button>
+                                    <Button
+                                      variant="ghost"
+                                      size="icon"
+                                      onClick={() => handleDelete(tratamiento.id)}
+                                    >
+                                      <Trash2 className="w-4 h-4 text-red-600" />
+                                    </Button>
+                                  </div>
+                                </TableCell>
+                              </TableRow>
+                            );
+                          })}
+                          {filteredTratamientos.length === 0 && (
+                            <TableRow>
+                              <TableCell colSpan={7} className="text-center py-12 text-gray-500">
+                                No se encontraron tratamientos
+                              </TableCell>
+                            </TableRow>
+                          )}
+                        </TableBody>
+                      </Table>
+                    </div>
+                    <div className="flex items-center justify-between mt-4">
+                      <p className="text-sm text-gray-600">Página {currentPage} de {totalPages}</p>
+                      <div className="flex gap-2">
+                        <Button variant="outline" onClick={() => setPage(p => Math.max(1, p - 1))} disabled={currentPage === 1}>Anterior</Button>
+                        <Button variant="outline" onClick={() => setPage(p => Math.min(totalPages, p + 1))} disabled={currentPage === totalPages}>Siguiente</Button>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+
+              {selectedMascotaId && (
+                <div className="xl:sticky xl:top-24">
+                  <HistorialClinico
+                    mascotaId={selectedMascotaId}
+                    autoGeneratePdf={autoPdfMascotaId === selectedMascotaId}
+                    onClose={() => { setSelectedMascotaId(null); setAutoPdfMascotaId(null); }}
+                    className="h-[70vh] xl:h-[calc(100vh-220px)] min-h-[480px]"
                   />
                 </div>
-              </CardHeader>
-            </Card>
-
-            <Card className="shadow-lg">
-              <CardHeader>
-                <CardTitle>Lista de Tratamientos ({filteredTratamientos.length})</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="overflow-x-auto">
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead className="text-center">Mascota</TableHead>
-                        <TableHead className="text-center">Cliente</TableHead>
-                        <TableHead className="text-center">Diagnóstico</TableHead>
-                        <TableHead className="text-center">Tratamiento</TableHead>
-                        <TableHead className="text-center">Veterinario</TableHead>
-                        <TableHead className="text-center">Fecha</TableHead>
-                        <TableHead className="text-center">Acciones</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {pagedTratamientos.map((tratamiento) => {
-                        const mascotaNombre = tratamiento?.mascota?.nombre || '—';
-                        const clienteNombre = `${tratamiento?.cliente?.nombres || ''} ${tratamiento?.cliente?.apellidos || ''}`.trim() || '—';
-                        const vetNombre = formatVeterinario(tratamiento?.veterinario);
-                        const fechaCita = tratamiento?.cita?.fecha || '—';
-                        return (
-                          <TableRow key={tratamiento.id} className="hover:bg-gray-50">
-                            <TableCell>
-                              <div className="flex items-center gap-2">
-                                <PawPrint className="w-4 h-4 text-primary" />
-                                <span className="font-semibold text-gray-900">{mascotaNombre}</span>
-                              </div>
-                            </TableCell>
-                            <TableCell>
-                              <div className="flex items-center gap-2 text-sm text-gray-700">
-                                <User className="w-4 h-4 text-gray-400" />
-                                <span>{clienteNombre}</span>
-                              </div>
-                            </TableCell>
-                            <TableCell>
-                              <p className="text-sm text-gray-700 truncate max-w-[240px]">
-                                {tratamiento.diagnostico || '—'}
-                              </p>
-                            </TableCell>
-                            <TableCell>
-                              <div className="flex items-center gap-2 text-sm text-gray-700 truncate max-w-[240px]">
-                                <Stethoscope className="w-4 h-4 text-secondary" />
-                                <span>{tratamiento.tratamiento_indicado || '—'}</span>
-                              </div>
-                            </TableCell>
-                            <TableCell>
-                              <div className="flex items-center gap-2 text-sm text-gray-700">
-                                <User className="w-4 h-4 text-gray-400" />
-                                <span>{vetNombre}</span>
-                              </div>
-                            </TableCell>
-                            <TableCell>
-                              <div className="flex items-center gap-2 text-sm text-gray-700">
-                                <Calendar className="w-4 h-4 text-gray-400" />
-                                <span>{fechaCita}</span>
-                              </div>
-                            </TableCell>
-                            <TableCell className="text-right">
-                              <div className="flex justify-end gap-2">
-                                <Button
-                                  variant="ghost"
-                                  size="icon"
-                                  onClick={() => { setSelectedMascotaId(tratamiento.mascota_id); setAutoPdfMascotaId(tratamiento.mascota_id); }}
-                                  title="Ver historial"
-                                >
-                                  <FileText className="w-4 h-4 text-secondary" />
-                                </Button>
-                                <Button
-                                  variant="ghost"
-                                  size="icon"
-                                  onClick={() => handleEdit(tratamiento)}
-                                >
-                                  <Edit className="w-4 h-4 text-secondary" />
-                                </Button>
-                                <Button
-                                  variant="ghost"
-                                  size="icon"
-                                  onClick={() => handleDelete(tratamiento.id)}
-                                >
-                                  <Trash2 className="w-4 h-4 text-red-600" />
-                                </Button>
-                              </div>
-                            </TableCell>
-                          </TableRow>
-                        );
-                      })}
-                      {filteredTratamientos.length === 0 && (
-                        <TableRow>
-                          <TableCell colSpan={7} className="text-center py-12 text-gray-500">
-                            No se encontraron tratamientos
-                          </TableCell>
-                        </TableRow>
-                      )}
-                    </TableBody>
-                  </Table>
-                </div>
-                <div className="flex items-center justify-between mt-4">
-                  <p className="text-sm text-gray-600">Página {currentPage} de {totalPages}</p>
-                  <div className="flex gap-2">
-                    <Button variant="outline" onClick={() => setPage(p => Math.max(1, p - 1))} disabled={currentPage === 1}>Anterior</Button>
-                    <Button variant="outline" onClick={() => setPage(p => Math.min(totalPages, p + 1))} disabled={currentPage === totalPages}>Siguiente</Button>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+              )}
+            </div>
           </>
         )}
       </div>
