@@ -1,12 +1,15 @@
 import { useEffect, useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { PawPrint, Weight } from "lucide-react";
+import { FileText, PawPrint, Weight } from "lucide-react";
+import HistorialClinico from "../components/tratamientos/HistorialClinico";
 
 export default function MisMascotas() {
   const [clienteId, setClienteId] = useState(null);
+  const [selectedMascotaId, setSelectedMascotaId] = useState(null);
 
   useEffect(() => {
     const raw = localStorage.getItem("auth_user");
@@ -118,6 +121,12 @@ export default function MisMascotas() {
             <CardTitle>Mascotas ({mascotas.length})</CardTitle>
           </CardHeader>
           <CardContent>
+            {selectedMascotaId && (
+              <HistorialClinico
+                mascotaId={selectedMascotaId}
+                onClose={() => setSelectedMascotaId(null)}
+              />
+            )}
             <div className="overflow-x-auto">
               <Table>
                 <TableHeader>
@@ -128,6 +137,7 @@ export default function MisMascotas() {
                     <TableHead className="text-center">Peso / Color</TableHead>
                     <TableHead className="text-center">Observaciones</TableHead>
                     <TableHead className="text-center">Tratamientos</TableHead>
+                    <TableHead className="text-center">Historial</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -185,11 +195,21 @@ export default function MisMascotas() {
                       <TableCell className="text-center">
                         {getTratamientosCount(mascota.id)}
                       </TableCell>
+                      <TableCell className="text-center">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => setSelectedMascotaId(mascota.id)}
+                          title="Ver historial clinico"
+                        >
+                          <FileText className="w-4 h-4 text-secondary" />
+                        </Button>
+                      </TableCell>
                     </TableRow>
                   ))}
                   {mascotas.length === 0 && (
                     <TableRow>
-                      <TableCell colSpan={6} className="text-center py-12 text-gray-500">
+                      <TableCell colSpan={7} className="text-center py-12 text-gray-500">
                         No tienes mascotas registradas
                       </TableCell>
                     </TableRow>
