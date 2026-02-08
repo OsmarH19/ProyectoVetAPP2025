@@ -8,6 +8,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Plus, Search, FileText, Edit, Trash2, User, PawPrint, Stethoscope, Calendar } from "lucide-react";
 import TratamientoForm from "../components/tratamientos/TratamientoForm";
 import HistorialClinico from "../components/tratamientos/HistorialClinico";
+import { setHistorialPdfUrl } from "@/lib/historialPdf";
 
 export default function Tratamientos() {
   const [showForm, setShowForm] = useState(false);
@@ -18,6 +19,20 @@ export default function Tratamientos() {
   const [selectedMascotaId, setSelectedMascotaId] = useState(null);
   const [autoPdfMascotaId, setAutoPdfMascotaId] = useState(null);
   const queryClient = useQueryClient();
+  const apiBase = import.meta.env.VITE_API_URL || "https://apivet.strategtic.com";
+
+  const generateHistorialPdf = async (mascotaId) => {
+    if (!mascotaId) return;
+    try {
+      const res = await fetch(`${apiBase}/api/mascotas/${mascotaId}/historial-pdf`);
+      const json = await res.json().catch(() => ({}));
+      if (res.ok && json?.data?.url) {
+        setHistorialPdfUrl(mascotaId, json.data.url);
+      }
+    } catch {
+      // ignore pdf generation failures
+    }
+  };
 
   const { data: tratamientos = [] } = useQuery({
     queryKey: ['api_tratamientos'],
@@ -269,12 +284,15 @@ export default function Tratamientos() {
         });
       }));
 
-      return created;
+      return { created, mascotaId: Number(data.mascota_id) || Number(created?.mascota_id) };
     },
-    onSuccess: () => {
+    onSuccess: async (result) => {
       queryClient.invalidateQueries({ queryKey: ['api_tratamientos'] });
       setShowForm(false);
       setEditingTratamiento(null);
+      if (result?.mascotaId) {
+        await generateHistorialPdf(result.mascotaId);
+      }
     },
   });
 
@@ -320,11 +338,15 @@ export default function Tratamientos() {
           });
         }
       }));
+      return { mascotaId: Number(data.mascota_id) || Number(editingTratamiento?.mascota_id) };
     },
-    onSuccess: () => {
+    onSuccess: async (result) => {
       queryClient.invalidateQueries({ queryKey: ['api_tratamientos'] });
       setShowForm(false);
       setEditingTratamiento(null);
+      if (result?.mascotaId) {
+        await generateHistorialPdf(result.mascotaId);
+      }
     },
   });
 

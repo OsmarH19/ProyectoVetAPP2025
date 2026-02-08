@@ -7,11 +7,18 @@ import { X, Download, FileText, User, Mail, Phone, MapPin, PawPrint, Calendar, S
 import toastr from "toastr";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
+import { getHistorialPdfUrl, setHistorialPdfUrl } from "@/lib/historialPdf";
 
 export default function HistorialClinico({ mascotaId, onClose, autoGeneratePdf }) {
   const printRef = useRef();
   const [downloading, setDownloading] = useState(false);
   const [autoRan, setAutoRan] = useState(false);
+  const [pdfUrl, setPdfUrl] = useState("");
+  const [pdfLoading, setPdfLoading] = useState(false);
+  const [pdfError, setPdfError] = useState("");
+  const [showPdfPreview, setShowPdfPreview] = useState(false);
+
+  const apiBase = import.meta.env.VITE_API_URL || "https://apivet.strategtic.com";
 
   const { data: mascota } = useQuery({
     queryKey: ['api_mascota', mascotaId],
@@ -154,37 +161,39 @@ export default function HistorialClinico({ mascotaId, onClose, autoGeneratePdf }
     enabled: Array.isArray(tratamientos) && tratamientos.length > 0,
   });
 
-  const handleDownloadPDF = async (openInNewTab = false) => {
+  const getPdfEndpoint = () => {
+    return mascotaId ? `${apiBase}/api/mascotas/${mascotaId}/historial-pdf` : "";
+  };
+
+  const handleDownloadPDF = async () => {
     setDownloading(true);
     try {
-      const html2canvas = (await import('html2canvas')).default;
-      const jsPDF = (await import('jspdf')).default;
-      
-      const element = printRef.current;
-      const canvas = await html2canvas(element, {
-        scale: 2,
-        useCORS: true,
-        logging: false,
-        backgroundColor: '#ffffff'
-      });
-      
-      const imgData = canvas.toDataURL('image/png');
-      const pdf = new jsPDF('p', 'mm', 'a4');
-      const pdfWidth = pdf.internal.pageSize.getWidth();
-      const pdfHeight = pdf.internal.pageSize.getHeight();
-      const imgWidth = canvas.width;
-      const imgHeight = canvas.height;
-      const ratio = Math.min(pdfWidth / imgWidth, pdfHeight / imgHeight);
-      const imgX = (pdfWidth - imgWidth * ratio) / 2;
-      const imgY = 0;
-      
-      pdf.addImage(imgData, 'PNG', imgX, imgY, imgWidth * ratio, imgHeight * ratio);
-      if (openInNewTab) {
-        const url = pdf.output('bloburl');
-        window.open(url, '_blank');
-      } else {
-        pdf.save(`Historial_Clinico_${mascota?.nombre}_${format(new Date(), 'dd-MM-yyyy')}.pdf`);
+      const cached = getHistorialPdfUrl(mascotaId);
+      if (cached) {
+        const link = document.createElement("a");
+        link.href = cached;
+        link.download = `Historial_Clinico_${mascota?.nombre || "Mascota"}.pdf`;
+        link.target = "_blank";
+        link.rel = "noreferrer";
+        link.click();
+        return;
       }
+
+      const endpoint = getPdfEndpoint();
+      if (!endpoint) throw new Error("No PDF endpoint");
+      const res = await fetch(endpoint);
+      const json = await res.json().catch(() => ({}));
+      if (res.ok && json?.data?.url) {
+        setHistorialPdfUrl(mascotaId, json.data.url);
+        const link = document.createElement("a");
+        link.href = json.data.url;
+        link.download = `Historial_Clinico_${mascota?.nombre || "Mascota"}.pdf`;
+        link.target = "_blank";
+        link.rel = "noreferrer";
+        link.click();
+        return;
+      }
+      throw new Error("PDF request failed");
     } catch (error) {
       console.error('Error generating PDF:', error);
       toastr.error('Error al generar el PDF. Por favor, intente nuevamente.');
@@ -193,7 +202,48 @@ export default function HistorialClinico({ mascotaId, onClose, autoGeneratePdf }
     }
   };
 
-  
+  const handlePreviewPDF = async () => {
+    setShowPdfPreview(true);
+    if (pdfUrl || pdfLoading) return;
+
+    const cached = getHistorialPdfUrl(mascotaId);
+    if (cached) {
+      setPdfUrl(cached);
+      return;
+    }
+
+    setPdfLoading(true);
+    setPdfError("");
+    try {
+      const endpoint = getPdfEndpoint();
+      if (!endpoint) throw new Error("No PDF endpoint");
+      const res = await fetch(endpoint);
+      const json = await res.json().catch(() => ({}));
+      if (res.ok && json?.data?.url) {
+        setHistorialPdfUrl(mascotaId, json.data.url);
+        setPdfUrl(json.data.url);
+        return;
+      }
+      throw new Error("PDF request failed");
+    } catch (error) {
+      console.error("PDF preview error:", error);
+      setPdfError("No se pudo cargar la vista previa del PDF.");
+      toastr.error("No se pudo cargar la vista previa del PDF.");
+    } finally {
+      setPdfLoading(false);
+    }
+  };
+
+  const handleClosePreview = () => {
+    setShowPdfPreview(false);
+  };
+
+  React.useEffect(() => {
+    if (autoGeneratePdf && mascotaId && !autoRan) {
+      setAutoRan(true);
+      handleDownloadPDF();
+    }
+  }, [autoGeneratePdf, mascotaId, autoRan]);
 
   const estadoColors = {
     "Pendiente": "bg-yellow-100 text-yellow-800 border-yellow-300",
@@ -210,7 +260,7 @@ export default function HistorialClinico({ mascotaId, onClose, autoGeneratePdf }
             <div>
               <CardTitle className="text-3xl font-bold flex items-center gap-3">
                 <FileText className="w-8 h-8" />
-                Historial Clínico
+                Historial Clinico
               </CardTitle>
               <p className="text-sm mt-2 opacity-90 flex items-center gap-2">
                 <Calendar className="w-4 h-4" />
@@ -218,6 +268,16 @@ export default function HistorialClinico({ mascotaId, onClose, autoGeneratePdf }
               </p>
             </div>
             <div className="flex gap-2">
+              <Button
+                variant="secondary"
+                size="sm"
+                onClick={handlePreviewPDF}
+                disabled={pdfLoading}
+                className="bg-white hover:bg-gray-100 text-primary font-semibold"
+              >
+                <FileText className="w-4 h-4 mr-2" />
+                {pdfLoading ? "Cargando..." : "Ver PDF"}
+              </Button>
               <Button
                 variant="secondary"
                 size="sm"
@@ -247,22 +307,22 @@ export default function HistorialClinico({ mascotaId, onClose, autoGeneratePdf }
               <div className="flex justify-between items-start">
                 <div>
                   <h1 className="text-3xl font-bold mb-2">VetApp</h1>
-                  <p className="text-lg opacity-90">Historial Clínico Veterinario</p>
+                  <p className="text-lg opacity-90">Historial Clinico Veterinario</p>
                 </div>
                 <div className="text-right text-sm opacity-90">
-                  <p className="font-semibold">Fecha de generación:</p>
+                  <p className="font-semibold">Fecha de generacion:</p>
                   <p>{format(new Date(), "dd 'de' MMMM 'de' yyyy", { locale: es })}</p>
                 </div>
               </div>
             </div>
 
-            {/* Información en dos columnas */}
+            {/* Informacion en dos columnas */}
             <div className="grid md:grid-cols-2 gap-6 mb-8">
-              {/* Información del Cliente */}
+              {/* Informacion del Cliente */}
               <div className="bg-gradient-to-br from-secondary/5 to-secondary/10 p-6 rounded-xl border-2 border-secondary/20 shadow-sm">
                 <div className="flex items-center gap-3 mb-4 pb-3 border-b-2 border-secondary/30">
                   <User className="w-6 h-6 text-secondary" />
-                  <h3 className="text-xl font-bold text-secondary">Información del Cliente</h3>
+                  <h3 className="text-xl font-bold text-secondary">Informacion del Cliente</h3>
                 </div>
                 <div className="space-y-3">
                   <div className="flex items-start gap-2">
@@ -282,7 +342,7 @@ export default function HistorialClinico({ mascotaId, onClose, autoGeneratePdf }
                   <div className="flex items-start gap-2">
                     <Phone className="w-4 h-4 text-secondary mt-1 flex-shrink-0" />
                     <div>
-                      <p className="text-xs text-secondary font-semibold">Teléfono</p>
+                      <p className="text-xs text-secondary font-semibold">Telefono</p>
                       <p className="text-gray-900">{clienteData?.telefono || '-'}</p>
                     </div>
                   </div>
@@ -296,18 +356,18 @@ export default function HistorialClinico({ mascotaId, onClose, autoGeneratePdf }
                   <div className="flex items-start gap-2">
                     <MapPin className="w-4 h-4 text-secondary mt-1 flex-shrink-0" />
                     <div>
-                      <p className="text-xs text-secondary font-semibold">Dirección</p>
+                      <p className="text-xs text-secondary font-semibold">Direccion</p>
                       <p className="text-gray-900">{clienteDireccion || '-'}</p>
                     </div>
                   </div>
                 </div>
               </div>
 
-              {/* Información de la Mascota */}
+              {/* Informacion de la Mascota */}
               <div className="bg-gradient-to-br from-primary/5 to-primary/10 p-6 rounded-xl border-2 border-primary/20 shadow-sm">
                 <div className="flex items-center gap-3 mb-4 pb-3 border-b-2 border-primary/30">
                   <PawPrint className="w-6 h-6 text-primary" />
-                  <h3 className="text-xl font-bold text-primary">Información de la Mascota</h3>
+                  <h3 className="text-xl font-bold text-primary">Informacion de la Mascota</h3>
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
@@ -335,20 +395,20 @@ export default function HistorialClinico({ mascotaId, onClose, autoGeneratePdf }
                     <p className="text-gray-900">{mascota?.peso} kg</p>
                   </div>
                   <div className="col-span-2">
-                    <p className="text-xs text-primary font-semibold">Color/Descripción</p>
+                    <p className="text-xs text-primary font-semibold">Color/Descripcion</p>
                     <p className="text-gray-900">{mascota?.color}</p>
                   </div>
                 </div>
               </div>
             </div>
 
-            {/* Historial Cronológico */}
+            {/* Historial Cronologico */}
             <div className="mb-6">
               <div className="flex items-center gap-3 mb-6 pb-3 border-b-2 border-gray-300">
                 <Stethoscope className="w-7 h-7 text-primary" />
-                <h2 className="text-2xl font-bold text-gray-900">Historial Cronológico de Consultas</h2>
+                <h2 className="text-2xl font-bold text-gray-900">Historial Cronologico de Consultas</h2>
               </div>
-              
+
               <div className="space-y-6">
                 {citas.map((cita, index) => {
                   const tratamiento = tratamientos.find(t => t.cita_id === cita.id);
@@ -356,10 +416,10 @@ export default function HistorialClinico({ mascotaId, onClose, autoGeneratePdf }
                   const medicamentos = tratamiento && Array.isArray(tratamiento.medicamentos)
                     ? tratamiento.medicamentos
                     : (tId ? (medicamentosPorTratamiento[tId] || []) : []);
-                  
+
                   return (
                     <div key={cita.id} className="border-l-4 border-primary pl-6 relative">
-                      {/* Número de consulta */}
+                      {/* Numero de consulta */}
                       <div className="absolute -left-8 top-0 w-12 h-12 bg-primary text-white rounded-full flex items-center justify-center font-bold shadow-lg">
                         {index + 1}
                       </div>
@@ -384,17 +444,21 @@ export default function HistorialClinico({ mascotaId, onClose, autoGeneratePdf }
 
                         {/* Contenido de la cita */}
                         <div className="grid md:grid-cols-2 gap-6">
-                          {/* Columna izquierda - Información de la cita */}
+                          {/* Columna izquierda */}
                           <div className="space-y-4">
                             <div className="bg-amber-50 p-4 rounded-lg border border-amber-200">
                               <p className="text-xs text-amber-700 font-semibold mb-1">MOTIVO DE CONSULTA</p>
                               <p className="text-gray-900 font-medium">{cita.motivo}</p>
                             </div>
-                            
+
                             {cita.veterinario && (
                               <div className="bg-secondary/5 p-4 rounded-lg border border-secondary/20">
                                 <p className="text-xs text-secondary font-semibold mb-1">VETERINARIO RESPONSABLE</p>
-                                <p className="text-gray-900 font-medium">Dr. {typeof cita.veterinario === 'object' ? `${cita.veterinario?.nombres || ''} ${cita.veterinario?.apellidos || ''}`.trim() : cita.veterinario}</p>
+                                <p className="text-gray-900 font-medium">
+                                  Dr. {typeof cita.veterinario === 'object'
+                                    ? `${cita.veterinario?.nombres || ''} ${cita.veterinario?.apellidos || ''}`.trim()
+                                    : cita.veterinario}
+                                </p>
                               </div>
                             )}
 
@@ -406,13 +470,13 @@ export default function HistorialClinico({ mascotaId, onClose, autoGeneratePdf }
                             )}
                           </div>
 
-                          {/* Columna derecha - Tratamiento */}
+                          {/* Columna derecha */}
                           {tratamiento && (
                             <div className="space-y-4">
                               <div className="bg-red-50 p-4 rounded-lg border-2 border-red-300">
                                 <div className="flex items-center gap-2 mb-2">
                                   <Stethoscope className="w-5 h-5 text-red-600" />
-                                  <p className="text-xs text-red-700 font-bold uppercase">Diagnóstico</p>
+                                  <p className="text-xs text-red-700 font-bold uppercase">Diagnostico</p>
                                 </div>
                                 <p className="text-gray-900 font-semibold">{tratamiento.diagnostico}</p>
                               </div>
@@ -440,7 +504,7 @@ export default function HistorialClinico({ mascotaId, onClose, autoGeneratePdf }
                                           )}
                                           {med.duracion && (
                                             <div>
-                                              <span className="font-semibold text-secondary">Duración:</span> {med.duracion}
+                                              <span className="font-semibold text-secondary">Duracion:</span> {med.duracion}
                                             </div>
                                           )}
                                         </div>
@@ -467,14 +531,14 @@ export default function HistorialClinico({ mascotaId, onClose, autoGeneratePdf }
                 {citas.length === 0 && (
                   <div className="text-center py-16 bg-gray-50 rounded-xl border-2 border-dashed border-gray-300">
                     <FileText className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-                    <p className="text-gray-500 text-lg font-semibold">No hay registros en el historial clínico</p>
-                    <p className="text-gray-400 text-sm mt-2">Las consultas aparecerán aquí una vez sean registradas</p>
+                    <p className="text-gray-500 text-lg font-semibold">No hay registros en el historial clinico</p>
+                    <p className="text-gray-400 text-sm mt-2">Las consultas apareceran aqui una vez sean registradas</p>
                   </div>
                 )}
               </div>
             </div>
 
-            {/* Footer con firma */}
+            {/* Footer */}
             <div className="mt-12 pt-8 border-t-2 border-gray-300">
               <div className="flex justify-between items-end">
                 <div className="text-center">
@@ -489,9 +553,35 @@ export default function HistorialClinico({ mascotaId, onClose, autoGeneratePdf }
               </div>
             </div>
           </div>
+
+          {showPdfPreview && (
+            <div className="mt-8">
+              <div className="flex items-center justify-between mb-3">
+                <h3 className="text-lg font-semibold text-gray-900">Vista previa PDF</h3>
+                <Button variant="outline" size="sm" onClick={handleClosePreview}>
+                  Ocultar
+                </Button>
+              </div>
+              {pdfError && (
+                <div className="rounded-md bg-red-50 text-red-700 text-sm px-3 py-2 mb-3">
+                  {pdfError}
+                </div>
+              )}
+              {pdfUrl ? (
+                <iframe
+                  title="Historial clinico PDF"
+                  src={pdfUrl}
+                  className="w-full h-[70vh] rounded-md border"
+                />
+              ) : (
+                <div className="text-sm text-gray-600">
+                  {pdfLoading ? "Cargando vista previa..." : "No hay vista previa disponible."}
+                </div>
+              )}
+            </div>
+          )}
         </CardContent>
       </Card>
     </div>
   );
 }
-
