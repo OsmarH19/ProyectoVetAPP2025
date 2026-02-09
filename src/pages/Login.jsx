@@ -38,6 +38,7 @@ export default function Login() {
 
   const googleClientId = import.meta.env.VITE_GOOGLE_CLIENT_ID || "";
   const googleAuthEndpoint = import.meta.env.VITE_GOOGLE_AUTH_ENDPOINT || "";
+  const welcomeEmailEndpoint = import.meta.env.VITE_WELCOME_EMAIL_ENDPOINT || "";
   const clientesEndpoint =
     import.meta.env.VITE_CLIENTE_CREATE_ENDPOINT ||
     "https://apivet.strategtic.com/api/clientes";
@@ -78,6 +79,43 @@ export default function Login() {
       ["/login", "/completar-cliente"].includes((last || "").toLowerCase());
     const defaultRoute = user.profileID === 1 ? "/dashboard" : "/clientedashboard";
     navigate(isForbiddenLast ? defaultRoute : last, { replace: true });
+  };
+
+  const splitFullName = (fullName = "") => {
+    const parts = String(fullName || "").trim().split(/\s+/).filter(Boolean);
+    return {
+      nombres: parts.slice(0, 2).join(" "),
+      apellidos: parts.slice(2).join(" "),
+    };
+  };
+
+  const submitWelcomeEmail = async ({ email, nombre }) => {
+    if (!welcomeEmailEndpoint) return;
+    if (!email) return;
+    try {
+      const res = await fetch(welcomeEmailEndpoint, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email,
+          nombre,
+        }),
+      });
+      const text = await res.text();
+      let json = {};
+      if (text) {
+        try {
+          json = JSON.parse(text);
+        } catch {
+          json = {};
+        }
+      }
+      if (!res.ok || json?.success === false || json?.status === false) {
+        throw new Error(json?.message || "No se pudo enviar el correo de bienvenida.");
+      }
+    } catch {
+      // Best effort only.
+    }
   };
 
   const isClienteRegisteredByEmail = async (email) => {
@@ -179,6 +217,14 @@ export default function Login() {
       needs_cliente_profile: true,
       cliente_profile_completed: false,
     };
+    let preExistingCliente = true;
+    if (fallbackUser.email) {
+      try {
+        preExistingCliente = await isClienteRegisteredByEmail(fallbackUser.email);
+      } catch {
+        preExistingCliente = true;
+      }
+    }
 
     try {
       if (googleAuthEndpoint) {
@@ -204,6 +250,8 @@ export default function Login() {
           responseData: data,
           userFromApi,
         });
+        const nameFromApi = userFromApi?.name || fallbackUser.name;
+        const split = splitFullName(nameFromApi);
         const normalizedUser = {
           ...fallbackUser,
           ...userFromApi,
@@ -214,6 +262,17 @@ export default function Login() {
           cliente_profile_completed: profileCompleted,
         };
         const token = data?.token || data?.access_token || data?.data?.token || "";
+        if (!preExistingCliente && profileCompleted) {
+          const nombreFromApi = `${userFromApi?.nombres || ""} ${userFromApi?.apellidos || ""}`.trim();
+          const nombre =
+            nombreFromApi ||
+            `${split.nombres} ${split.apellidos}`.trim() ||
+            normalizedUser.name;
+          await submitWelcomeEmail({
+            email: normalizedUser.email,
+            nombre,
+          });
+        }
         saveSessionAndRedirect(normalizedUser, token);
         return;
       }

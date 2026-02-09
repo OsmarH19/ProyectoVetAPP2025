@@ -110,18 +110,30 @@ export default function CompletarCliente() {
     runDniLookup(dni, { force: true });
   };
 
-  const submitWelcomeEmail = async ({ clienteId }) => {
+  const submitWelcomeEmail = async () => {
     if (!welcomeEmailEndpoint) return;
-    await fetch(welcomeEmailEndpoint, {
+    const nombre = `${formData.nombres} ${formData.apellidos}`.trim();
+    if (!formData.email || !nombre) return;
+    const res = await fetch(welcomeEmailEndpoint, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        cliente_id: clienteId,
         email: formData.email,
-        nombres: formData.nombres,
-        apellidos: formData.apellidos,
+        nombre,
       }),
     });
+    const text = await res.text();
+    let json = {};
+    if (text) {
+      try {
+        json = JSON.parse(text);
+      } catch {
+        json = {};
+      }
+    }
+    if (!res.ok || json?.success === false || json?.status === false) {
+      throw new Error(json?.message || "No se pudo enviar el correo de bienvenida.");
+    }
   };
 
   const handleSubmit = async (event) => {
@@ -161,7 +173,7 @@ export default function CompletarCliente() {
         null;
 
       try {
-        await submitWelcomeEmail({ clienteId });
+        await submitWelcomeEmail();
       } catch {
         // Welcome email is best effort and should not block onboarding.
       }
