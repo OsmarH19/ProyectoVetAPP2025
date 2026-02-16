@@ -409,167 +409,168 @@ export default function Servicios() {
           </Card>
         )}
 
-        <Card className="shadow-sm">
-          <CardContent className="pt-6">
-            <div className="flex flex-col lg:flex-row gap-3">
-              <div className="relative flex-1">
-                <Search className="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
-                <Input
-                  value={search}
-                  onChange={(e) => setSearch(e.target.value)}
-                  placeholder="Buscar servicios..."
-                  className="pl-10"
-                />
-              </div>
-              <select
-                className="h-10 rounded-md border border-input bg-background px-3 text-sm min-w-[210px]"
-                value={tipoFiltro}
-                onChange={(e) => setTipoFiltro(e.target.value)}
-              >
-                {tiposDisponiblesFiltro.map((item) => (
-                  <option key={item.value} value={item.value}>
-                    {item.label}
-                  </option>
-                ))}
-              </select>
-            </div>
-          </CardContent>
-        </Card>
-
-        <div className="inline-flex bg-white border border-slate-200 rounded-xl p-1 shadow-sm">
-          <button
-            type="button"
-            onClick={() => setTab(TABS.activos)}
-            className={`px-4 py-1.5 rounded-lg text-sm font-medium transition-colors ${
-              tab === TABS.activos ? "bg-primary/15 text-primary" : "text-muted-foreground hover:text-foreground"
-            }`}
-          >
-            Activos ({counts.activos})
-          </button>
-          <button
-            type="button"
-            onClick={() => setTab(TABS.inactivos)}
-            className={`px-4 py-1.5 rounded-lg text-sm font-medium transition-colors ${
-              tab === TABS.inactivos ? "bg-primary/15 text-primary" : "text-muted-foreground hover:text-foreground"
-            }`}
-          >
-            Inactivos ({counts.inactivos})
-          </button>
-          <button
-            type="button"
-            onClick={() => setTab(TABS.todos)}
-            className={`px-4 py-1.5 rounded-lg text-sm font-medium transition-colors ${
-              tab === TABS.todos ? "bg-primary/15 text-primary" : "text-muted-foreground hover:text-foreground"
-            }`}
-          >
-            Todos ({counts.todos})
-          </button>
-        </div>
-
-        {isLoading && (
-          <Card>
-            <CardContent className="py-10 text-center text-slate-500">Cargando servicios...</CardContent>
-          </Card>
-        )}
-
-        {isError && !isLoading && (
-          <Card>
-            <CardContent className="py-10 text-center text-red-600">{error?.message || "No se pudo cargar servicios."}</CardContent>
-          </Card>
-        )}
-
-        {!isLoading && !isError && (
+        {!showForm && (
           <>
-            <Card className="shadow-sm border-slate-200">
+            <Card className="shadow-sm">
               <CardContent className="pt-6">
-                <div className="overflow-x-auto">
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead className="text-center">Nombre</TableHead>
-                        <TableHead className="text-center">Descripcion</TableHead>
-                        <TableHead className="text-center">Precio</TableHead>
-                        <TableHead className="text-center">Duracion</TableHead>
-                        <TableHead className="text-center">Cita previa</TableHead>
-                        <TableHead className="text-center">Estado</TableHead>
-                        <TableHead className="text-center">Acciones</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {serviciosFiltrados.map((servicio) => (
-                        <TableRow key={servicio.id} className="hover:bg-muted/40">
-                          <TableCell>
-                            <span className={`inline-flex px-2.5 py-1 rounded-md text-xs font-semibold ${badgeColorTipo(servicio.nombre)}`}>
-                              {servicio.nombre}
-                            </span>
-                          </TableCell>
-                          <TableCell>
-                            <p className="max-w-[340px] mx-auto truncate text-slate-700">
-                              {servicio.descripcion}
-                            </p>
-                            <p className="max-w-[340px] mx-auto truncate text-xs text-muted-foreground mt-1">
-                              {servicio.observaciones || "Sin observaciones"}
-                            </p>
-                          </TableCell>
-                          <TableCell className="text-center font-semibold text-primary">
-                            S/ {servicio.precio.toFixed(2)}
-                          </TableCell>
-                          <TableCell className="text-center text-secondary font-semibold">
-                            {servicio.duracion} min
-                          </TableCell>
-                          <TableCell className="text-center">
-                            <span
-                              className={`inline-flex px-2.5 py-1 rounded-md text-xs font-medium border ${
-                                servicio.requiere_cita_previa
-                                  ? "border-accent/60 text-accent-foreground bg-accent/20"
-                                  : "border-muted text-muted-foreground bg-muted/40"
-                              }`}
-                            >
-                              {servicio.requiere_cita_previa ? "Si" : "No"}
-                            </span>
-                          </TableCell>
-                          <TableCell className="text-center">
-                            <span
-                              className={`inline-flex px-2.5 py-1 rounded-md text-xs font-semibold ${
-                                servicio.activo ? "bg-primary text-primary-foreground" : "bg-destructive/10 text-destructive"
-                              }`}
-                            >
-                              {servicio.activo ? "Disponible" : "Inactivo"}
-                            </span>
-                          </TableCell>
-                          <TableCell className="text-center">
-                            <div className="flex justify-center gap-2">
-                              <Button variant="outline" size="sm" className="text-slate-700" onClick={() => openEditForm(servicio)}>
-                                <Pencil className="w-4 h-4 mr-1" />
-                                Editar
-                              </Button>
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                className="text-red-600 border-red-200 hover:bg-red-50"
-                                onClick={() => handleDelete(servicio)}
-                                disabled={deleteMutation.isPending}
-                              >
-                                <Trash2 className="w-4 h-4 mr-1" />
-                                Eliminar
-                              </Button>
-                            </div>
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                      {serviciosFiltrados.length === 0 && (
-                        <TableRow>
-                          <TableCell colSpan={8} className="py-12 text-center text-muted-foreground">
-                            No hay servicios para el filtro seleccionado.
-                          </TableCell>
-                        </TableRow>
-                      )}
-                    </TableBody>
-                  </Table>
+                <div className="flex flex-col lg:flex-row gap-3">
+                  <div className="relative flex-1">
+                    <Search className="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                    <Input
+                      value={search}
+                      onChange={(e) => setSearch(e.target.value)}
+                      placeholder="Buscar servicios..."
+                      className="pl-10"
+                    />
+                  </div>
+                  <select
+                    className="h-10 rounded-md border border-input bg-background px-3 text-sm min-w-[210px]"
+                    value={tipoFiltro}
+                    onChange={(e) => setTipoFiltro(e.target.value)}
+                  >
+                    {tiposDisponiblesFiltro.map((item) => (
+                      <option key={item.value} value={item.value}>
+                        {item.label}
+                      </option>
+                    ))}
+                  </select>
                 </div>
               </CardContent>
             </Card>
 
+            <div className="inline-flex bg-white border border-slate-200 rounded-xl p-1 shadow-sm">
+              <button
+                type="button"
+                onClick={() => setTab(TABS.activos)}
+                className={`px-4 py-1.5 rounded-lg text-sm font-medium transition-colors ${
+                  tab === TABS.activos ? "bg-primary/15 text-primary" : "text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                Activos ({counts.activos})
+              </button>
+              <button
+                type="button"
+                onClick={() => setTab(TABS.inactivos)}
+                className={`px-4 py-1.5 rounded-lg text-sm font-medium transition-colors ${
+                  tab === TABS.inactivos ? "bg-primary/15 text-primary" : "text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                Inactivos ({counts.inactivos})
+              </button>
+              <button
+                type="button"
+                onClick={() => setTab(TABS.todos)}
+                className={`px-4 py-1.5 rounded-lg text-sm font-medium transition-colors ${
+                  tab === TABS.todos ? "bg-primary/15 text-primary" : "text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                Todos ({counts.todos})
+              </button>
+            </div>
+
+            {isLoading && (
+              <Card>
+                <CardContent className="py-10 text-center text-slate-500">Cargando servicios...</CardContent>
+              </Card>
+            )}
+
+            {isError && !isLoading && (
+              <Card>
+                <CardContent className="py-10 text-center text-red-600">{error?.message || "No se pudo cargar servicios."}</CardContent>
+              </Card>
+            )}
+
+            {!isLoading && !isError && (
+              <Card className="shadow-sm border-slate-200">
+                <CardContent className="pt-6">
+                  <div className="overflow-x-auto">
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead className="text-center">Nombre</TableHead>
+                          <TableHead className="text-center">Descripcion</TableHead>
+                          <TableHead className="text-center">Precio</TableHead>
+                          <TableHead className="text-center">Duracion</TableHead>
+                          <TableHead className="text-center">Cita previa</TableHead>
+                          <TableHead className="text-center">Estado</TableHead>
+                          <TableHead className="text-center">Acciones</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {serviciosFiltrados.map((servicio) => (
+                          <TableRow key={servicio.id} className="hover:bg-muted/40">
+                            <TableCell>
+                              <span className={`inline-flex px-2.5 py-1 rounded-md text-xs font-semibold ${badgeColorTipo(servicio.nombre)}`}>
+                                {servicio.nombre}
+                              </span>
+                            </TableCell>
+                            <TableCell>
+                              <p className="max-w-[340px] mx-auto truncate text-slate-700">
+                                {servicio.descripcion}
+                              </p>
+                              <p className="max-w-[340px] mx-auto truncate text-xs text-muted-foreground mt-1">
+                                {servicio.observaciones || "Sin observaciones"}
+                              </p>
+                            </TableCell>
+                            <TableCell className="text-center font-semibold text-primary">
+                              S/ {servicio.precio.toFixed(2)}
+                            </TableCell>
+                            <TableCell className="text-center text-secondary font-semibold">
+                              {servicio.duracion} min
+                            </TableCell>
+                            <TableCell className="text-center">
+                              <span
+                                className={`inline-flex px-2.5 py-1 rounded-md text-xs font-medium border ${
+                                  servicio.requiere_cita_previa
+                                    ? "border-accent/60 text-accent-foreground bg-accent/20"
+                                    : "border-muted text-muted-foreground bg-muted/40"
+                                }`}
+                              >
+                                {servicio.requiere_cita_previa ? "Si" : "No"}
+                              </span>
+                            </TableCell>
+                            <TableCell className="text-center">
+                              <span
+                                className={`inline-flex px-2.5 py-1 rounded-md text-xs font-semibold ${
+                                  servicio.activo ? "bg-primary text-primary-foreground" : "bg-destructive/10 text-destructive"
+                                }`}
+                              >
+                                {servicio.activo ? "Disponible" : "Inactivo"}
+                              </span>
+                            </TableCell>
+                            <TableCell className="text-center">
+                              <div className="flex justify-center gap-2">
+                                <Button variant="outline" size="sm" className="text-slate-700" onClick={() => openEditForm(servicio)}>
+                                  <Pencil className="w-4 h-4 mr-1" />
+                                  Editar
+                                </Button>
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  className="text-red-600 border-red-200 hover:bg-red-50"
+                                  onClick={() => handleDelete(servicio)}
+                                  disabled={deleteMutation.isPending}
+                                >
+                                  <Trash2 className="w-4 h-4 mr-1" />
+                                  Eliminar
+                                </Button>
+                              </div>
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                        {serviciosFiltrados.length === 0 && (
+                          <TableRow>
+                            <TableCell colSpan={8} className="py-12 text-center text-muted-foreground">
+                              No hay servicios para el filtro seleccionado.
+                            </TableCell>
+                          </TableRow>
+                        )}
+                      </TableBody>
+                    </Table>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
           </>
         )}
       </div>
