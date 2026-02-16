@@ -15,6 +15,16 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 const TABS = {
   activos: "activos",
@@ -85,6 +95,7 @@ export default function Servicios() {
   const [tab, setTab] = useState(TABS.activos);
   const [showForm, setShowForm] = useState(false);
   const [formData, setFormData] = useState(EMPTY_FORM);
+  const [deleteTarget, setDeleteTarget] = useState(null);
 
   const queryClient = useQueryClient();
   const apiBase = import.meta.env.VITE_API_URL || "https://apivet.strategtic.com";
@@ -263,8 +274,14 @@ export default function Servicios() {
     saveMutation.mutate({ payload, isEdit: Boolean(formData.id) });
   };
 
-  const handleDelete = (id) => {
-    if (!window.confirm("Esta seguro de eliminar este servicio?")) return;
+  const handleDelete = (servicio) => {
+    setDeleteTarget(servicio);
+  };
+
+  const confirmDelete = () => {
+    if (!deleteTarget?.id) return;
+    const id = deleteTarget.id;
+    setDeleteTarget(null);
     deleteMutation.mutate(id);
   };
 
@@ -530,7 +547,7 @@ export default function Servicios() {
                                 variant="outline"
                                 size="sm"
                                 className="text-red-600 border-red-200 hover:bg-red-50"
-                                onClick={() => handleDelete(servicio.id)}
+                                onClick={() => handleDelete(servicio)}
                                 disabled={deleteMutation.isPending}
                               >
                                 <Trash2 className="w-4 h-4 mr-1" />
@@ -556,6 +573,26 @@ export default function Servicios() {
           </>
         )}
       </div>
+
+      <AlertDialog open={Boolean(deleteTarget)} onOpenChange={(open) => !open && setDeleteTarget(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Eliminar servicio</AlertDialogTitle>
+            <AlertDialogDescription>
+              Esta seguro de eliminar este servicio?
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={confirmDelete}
+              className="bg-destructive hover:bg-destructive/90 text-destructive-foreground"
+            >
+              Eliminar
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
