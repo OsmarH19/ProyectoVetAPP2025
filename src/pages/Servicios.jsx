@@ -102,11 +102,11 @@ function iconoServicioByTipo(tipoNombre) {
 
 function badgeColorTipo(tipoNombre) {
   const normalized = String(tipoNombre || "").toLowerCase();
-  if (normalized.includes("consulta")) return "bg-indigo-100 text-indigo-700";
-  if (normalized.includes("bano") || normalized.includes("ba")) return "bg-cyan-100 text-cyan-700";
-  if (normalized.includes("peluquer")) return "bg-pink-100 text-pink-700";
-  if (normalized.includes("vacun")) return "bg-emerald-100 text-emerald-700";
-  return "bg-slate-100 text-slate-700";
+  if (normalized.includes("consulta")) return "bg-primary/15 text-primary";
+  if (normalized.includes("bano") || normalized.includes("ba")) return "bg-secondary/15 text-secondary";
+  if (normalized.includes("peluquer")) return "bg-accent/25 text-foreground";
+  if (normalized.includes("vacun")) return "bg-primary/10 text-primary";
+  return "bg-muted text-muted-foreground";
 }
 
 export default function Servicios() {
@@ -321,12 +321,12 @@ export default function Servicios() {
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div>
             <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-3">
-              <Sparkles className="w-7 h-7 text-emerald-600" />
+              <Sparkles className="w-7 h-7 text-primary" />
               Gestion de Servicios
             </h1>
             <p className="text-gray-600 mt-1">Administra todos los servicios para mascotas</p>
           </div>
-          <Button className="bg-emerald-600 hover:bg-emerald-700 text-white" onClick={openCreateForm}>
+          <Button className="bg-primary hover:bg-primary/90 text-white" onClick={openCreateForm}>
             <Plus className="w-4 h-4 mr-2" />
             Nuevo Servicio
           </Button>
@@ -487,7 +487,7 @@ export default function Servicios() {
             type="button"
             onClick={() => setTab(TABS.activos)}
             className={`px-4 py-1.5 rounded-lg text-sm font-medium transition-colors ${
-              tab === TABS.activos ? "bg-slate-100 text-slate-900" : "text-slate-500 hover:text-slate-700"
+              tab === TABS.activos ? "bg-primary/15 text-primary" : "text-muted-foreground hover:text-foreground"
             }`}
           >
             Activos ({counts.activos})
@@ -496,7 +496,7 @@ export default function Servicios() {
             type="button"
             onClick={() => setTab(TABS.inactivos)}
             className={`px-4 py-1.5 rounded-lg text-sm font-medium transition-colors ${
-              tab === TABS.inactivos ? "bg-slate-100 text-slate-900" : "text-slate-500 hover:text-slate-700"
+              tab === TABS.inactivos ? "bg-primary/15 text-primary" : "text-muted-foreground hover:text-foreground"
             }`}
           >
             Inactivos ({counts.inactivos})
@@ -505,7 +505,7 @@ export default function Servicios() {
             type="button"
             onClick={() => setTab(TABS.todos)}
             className={`px-4 py-1.5 rounded-lg text-sm font-medium transition-colors ${
-              tab === TABS.todos ? "bg-slate-100 text-slate-900" : "text-slate-500 hover:text-slate-700"
+              tab === TABS.todos ? "bg-primary/15 text-primary" : "text-muted-foreground hover:text-foreground"
             }`}
           >
             Todos ({counts.todos})
@@ -534,7 +534,7 @@ export default function Servicios() {
                     <CardHeader className="bg-slate-50 border-b border-slate-200 space-y-4">
                       <div className="flex justify-between items-start gap-3">
                         <div className="flex gap-3">
-                          <div className="w-9 h-9 rounded-lg bg-indigo-100 text-indigo-600 flex items-center justify-center">
+                          <div className="w-9 h-9 rounded-lg bg-primary/10 text-primary flex items-center justify-center">
                             <Icono className="w-5 h-5" />
                           </div>
                           <div>
@@ -550,7 +550,7 @@ export default function Servicios() {
                         </div>
                         <span
                           className={`inline-flex px-3 py-1 rounded-md text-xs font-semibold ${
-                            servicio.activo ? "bg-emerald-600 text-white" : "bg-rose-100 text-rose-700"
+                            servicio.activo ? "bg-primary text-primary-foreground" : "bg-destructive/10 text-destructive"
                           }`}
                         >
                           {servicio.activo ? "Disponible" : "Inactivo"}
@@ -562,17 +562,17 @@ export default function Servicios() {
                       <p className="text-slate-700 min-h-[56px]">{servicio.descripcion}</p>
 
                       <div className="grid grid-cols-2 gap-3">
-                        <div className="rounded-lg border border-emerald-200 bg-emerald-50 p-3">
-                          <p className="text-xs uppercase tracking-wide text-emerald-700 flex items-center gap-1">
+                        <div className="rounded-lg border border-primary/20 bg-primary/5 p-3">
+                          <p className="text-xs uppercase tracking-wide text-primary flex items-center gap-1">
                             <DollarSign className="w-4 h-4" /> Precio
                           </p>
-                          <p className="text-4xl font-bold text-emerald-900 mt-1">S/ {servicio.precio.toFixed(2)}</p>
+                          <p className="text-4xl font-bold text-primary mt-1">S/ {servicio.precio.toFixed(2)}</p>
                         </div>
-                        <div className="rounded-lg border border-blue-200 bg-blue-50 p-3">
-                          <p className="text-xs uppercase tracking-wide text-blue-700 flex items-center gap-1">
+                        <div className="rounded-lg border border-secondary/20 bg-secondary/5 p-3">
+                          <p className="text-xs uppercase tracking-wide text-secondary flex items-center gap-1">
                             <Clock3 className="w-4 h-4" /> Duracion
                           </p>
-                          <p className="text-4xl font-bold text-blue-900 mt-1">{servicio.duracion} min</p>
+                          <p className="text-4xl font-bold text-secondary mt-1">{servicio.duracion} min</p>
                         </div>
                       </div>
 
@@ -582,7 +582,7 @@ export default function Servicios() {
                       </div>
 
                       {servicio.requiere_cita_previa && (
-                        <span className="inline-flex px-3 py-1 rounded-md text-xs font-medium border border-amber-300 text-amber-700 bg-amber-50">
+                        <span className="inline-flex px-3 py-1 rounded-md text-xs font-medium border border-accent/60 text-accent-foreground bg-accent/20">
                           Requiere cita previa
                         </span>
                       )}
