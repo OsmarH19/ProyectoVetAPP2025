@@ -5,11 +5,6 @@ import {
   Sparkles,
   Plus,
   Search,
-  Stethoscope,
-  Scissors,
-  Bath,
-  Clock3,
-  DollarSign,
   Pencil,
   Trash2,
 } from "lucide-react";
@@ -19,6 +14,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 
 const TIPO_SERVICIO_OPTIONS = [
   { id: 1, nombre: "Consulta Veterinaria" },
@@ -91,13 +87,6 @@ function extractApiError(json, fallback = "Ocurrio un error en la solicitud.") {
 function getTipoNombreById(tipoId) {
   const found = TIPO_SERVICIO_OPTIONS.find((item) => item.id === Number(tipoId));
   return found?.nombre || `Tipo ${tipoId || "-"}`;
-}
-
-function iconoServicioByTipo(tipoNombre) {
-  const normalized = String(tipoNombre || "").toLowerCase();
-  if (normalized.includes("peluquer")) return Scissors;
-  if (normalized.includes("bano") || normalized.includes("ba")) return Bath;
-  return Stethoscope;
 }
 
 function badgeColorTipo(tipoNombre) {
@@ -526,95 +515,102 @@ export default function Servicios() {
 
         {!isLoading && !isError && (
           <>
-            <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
-              {serviciosFiltrados.map((servicio) => {
-                const Icono = iconoServicioByTipo(servicio.tipoNombre);
-                return (
-                  <Card key={servicio.id} className="shadow-sm border-slate-200 overflow-hidden">
-                    <CardHeader className="bg-slate-50 border-b border-slate-200 space-y-4">
-                      <div className="flex justify-between items-start gap-3">
-                        <div className="flex gap-3">
-                          <div className="w-9 h-9 rounded-lg bg-primary/10 text-primary flex items-center justify-center">
-                            <Icono className="w-5 h-5" />
-                          </div>
-                          <div>
-                            <h3 className="text-2xl font-bold leading-tight text-slate-900">{servicio.nombre}</h3>
-                            <span
-                              className={`inline-flex px-3 py-1 rounded-md text-xs font-semibold mt-2 ${badgeColorTipo(
-                                servicio.tipoNombre
-                              )}`}
-                            >
+            <Card className="shadow-sm border-slate-200">
+              <CardContent className="pt-6">
+                <div className="overflow-x-auto">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead className="text-center">Nombre</TableHead>
+                        <TableHead className="text-center">Tipo</TableHead>
+                        <TableHead className="text-center">Descripcion</TableHead>
+                        <TableHead className="text-center">Precio</TableHead>
+                        <TableHead className="text-center">Duracion</TableHead>
+                        <TableHead className="text-center">Cita previa</TableHead>
+                        <TableHead className="text-center">Estado</TableHead>
+                        <TableHead className="text-center">Acciones</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {serviciosFiltrados.map((servicio) => (
+                        <TableRow key={servicio.id} className="hover:bg-muted/40">
+                          <TableCell>
+                            <span className={`inline-flex px-2.5 py-1 rounded-md text-xs font-semibold ${badgeColorTipo(servicio.nombre)}`}>
+                              {servicio.nombre}
+                            </span>
+                          </TableCell>
+                          <TableCell>
+                            <span className={`inline-flex px-2.5 py-1 rounded-md text-xs font-semibold ${badgeColorTipo(servicio.tipoNombre)}`}>
                               {servicio.tipoNombre}
                             </span>
-                          </div>
-                        </div>
-                        <span
-                          className={`inline-flex px-3 py-1 rounded-md text-xs font-semibold ${
-                            servicio.activo ? "bg-primary text-primary-foreground" : "bg-destructive/10 text-destructive"
-                          }`}
-                        >
-                          {servicio.activo ? "Disponible" : "Inactivo"}
-                        </span>
-                      </div>
-                    </CardHeader>
-
-                    <CardContent className="p-6 space-y-4">
-                      <p className="text-slate-700 min-h-[56px]">{servicio.descripcion}</p>
-
-                      <div className="grid grid-cols-2 gap-3">
-                        <div className="rounded-lg border border-primary/20 bg-primary/5 p-3">
-                          <p className="text-xs uppercase tracking-wide text-primary flex items-center gap-1">
-                            <DollarSign className="w-4 h-4" /> Precio
-                          </p>
-                          <p className="text-4xl font-bold text-primary mt-1">S/ {servicio.precio.toFixed(2)}</p>
-                        </div>
-                        <div className="rounded-lg border border-secondary/20 bg-secondary/5 p-3">
-                          <p className="text-xs uppercase tracking-wide text-secondary flex items-center gap-1">
-                            <Clock3 className="w-4 h-4" /> Duracion
-                          </p>
-                          <p className="text-4xl font-bold text-secondary mt-1">{servicio.duracion} min</p>
-                        </div>
-                      </div>
-
-                      <div className="rounded-lg border border-slate-200 bg-slate-50 p-3">
-                        <p className="text-xs uppercase tracking-wide text-slate-600">Observaciones</p>
-                        <p className="text-slate-700 mt-1">{servicio.observaciones || "Sin observaciones."}</p>
-                      </div>
-
-                      {servicio.requiere_cita_previa && (
-                        <span className="inline-flex px-3 py-1 rounded-md text-xs font-medium border border-accent/60 text-accent-foreground bg-accent/20">
-                          Requiere cita previa
-                        </span>
+                          </TableCell>
+                          <TableCell>
+                            <p className="max-w-[340px] mx-auto truncate text-slate-700">
+                              {servicio.descripcion}
+                            </p>
+                            <p className="max-w-[340px] mx-auto truncate text-xs text-muted-foreground mt-1">
+                              {servicio.observaciones || "Sin observaciones"}
+                            </p>
+                          </TableCell>
+                          <TableCell className="text-center font-semibold text-primary">
+                            S/ {servicio.precio.toFixed(2)}
+                          </TableCell>
+                          <TableCell className="text-center text-secondary font-semibold">
+                            {servicio.duracion} min
+                          </TableCell>
+                          <TableCell className="text-center">
+                            <span
+                              className={`inline-flex px-2.5 py-1 rounded-md text-xs font-medium border ${
+                                servicio.requiere_cita_previa
+                                  ? "border-accent/60 text-accent-foreground bg-accent/20"
+                                  : "border-muted text-muted-foreground bg-muted/40"
+                              }`}
+                            >
+                              {servicio.requiere_cita_previa ? "Si" : "No"}
+                            </span>
+                          </TableCell>
+                          <TableCell className="text-center">
+                            <span
+                              className={`inline-flex px-2.5 py-1 rounded-md text-xs font-semibold ${
+                                servicio.activo ? "bg-primary text-primary-foreground" : "bg-destructive/10 text-destructive"
+                              }`}
+                            >
+                              {servicio.activo ? "Disponible" : "Inactivo"}
+                            </span>
+                          </TableCell>
+                          <TableCell className="text-center">
+                            <div className="flex justify-center gap-2">
+                              <Button variant="outline" size="sm" className="text-slate-700" onClick={() => openEditForm(servicio)}>
+                                <Pencil className="w-4 h-4 mr-1" />
+                                Editar
+                              </Button>
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                className="text-red-600 border-red-200 hover:bg-red-50"
+                                onClick={() => handleDelete(servicio.id)}
+                                disabled={deleteMutation.isPending}
+                              >
+                                <Trash2 className="w-4 h-4 mr-1" />
+                                Eliminar
+                              </Button>
+                            </div>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                      {serviciosFiltrados.length === 0 && (
+                        <TableRow>
+                          <TableCell colSpan={8} className="py-12 text-center text-muted-foreground">
+                            No hay servicios para el filtro seleccionado.
+                          </TableCell>
+                        </TableRow>
                       )}
+                    </TableBody>
+                  </Table>
+                </div>
+              </CardContent>
+            </Card>
 
-                      <div className="flex justify-end gap-2 pt-2">
-                        <Button variant="outline" className="text-slate-700" onClick={() => openEditForm(servicio)}>
-                          <Pencil className="w-4 h-4 mr-2" />
-                          Editar
-                        </Button>
-                        <Button
-                          variant="outline"
-                          className="text-red-600 border-red-200 hover:bg-red-50"
-                          onClick={() => handleDelete(servicio.id)}
-                          disabled={deleteMutation.isPending}
-                        >
-                          <Trash2 className="w-4 h-4 mr-2" />
-                          Eliminar
-                        </Button>
-                      </div>
-                    </CardContent>
-                  </Card>
-                );
-              })}
-            </div>
-
-            {serviciosFiltrados.length === 0 && (
-              <Card className="border-dashed border-slate-300">
-                <CardContent className="py-12 text-center text-slate-500">
-                  No hay servicios para el filtro seleccionado.
-                </CardContent>
-              </Card>
-            )}
           </>
         )}
       </div>
