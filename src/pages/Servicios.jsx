@@ -16,19 +16,6 @@ import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 
-const TIPO_SERVICIO_OPTIONS = [
-  { id: 1, nombre: "Consulta Veterinaria" },
-  { id: 2, nombre: "Bano" },
-  { id: 3, nombre: "Peluqueria" },
-  { id: 4, nombre: "Vacunacion" },
-  { id: 5, nombre: "Desparasitacion" },
-  { id: 6, nombre: "Cirugia Menor" },
-  { id: 7, nombre: "Cirugia Mayor" },
-  { id: 8, nombre: "Control Postoperatorio" },
-  { id: 9, nombre: "Examen de Laboratorio" },
-  { id: 10, nombre: "Emergencia" },
-];
-
 const TABS = {
   activos: "activos",
   inactivos: "inactivos",
@@ -38,7 +25,6 @@ const TABS = {
 const EMPTY_FORM = {
   id: null,
   nombre: "",
-  tiposervicioID: "1",
   descripcion: "",
   precio: "",
   duracion: "",
@@ -84,11 +70,6 @@ function extractApiError(json, fallback = "Ocurrio un error en la solicitud.") {
   return `${baseMessage} - ${details.join(" | ")}`;
 }
 
-function getTipoNombreById(tipoId) {
-  const found = TIPO_SERVICIO_OPTIONS.find((item) => item.id === Number(tipoId));
-  return found?.nombre || `Tipo ${tipoId || "-"}`;
-}
-
 function badgeColorTipo(tipoNombre) {
   const normalized = String(tipoNombre || "").toLowerCase();
   if (normalized.includes("consulta")) return "bg-primary/15 text-primary";
@@ -123,14 +104,10 @@ export default function Servicios() {
       }
       const items = Array.isArray(json?.data) ? json.data : [];
       return items.map((item) => {
-        const tipoId = Number(
-          item?.tiposervicioID ?? item?.tipo_servicio_id ?? item?.tiposervicio_id ?? 0
-        ) || null;
         return {
           id: Number(item?.id ?? 0),
           nombre: item?.nombre || "",
-          tiposervicioID: tipoId,
-          tipoNombre: item?.tiposervicio?.nombre || getTipoNombreById(tipoId),
+          tipoNombre: item?.tiposervicio?.nombre || item?.tipo || "",
           descripcion: item?.descripcion || "",
           precio: Number(item?.precio ?? 0) || 0,
           duracion: Number(item?.duracion ?? 0) || 0,
@@ -153,22 +130,12 @@ export default function Servicios() {
   }, [servicios]);
 
   const tiposDisponiblesFiltro = useMemo(() => {
-    const map = new Map();
-    map.set("todos", "Todos los tipos");
-
-    TIPO_SERVICIO_OPTIONS.forEach((item) => {
-      map.set(String(item.id), item.nombre);
-    });
-
+    const setTipos = new Set();
     servicios.forEach((item) => {
-      if (!item.tiposervicioID) return;
-      const key = String(item.tiposervicioID);
-      if (!map.has(key)) {
-        map.set(key, item.tipoNombre || `Tipo ${item.tiposervicioID}`);
-      }
+      const tipo = String(item?.tipoNombre || "").trim();
+      if (tipo) setTipos.add(tipo);
     });
-
-    return Array.from(map.entries()).map(([value, label]) => ({ value, label }));
+    return [{ value: "todos", label: "Todos los tipos" }, ...Array.from(setTipos).map((tipo) => ({ value: tipo, label: tipo }))];
   }, [servicios]);
 
   const serviciosFiltrados = useMemo(() => {
@@ -182,8 +149,7 @@ export default function Servicios() {
             ? item.activo
             : !item.activo;
 
-      const byType =
-        tipoFiltro === "todos" ? true : String(item.tiposervicioID || "") === tipoFiltro;
+      const byType = tipoFiltro === "todos" ? true : item.tipoNombre === tipoFiltro;
 
       const bySearch =
         !term ||
@@ -252,7 +218,6 @@ export default function Servicios() {
     setFormData({
       id: servicio.id,
       nombre: servicio.nombre,
-      tiposervicioID: String(servicio.tiposervicioID || "1"),
       descripcion: servicio.descripcion,
       precio: servicio.precio ? String(servicio.precio) : "",
       duracion: servicio.duracion ? String(servicio.duracion) : "",
@@ -268,7 +233,6 @@ export default function Servicios() {
 
     const payload = {
       nombre: formData.nombre.trim(),
-      tiposervicioID: Number(formData.tiposervicioID),
       descripcion: formData.descripcion.trim(),
       precio: Number(formData.precio),
       duracion: Number(formData.duracion),
@@ -281,8 +245,8 @@ export default function Servicios() {
       payload.id = Number(formData.id);
     }
 
-    if (!payload.nombre || !payload.tiposervicioID || !payload.descripcion) {
-      toastr.warning("Completa nombre, tipo y descripcion.");
+    if (!payload.nombre || !payload.descripcion) {
+      toastr.warning("Completa nombre y descripcion.");
       return;
     }
 
@@ -330,7 +294,7 @@ export default function Servicios() {
             </CardHeader>
             <CardContent className="pt-6">
               <form onSubmit={handleSubmit} className="space-y-4">
-                <div className="grid md:grid-cols-2 gap-4">
+                <div className="grid md:grid-cols-1 gap-4">
                   <div className="space-y-2">
                     <Label htmlFor="nombre">Nombre *</Label>
                     <Input
@@ -339,22 +303,6 @@ export default function Servicios() {
                       onChange={(e) => handleFormChange("nombre", e.target.value)}
                       required
                     />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="tiposervicioID">Tipo de servicio *</Label>
-                    <select
-                      id="tiposervicioID"
-                      className="h-10 rounded-md border border-input bg-background px-3 text-sm w-full"
-                      value={formData.tiposervicioID}
-                      onChange={(e) => handleFormChange("tiposervicioID", e.target.value)}
-                      required
-                    >
-                      {TIPO_SERVICIO_OPTIONS.map((item) => (
-                        <option key={item.id} value={item.id}>
-                          {item.nombre}
-                        </option>
-                      ))}
-                    </select>
                   </div>
                 </div>
 
@@ -522,7 +470,6 @@ export default function Servicios() {
                     <TableHeader>
                       <TableRow>
                         <TableHead className="text-center">Nombre</TableHead>
-                        <TableHead className="text-center">Tipo</TableHead>
                         <TableHead className="text-center">Descripcion</TableHead>
                         <TableHead className="text-center">Precio</TableHead>
                         <TableHead className="text-center">Duracion</TableHead>
@@ -537,11 +484,6 @@ export default function Servicios() {
                           <TableCell>
                             <span className={`inline-flex px-2.5 py-1 rounded-md text-xs font-semibold ${badgeColorTipo(servicio.nombre)}`}>
                               {servicio.nombre}
-                            </span>
-                          </TableCell>
-                          <TableCell>
-                            <span className={`inline-flex px-2.5 py-1 rounded-md text-xs font-semibold ${badgeColorTipo(servicio.tipoNombre)}`}>
-                              {servicio.tipoNombre}
                             </span>
                           </TableCell>
                           <TableCell>
