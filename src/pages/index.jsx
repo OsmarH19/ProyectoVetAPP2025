@@ -4,6 +4,7 @@ import Dashboard from "./Dashboard";
 import Clientes from "./Clientes";
 import Mascotas from "./Mascotas";
 import Citas from "./Citas";
+import Servicios from "./Servicios";
 import Tratamientos from "./Tratamientos";
 import MisMascotas from "./MisMascotas";
 import MisCitas from "./MisCitas";
@@ -18,6 +19,7 @@ const PAGES = {
   Clientes,
   Mascotas,
   Citas,
+  Servicios,
   Tratamientos,
   MisMascotas,
   MisCitas,
@@ -162,6 +164,10 @@ function PagesContent() {
         <Route
           path="/citas"
           element={<ProtectedRoute element={<Citas />} denyClients />}
+        />
+        <Route
+          path="/servicios"
+          element={<ProtectedRoute element={<Servicios />} />}
         />
         <Route
           path="/tratamientos"

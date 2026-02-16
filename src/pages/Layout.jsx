@@ -8,6 +8,7 @@ import {
   PawPrint, 
   Calendar, 
   Stethoscope,
+  ClipboardList,
   LogOut,
   Menu,
   X,
@@ -110,6 +111,11 @@ export default function Layout({ children, currentPageName }) {
       icon: Calendar,
     },
     {
+      title: "Servicios",
+      url: createPageUrl("Servicios"),
+      icon: ClipboardList,
+    },
+    {
       title: "Tratamientos",
       url: createPageUrl("Tratamientos"),
       icon: Stethoscope,
@@ -136,6 +142,11 @@ export default function Layout({ children, currentPageName }) {
       title: "Mis Citas",
       url: createPageUrl("MisCitas"),
       icon: Calendar,
+    },
+    {
+      title: "Servicios",
+      url: createPageUrl("Servicios"),
+      icon: ClipboardList,
     },
     {
       title: "Mis Tratamientos",
