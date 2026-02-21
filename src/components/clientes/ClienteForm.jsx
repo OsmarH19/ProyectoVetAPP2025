@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+﻿import { useRef, useState } from "react";
 import PropTypes from "prop-types";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -132,7 +132,7 @@ export default function ClienteForm({ cliente, onSubmit, onCancel, isLoading }) 
     if (isEditing) return;
     const dni = (formData.dni || "").trim();
     if (dni.length !== 8) {
-      setDniError("Ingresa 8 dígitos para buscar.");
+      setDniError("Ingresa 8 digitos para buscar.");
       return;
     }
     runDniLookup(dni, { force: true });
@@ -147,87 +147,112 @@ export default function ClienteForm({ cliente, onSubmit, onCancel, isLoading }) 
         </CardTitle>
       </CardHeader>
       <form onSubmit={handleSubmit}>
-        <CardContent className="space-y-4">
-          <div className="grid md:grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="dni">DNI *</Label>
-              <div className="flex gap-2">
+        <CardContent className="space-y-6">
+          <section className="rounded-lg border border-border p-4 space-y-4">
+            <div className="space-y-1">
+              <h3 className="text-sm font-semibold text-gray-900">1. Identificacion</h3>
+              <p className="text-xs text-muted-foreground">
+                Ingresa el DNI para completar datos base del cliente.
+              </p>
+            </div>
+
+            <div className="grid md:grid-cols-3 gap-4 items-start">
+              <div className="space-y-2">
+                <Label htmlFor="dni">DNI *</Label>
+                <div className="flex gap-2">
+                  <Input
+                    id="dni"
+                    value={formData.dni}
+                    onChange={(e) => handleChange("dni", e.target.value.replace(/\D/g, "").slice(0, 8))}
+                    required
+                  />
+                  {!isEditing && (
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={handleDniSearch}
+                      disabled={dniLoading || (formData.dni || "").trim().length !== 8}
+                    >
+                      <Search className="w-4 h-4 mr-1" />
+                      Buscar
+                    </Button>
+                  )}
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="nombres">Nombres *</Label>
                 <Input
-                  id="dni"
-                  value={formData.dni}
-                  onChange={(e) => handleChange('dni', e.target.value.replace(/\D/g, '').slice(0, 8))}
+                  id="nombres"
+                  value={formData.nombres}
+                  onChange={(e) => handleChange("nombres", e.target.value)}
                   required
                 />
-                {!isEditing && (
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={handleDniSearch}
-                    disabled={dniLoading || (formData.dni || "").trim().length !== 8}
-                  >
-                    <Search className="w-4 h-4 mr-1" />
-                    Buscar
-                  </Button>
-                )}
               </div>
-              {!isEditing && (
-                <div className="text-xs text-muted-foreground">
-                  {dniLoading ? "Buscando DNI..." : dniError ? <span className="text-red-600">{dniError}</span> : "Presiona Buscar para autocompletar."}
-                </div>
-              )}
+
+              <div className="space-y-2">
+                <Label htmlFor="apellidos">Apellidos *</Label>
+                <Input
+                  id="apellidos"
+                  value={formData.apellidos}
+                  onChange={(e) => handleChange("apellidos", e.target.value)}
+                  required
+                />
+              </div>
             </div>
+
+            {!isEditing && (
+              <div className="text-xs text-muted-foreground">
+                {dniLoading
+                  ? "Buscando DNI..."
+                  : dniError
+                    ? <span className="text-red-600">{dniError}</span>
+                    : "Presiona Buscar para autocompletar."}
+              </div>
+            )}
+          </section>
+
+          <section className="rounded-lg border border-border p-4 space-y-4">
+            <div className="space-y-1">
+              <h3 className="text-sm font-semibold text-gray-900">2. Contacto</h3>
+              <p className="text-xs text-muted-foreground">
+                Completa los datos para comunicacion y ubicacion.
+              </p>
+            </div>
+
+            <div className="grid md:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="telefono">Telefono *</Label>
+                <Input
+                  id="telefono"
+                  value={formData.telefono}
+                  onChange={(e) => handleChange("telefono", e.target.value)}
+                  required
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="email">Email *</Label>
+                <Input
+                  id="email"
+                  type="email"
+                  value={formData.email}
+                  onChange={(e) => handleChange("email", e.target.value)}
+                  required
+                />
+              </div>
+            </div>
+
             <div className="space-y-2">
-              <Label htmlFor="nombres">Nombres *</Label>
-              <Input
-                id="nombres"
-                value={formData.nombres}
-                onChange={(e) => handleChange('nombres', e.target.value)}
-                required
+              <Label htmlFor="direccion">Direccion</Label>
+              <Textarea
+                id="direccion"
+                value={formData.direccion}
+                onChange={(e) => handleChange("direccion", e.target.value)}
+                rows={3}
               />
             </div>
-          </div>
-
-          <div className="grid md:grid-cols-2 gap-4">            
-            <div className="space-y-2">
-              <Label htmlFor="apellidos">Apellidos *</Label>
-              <Input
-                id="apellidos"
-                value={formData.apellidos}
-                onChange={(e) => handleChange('apellidos', e.target.value)}
-                required
-              />
-            </div>            
-            <div className="space-y-2">
-              <Label htmlFor="telefono">Teléfono *</Label>
-              <Input
-                id="telefono"
-                value={formData.telefono}
-                onChange={(e) => handleChange('telefono', e.target.value)}
-                required
-              />
-            </div>
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="email">Email *</Label>
-            <Input
-              id="email"
-              type="email"
-              value={formData.email}
-              onChange={(e) => handleChange('email', e.target.value)}
-              required
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="direccion">Dirección</Label>
-            <Textarea
-              id="direccion"
-              value={formData.direccion}
-              onChange={(e) => handleChange('direccion', e.target.value)}
-              rows={3}
-            />
-          </div>
+          </section>
         </CardContent>
         <CardFooter className="flex justify-end gap-3">
           <Button
@@ -259,4 +284,6 @@ ClienteForm.propTypes = {
   onCancel: PropTypes.func,
   isLoading: PropTypes.bool,
 };
+
+
 
