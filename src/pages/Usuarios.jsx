@@ -56,69 +56,87 @@ function UserForm({ user, onSubmit, onCancel, isLoading }) {
         <CardTitle>{user ? "Editar usuario" : "Nuevo usuario"}</CardTitle>
       </CardHeader>
       <form onSubmit={handleSubmit}>
-        <CardContent className="space-y-4">
-          <div className="grid gap-4 md:grid-cols-2">
+        <CardContent className="space-y-6">
+          <section className="rounded-lg border border-border p-4 space-y-4">
             <div className="space-y-1">
-              <Label htmlFor="user-name">Nombre completo</Label>
-              <Input
-                id="user-name"
-                placeholder="Alan Huidobro"
-                value={formData.name}
-                onChange={(event) => handleChange("name", event.target.value)}
-                required
-              />
-            </div>
-            <div className="space-y-1">
-              <Label htmlFor="user-email">Correo electrónico</Label>
-              <Input
-                id="user-email"
-                type="email"
-                placeholder="alan@gmail.com"
-                value={formData.email}
-                onChange={(event) => handleChange("email", event.target.value)}
-                required
-              />
-            </div>
-          </div>
-
-          <div className="grid gap-4 md:grid-cols-2">
-            <div className="space-y-1">
-              <Label htmlFor="user-password">
-                {user ? "Contraseña (opcional)" : "Contraseña"}
-              </Label>
-              <Input
-                id="user-password"
-                type="password"
-                placeholder={user ? "Dejar en blanco para mantenerla" : "123456"}
-                value={formData.password}
-                onChange={(event) => handleChange("password", event.target.value)}
-                required={!user}
-              />
-              {user && (
-                <p className="text-xs text-muted-foreground">
-                  Solo completa este campo si deseas cambiar la contraseña.
-                </p>
-              )}
+              <h3 className="text-sm font-semibold text-gray-900">1. Datos personales</h3>
+              <p className="text-xs text-muted-foreground">
+                Registra la identidad basica del usuario.
+              </p>
             </div>
 
-            <div className="space-y-1">
-              <Label>Rol</Label>
-              <Select
-                value={formData.profileID}
-                onValueChange={(value) => handleChange("profileID", value)}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Selecciona un rol" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="1">Administrador</SelectItem>
-                  <SelectItem value="2">Veterinario</SelectItem>
-                  <SelectItem value="3">Asistente</SelectItem>
-                  <SelectItem value="4">Doctor</SelectItem>
-                </SelectContent>
-              </Select>
+            <div className="grid gap-4 md:grid-cols-2">
+              <div className="space-y-1">
+                <Label htmlFor="user-name">Nombre completo</Label>
+                <Input
+                  id="user-name"
+                  placeholder="Alan Huidobro"
+                  value={formData.name}
+                  onChange={(event) => handleChange("name", event.target.value)}
+                  required
+                />
+              </div>
+              <div className="space-y-1">
+                <Label htmlFor="user-email">Correo electronico</Label>
+                <Input
+                  id="user-email"
+                  type="email"
+                  placeholder="alan@gmail.com"
+                  value={formData.email}
+                  onChange={(event) => handleChange("email", event.target.value)}
+                  required
+                />
+              </div>
             </div>
-          </div>
+          </section>
+
+          <section className="rounded-lg border border-border p-4 space-y-4">
+            <div className="space-y-1">
+              <h3 className="text-sm font-semibold text-gray-900">2. Acceso y permisos</h3>
+              <p className="text-xs text-muted-foreground">
+                Define rol y credenciales para controlar el acceso al sistema.
+              </p>
+            </div>
+
+            <div className="grid gap-4 md:grid-cols-2">
+              <div className="space-y-1">
+                <Label>Rol</Label>
+                <Select
+                  value={formData.profileID}
+                  onValueChange={(value) => handleChange("profileID", value)}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Selecciona un rol" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="1">Administrador</SelectItem>
+                    <SelectItem value="2">Veterinario</SelectItem>
+                    <SelectItem value="3">Asistente</SelectItem>
+                    <SelectItem value="4">Doctor</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-1">
+                <Label htmlFor="user-password">
+                  {user ? "Contrasena (opcional)" : "Contrasena"}
+                </Label>
+                <Input
+                  id="user-password"
+                  type="password"
+                  placeholder={user ? "Dejar en blanco para mantenerla" : "123456"}
+                  value={formData.password}
+                  onChange={(event) => handleChange("password", event.target.value)}
+                  required={!user}
+                />
+                {user && (
+                  <p className="text-xs text-muted-foreground">
+                    Solo completa este campo si deseas cambiar la contrasena.
+                  </p>
+                )}
+              </div>
+            </div>
+          </section>
         </CardContent>
         <CardFooter className="flex flex-wrap justify-end gap-3">
           <Button
