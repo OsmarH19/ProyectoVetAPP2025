@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+﻿import React, { useEffect, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -200,143 +200,185 @@ export default function MascotaForm({ mascota, onCancel, isLoading }) {
         </CardTitle>
       </CardHeader>
       <form onSubmit={handleSubmit}>
-        <CardContent className="space-y-4">
-          <div className="grid md:grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="nombre">Nombre *</Label>
-              <Input
-                id="nombre"
-                value={formData.nombre}
-                onChange={(e) => handleChange('nombre', e.target.value)}
-                required
-              />
+        <CardContent className="space-y-6">
+          <section className="rounded-lg border border-border p-4 space-y-4">
+            <div className="space-y-1">
+              <h3 className="text-sm font-semibold text-gray-900">1. Identificacion</h3>
+              <p className="text-xs text-muted-foreground">
+                Primero define los datos base de la mascota y su dueno.
+              </p>
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="cliente_id">Dueño *</Label>
-              <Select
-                value={formData.cliente_id ? String(formData.cliente_id) : ""}
-                onValueChange={(value) => handleChange('cliente_id', value)}
-                required
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Seleccionar cliente" />
-                </SelectTrigger>
-                <SelectContent>
-                  {clientesApi.map(c => (
-                    <SelectItem key={c.cliente_id} value={String(c.cliente_id)}>
-                      {c.nombres} {c.apellidos}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
 
-          <div className="grid md:grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="especie">Especie *</Label>
-              <Select
-                value={formData.especie ? String(formData.especie) : ""}
-                onValueChange={(value) => handleChange('especie', value)}
-              >
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {especies.map((e) => (
-                    <SelectItem key={e.MaeestroID} value={String(e.MaeestroID)}>
-                      {e.nombre}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="raza">Raza</Label>
-              <Input
-                id="raza"
-                value={formData.raza}
-                onChange={(e) => handleChange('raza', e.target.value)}
-              />
-            </div>
-          </div>
+            <div className="grid md:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="nombre">Nombre *</Label>
+                <Input
+                  id="nombre"
+                  value={formData.nombre}
+                  onChange={(e) => handleChange("nombre", e.target.value)}
+                  required
+                />
+              </div>
 
-          <div className="grid md:grid-cols-3 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="edad">Edad (años)</Label>
-              <Input
-                id="edad"
-                type="number"
-                min="0"
-                step="0.1"
-                value={formData.edad}
-                onChange={(e) => handleChange('edad', parseFloat(e.target.value))}
-              />
+              <div className="space-y-2">
+                <Label htmlFor="cliente_id">Dueno *</Label>
+                <Select
+                  value={formData.cliente_id ? String(formData.cliente_id) : ""}
+                  onValueChange={(value) => handleChange("cliente_id", value)}
+                  required
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Seleccionar cliente" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {clientesApi.map((c) => (
+                      <SelectItem key={c.cliente_id} value={String(c.cliente_id)}>
+                        {c.nombres} {c.apellidos}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="sexo">Sexo</Label>
-              <Select
-                value={formData.sexo ? String(formData.sexo) : ""}
-                onValueChange={(value) => handleChange('sexo', value)}
-              >
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {sexos.map((s) => (
-                    <SelectItem key={s.MaeestroID} value={String(s.MaeestroID)}>
-                      {s.nombre}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="peso">Peso (kg)</Label>
-              <Input
-                id="peso"
-                type="number"
-                min="0"
-                step="0.1"
-                value={formData.peso}
-                onChange={(e) => handleChange('peso', e.target.value)}
-              />
-            </div>
-          </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="color">Color / Descripción</Label>
-            <Input
-              id="color"
-              value={formData.color}
-              onChange={(e) => handleChange('color', e.target.value)}
-            />
-          </div>
+            <div className="grid md:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="especie">Especie *</Label>
+                <Select
+                  value={formData.especie ? String(formData.especie) : ""}
+                  onValueChange={(value) => handleChange("especie", value)}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Seleccionar especie" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {especies.map((e) => (
+                      <SelectItem key={e.MaeestroID} value={String(e.MaeestroID)}>
+                        {e.nombre}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="foto">Fotografía</Label>
-            <div className="flex gap-2">
-              <Input
-                id="foto"
-                type="file"
-                accept="image/*"
-                onChange={handleFileUpload}
-                disabled={uploading}
-              />
-              {formData.foto_url && (
-                <img src={formData.foto_url} alt="Preview" className="w-20 h-20 object-cover rounded" />
-              )}
+              <div className="space-y-2">
+                <Label htmlFor="raza">Raza</Label>
+                <Input
+                  id="raza"
+                  value={formData.raza}
+                  onChange={(e) => handleChange("raza", e.target.value)}
+                />
+              </div>
             </div>
-          </div>
+          </section>
 
-          <div className="space-y-2">
-            <Label htmlFor="observaciones">Observaciones</Label>
-            <RichTextEditor
-              id="observaciones"
-              value={formData.observaciones}
-              onChange={(html) => handleChange('observaciones', html)}
-            />
-          </div>
+          <section className="rounded-lg border border-border p-4 space-y-4">
+            <div className="space-y-1">
+              <h3 className="text-sm font-semibold text-gray-900">2. Caracteristicas</h3>
+              <p className="text-xs text-muted-foreground">
+                Completa los datos fisicos para mejorar la ficha clinica.
+              </p>
+            </div>
+
+            <div className="grid md:grid-cols-4 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="sexo">Sexo</Label>
+                <Select
+                  value={formData.sexo ? String(formData.sexo) : ""}
+                  onValueChange={(value) => handleChange("sexo", value)}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Seleccionar sexo" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {sexos.map((s) => (
+                      <SelectItem key={s.MaeestroID} value={String(s.MaeestroID)}>
+                        {s.nombre}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="edad">Edad (anos)</Label>
+                <Input
+                  id="edad"
+                  type="number"
+                  min="0"
+                  step="0.1"
+                  value={formData.edad}
+                  onChange={(e) => {
+                    const next = e.target.value;
+                    handleChange("edad", next === "" ? "" : Number(next));
+                  }}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="peso">Peso (kg)</Label>
+                <Input
+                  id="peso"
+                  type="number"
+                  min="0"
+                  step="0.1"
+                  value={formData.peso}
+                  onChange={(e) => handleChange("peso", e.target.value)}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="color">Color / Descripcion</Label>
+                <Input
+                  id="color"
+                  value={formData.color}
+                  onChange={(e) => handleChange("color", e.target.value)}
+                />
+              </div>
+            </div>
+          </section>
+
+          <section className="rounded-lg border border-border p-4 space-y-4">
+            <div className="space-y-1">
+              <h3 className="text-sm font-semibold text-gray-900">3. Evidencia y observaciones</h3>
+              <p className="text-xs text-muted-foreground">
+                Adjunta una foto y agrega notas relevantes de la mascota.
+              </p>
+            </div>
+
+            <div className="grid md:grid-cols-3 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="foto">Fotografia</Label>
+                <Input
+                  id="foto"
+                  type="file"
+                  accept="image/*"
+                  onChange={handleFileUpload}
+                  disabled={uploading}
+                />
+                {formData.foto_url ? (
+                  <img
+                    src={formData.foto_url}
+                    alt="Preview"
+                    className="w-full max-w-[180px] h-[140px] object-cover rounded-md border border-border"
+                  />
+                ) : (
+                  <div className="w-full max-w-[180px] h-[140px] rounded-md border border-dashed border-border bg-muted/20 flex items-center justify-center text-xs text-muted-foreground">
+                    Sin imagen
+                  </div>
+                )}
+              </div>
+
+              <div className="space-y-2 md:col-span-2">
+                <Label htmlFor="observaciones">Observaciones</Label>
+                <RichTextEditor
+                  id="observaciones"
+                  value={formData.observaciones}
+                  onChange={(html) => handleChange("observaciones", html)}
+                />
+              </div>
+            </div>
+          </section>
         </CardContent>
         <CardFooter className="flex justify-end gap-3">
           <Button
@@ -361,3 +403,4 @@ export default function MascotaForm({ mascota, onCancel, isLoading }) {
     </Card>
   );
 }
+
