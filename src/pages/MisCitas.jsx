@@ -65,6 +65,8 @@ export default function MisCitas() {
         id: c?.cita_id || c?.id,
         fecha: c?.fecha,
         hora: c?.hora,
+        tiposervicio_id: c?.tiposervicio_id ? Number(c.tiposervicio_id) : (c?.servicio?.id ? Number(c.servicio.id) : undefined),
+        servicio: c?.servicio || null,
         motivo: c?.motivo,
         estado: c?.estados?.nombre || c?.estado,
         mascota_id: c?.mascota_id ?? c?.mascota?.mascota_id,
@@ -152,6 +154,7 @@ export default function MisCitas() {
           <TableRow>
             <TableHead className="text-center">Fecha</TableHead>
             <TableHead className="text-center">Hora</TableHead>
+            <TableHead className="text-center">Servicio</TableHead>
             <TableHead className="text-center">Mascota</TableHead>
             <TableHead className="text-center">Motivo</TableHead>
             <TableHead className="text-center">Estado</TableHead>
@@ -174,6 +177,11 @@ export default function MisCitas() {
                   <div className="flex items-center gap-2 text-sm text-gray-700">
                     <Clock className="w-4 h-4 text-gray-400" />
                     <span>{cita.hora || "—"}</span>
+                  </div>
+                </TableCell>
+                <TableCell>
+                  <div className="text-sm text-gray-700">
+                    {cita?.servicio?.nombre || "—"}
                   </div>
                 </TableCell>
                 <TableCell>
@@ -210,7 +218,7 @@ export default function MisCitas() {
           })}
           {items.length === 0 && (
             <TableRow>
-              <TableCell colSpan={7} className="text-center py-12 text-gray-500">
+              <TableCell colSpan={8} className="text-center py-12 text-gray-500">
                 No tienes citas registradas
               </TableCell>
             </TableRow>

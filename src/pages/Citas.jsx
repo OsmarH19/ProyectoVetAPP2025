@@ -31,11 +31,14 @@ export default function Citas() {
         estado_id: item?.estados?.MaeestroID ? Number(item.estados.MaeestroID) : (item?.estado && !isNaN(Number(item.estado)) ? Number(item.estado) : undefined),
         mascota_id: item?.mascota_id ? Number(item.mascota_id) : item?.mascota?.mascota_id,
         cliente_id: item?.cliente_id ? Number(item.cliente_id) : item?.cliente?.cliente_id,
+        tiposervicio_id: item?.tiposervicio_id ? Number(item.tiposervicio_id) : (item?.servicio?.id ? Number(item.servicio.id) : undefined),
+        servicio_nombre: item?.servicio?.nombre || '',
         veterinario: item?.veterinario ? `${item.veterinario?.nombres || ''} ${item.veterinario?.apellidos || ''}`.trim() : '',
         veterinario_id: item?.veterinario_id ? Number(item.veterinario_id) : (item?.veterinario?.veterinario_id ?? undefined),
         observaciones: item?.observaciones || '',
         mascota: item?.mascota || null,
         cliente: item?.cliente || null,
+        servicio: item?.servicio || null,
       }));
     },
   });
@@ -65,6 +68,7 @@ const createMutation = useMutation({
         estado: isNaN(Number(data.estado_id)) ? data.estado_id : Number(data.estado_id),
         mascota_id: isNaN(Number(data.mascota_id)) ? data.mascota_id : Number(data.mascota_id),
         cliente_id: isNaN(Number(data.cliente_id)) ? data.cliente_id : Number(data.cliente_id),
+        tiposervicio_id: isNaN(Number(data.tiposervicio_id)) ? data.tiposervicio_id : Number(data.tiposervicio_id),
         veterinario_id: isNaN(Number(data.veterinario_id)) ? data.veterinario_id : Number(data.veterinario_id),
         observaciones: data.observaciones || '',
         activo: 1,
@@ -97,6 +101,7 @@ const createMutation = useMutation({
         estado: isNaN(Number(data.estado_id)) ? data.estado_id : Number(data.estado_id),
         mascota_id: isNaN(Number(data.mascota_id)) ? data.mascota_id : Number(data.mascota_id),
         cliente_id: isNaN(Number(data.cliente_id)) ? data.cliente_id : Number(data.cliente_id),
+        tiposervicio_id: isNaN(Number(data.tiposervicio_id)) ? data.tiposervicio_id : Number(data.tiposervicio_id),
         veterinario_id: isNaN(Number(data.veterinario_id)) ? data.veterinario_id : Number(data.veterinario_id),
         observaciones: data.observaciones || '',
       }
@@ -131,6 +136,11 @@ const createMutation = useMutation({
   });
 
   const handleSubmit = (data) => {
+    if (!data?.tiposervicio_id) {
+      toastr.warning('Seleccione un servicio para la cita.');
+      return;
+    }
+
     const isConflict = citas.some(c => 
       c.id !== editingCita?.id &&
       c.fecha === data.fecha &&

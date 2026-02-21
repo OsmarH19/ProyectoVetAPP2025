@@ -59,6 +59,7 @@ export default function CitasList({ citas, mascotas, clientes, onEdit, onDelete,
                 <TableHead className="text-center">Mascota</TableHead>
                 <TableHead className="text-center">Cliente</TableHead>
                 <TableHead className="text-center">Motivo</TableHead>
+                <TableHead className="text-center">Servicio</TableHead>
                 <TableHead className="text-center">Estado</TableHead>
                 <TableHead className="text-center">Acciones</TableHead>
               </TableRow>
@@ -69,6 +70,7 @@ export default function CitasList({ citas, mascotas, clientes, onEdit, onDelete,
                 const cliente = clientes.find(c => c.id === cita.cliente_id);
                 const mascotaNombre = mascota?.nombre ?? cita?.mascota?.nombre;
                 const clienteNombre = cliente ? `${cliente.nombres || ''} ${cliente.apellidos || ''}`.trim() : `${cita?.cliente?.nombres || ''} ${cita?.cliente?.apellidos || ''}`.trim();
+                const servicioNombre = cita?.servicio?.nombre || cita?.servicio_nombre || "—";
 
                 return (
                   <TableRow key={cita.id} className="hover:bg-gray-50">
@@ -106,6 +108,9 @@ export default function CitasList({ citas, mascotas, clientes, onEdit, onDelete,
                       {cita.veterinario && (
                         <p className="text-xs text-gray-500 mt-1">Dr. {cita.veterinario}</p>
                       )}
+                    </TableCell>
+                    <TableCell>
+                      <p className="text-sm font-medium">{servicioNombre}</p>
                     </TableCell>
                     <TableCell>
                     <Select
@@ -148,7 +153,7 @@ export default function CitasList({ citas, mascotas, clientes, onEdit, onDelete,
               })}
               {filteredCitas.length === 0 && (
                 <TableRow>
-                  <TableCell colSpan={6} className="text-center py-8 text-gray-500">
+                  <TableCell colSpan={7} className="text-center py-8 text-gray-500">
                     No se encontraron citas
                   </TableCell>
                 </TableRow>
