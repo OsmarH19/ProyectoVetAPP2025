@@ -310,8 +310,13 @@ export default function Servicios() {
               </h2>
             </CardHeader>
             <CardContent className="pt-6">
-              <form onSubmit={handleSubmit} className="space-y-4">
-                <div className="grid md:grid-cols-1 gap-4">
+              <form onSubmit={handleSubmit} className="space-y-6">
+                <section className="rounded-lg border border-slate-200 p-4 space-y-4">
+                  <div className="space-y-1">
+                    <h3 className="text-sm font-semibold text-slate-900">1. Identificacion del servicio</h3>
+                    <p className="text-xs text-muted-foreground">Define claramente que servicio ofreces.</p>
+                  </div>
+
                   <div className="space-y-2">
                     <Label htmlFor="nombre">Nombre *</Label>
                     <Input
@@ -321,72 +326,86 @@ export default function Servicios() {
                       required
                     />
                   </div>
-                </div>
 
-                <div className="grid md:grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label htmlFor="precio">Precio *</Label>
-                    <Input
-                      id="precio"
-                      type="number"
-                      min="0"
-                      step="0.01"
-                      value={formData.precio}
-                      onChange={(e) => handleFormChange("precio", e.target.value)}
+                    <Label htmlFor="descripcion">Descripcion *</Label>
+                    <Textarea
+                      id="descripcion"
+                      rows={2}
+                      value={formData.descripcion}
+                      onChange={(e) => handleFormChange("descripcion", e.target.value)}
                       required
                     />
                   </div>
+                </section>
+
+                <section className="rounded-lg border border-slate-200 p-4 space-y-4">
+                  <div className="space-y-1">
+                    <h3 className="text-sm font-semibold text-slate-900">2. Precio y tiempo</h3>
+                    <p className="text-xs text-muted-foreground">Configura el costo y la duracion de atencion.</p>
+                  </div>
+
+                  <div className="grid md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="precio">Precio *</Label>
+                      <Input
+                        id="precio"
+                        type="number"
+                        min="0"
+                        step="0.01"
+                        value={formData.precio}
+                        onChange={(e) => handleFormChange("precio", e.target.value)}
+                        required
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="duracion">Duracion (min) *</Label>
+                      <Input
+                        id="duracion"
+                        type="number"
+                        min="1"
+                        step="1"
+                        value={formData.duracion}
+                        onChange={(e) => handleFormChange("duracion", e.target.value)}
+                        required
+                      />
+                    </div>
+                  </div>
+                </section>
+
+                <section className="rounded-lg border border-slate-200 p-4 space-y-4">
+                  <div className="space-y-1">
+                    <h3 className="text-sm font-semibold text-slate-900">3. Reglas y notas</h3>
+                    <p className="text-xs text-muted-foreground">Define disponibilidad y detalles operativos.</p>
+                  </div>
+
+                  <div className="grid sm:grid-cols-2 gap-4">
+                    <div className="flex items-center justify-between rounded-md border border-slate-200 p-3">
+                      <span className="text-sm font-medium text-slate-700">Requiere cita previa</span>
+                      <Switch
+                        checked={formData.requiere_cita_previa}
+                        onCheckedChange={(checked) => handleFormChange("requiere_cita_previa", checked)}
+                      />
+                    </div>
+                    <div className="flex items-center justify-between rounded-md border border-slate-200 p-3">
+                      <span className="text-sm font-medium text-slate-700">Activo</span>
+                      <Switch
+                        checked={formData.activo}
+                        onCheckedChange={(checked) => handleFormChange("activo", checked)}
+                      />
+                    </div>
+                  </div>
+
                   <div className="space-y-2">
-                    <Label htmlFor="duracion">Duracion (min) *</Label>
-                    <Input
-                      id="duracion"
-                      type="number"
-                      min="1"
-                      step="1"
-                      value={formData.duracion}
-                      onChange={(e) => handleFormChange("duracion", e.target.value)}
-                      required
+                    <Label htmlFor="observaciones">Observaciones</Label>
+                    <Textarea
+                      id="observaciones"
+                      rows={2}
+                      value={formData.observaciones}
+                      onChange={(e) => handleFormChange("observaciones", e.target.value)}
                     />
                   </div>
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="descripcion">Descripcion *</Label>
-                  <Textarea
-                    id="descripcion"
-                    rows={2}
-                    value={formData.descripcion}
-                    onChange={(e) => handleFormChange("descripcion", e.target.value)}
-                    required
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="observaciones">Observaciones</Label>
-                  <Textarea
-                    id="observaciones"
-                    rows={2}
-                    value={formData.observaciones}
-                    onChange={(e) => handleFormChange("observaciones", e.target.value)}
-                  />
-                </div>
-
-                <div className="grid sm:grid-cols-2 gap-4">
-                  <div className="flex items-center justify-between rounded-md border border-slate-200 p-3">
-                    <span className="text-sm font-medium text-slate-700">Requiere cita previa</span>
-                    <Switch
-                      checked={formData.requiere_cita_previa}
-                      onCheckedChange={(checked) => handleFormChange("requiere_cita_previa", checked)}
-                    />
-                  </div>
-                  <div className="flex items-center justify-between rounded-md border border-slate-200 p-3">
-                    <span className="text-sm font-medium text-slate-700">Activo</span>
-                    <Switch
-                      checked={formData.activo}
-                      onCheckedChange={(checked) => handleFormChange("activo", checked)}
-                    />
-                  </div>
-                </div>
+                </section>
 
                 <div className="flex justify-end gap-2 pt-2">
                   <Button
