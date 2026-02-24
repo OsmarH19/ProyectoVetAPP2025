@@ -1,3 +1,4 @@
+import { apiUrl } from "@/lib/api";
 
 import React, { useState, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
@@ -66,7 +67,7 @@ export default function Layout({ children, currentPageName }) {
     const controller = new AbortController();
     const loadCliente = async () => {
       try {
-        const res = await fetch("https://apivet.strategtic.com/api/clientes", {
+        const res = await fetch(apiUrl("/clientes"), {
           signal: controller.signal,
         });
         const json = await res.json().catch(() => ({}));

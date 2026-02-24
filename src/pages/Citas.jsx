@@ -9,6 +9,7 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import CitasList from "../components/citas/CitasList";
 import CitasCalendar from "../components/citas/CitasCalendar";
 import CitaForm from "../components/citas/CitaForm";
+import { apiUrl } from "@/lib/api";
 
 export default function Citas() {
   const [showForm, setShowForm] = useState(false);
@@ -19,7 +20,7 @@ export default function Citas() {
   const { data: citas = [] } = useQuery({
     queryKey: ['api_citas'],
     queryFn: async () => {
-      const res = await fetch('https://apivet.strategtic.com/api/citas');
+      const res = await fetch(apiUrl("/citas"));
       const json = await res.json();
       const items = json?.data || [];
       return items.map((item) => ({
@@ -73,7 +74,7 @@ const createMutation = useMutation({
         observaciones: data.observaciones || '',
         activo: 1,
       }
-      const res = await fetch('https://apivet.strategtic.com/api/citas', {
+      const res = await fetch(apiUrl("/citas"), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
@@ -105,7 +106,7 @@ const createMutation = useMutation({
         veterinario_id: isNaN(Number(data.veterinario_id)) ? data.veterinario_id : Number(data.veterinario_id),
         observaciones: data.observaciones || '',
       }
-      const res = await fetch(`https://apivet.strategtic.com/api/citas/${id}`, {
+      const res = await fetch(apiUrl(`/citas/${id}`), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
@@ -173,7 +174,7 @@ const createMutation = useMutation({
 
   const handleChangeStatus = async (id, newStatus) => {
     try {
-      const res = await fetch(`https://apivet.strategtic.com/api/citas/${id}`, {
+      const res = await fetch(apiUrl(`/citas/${id}`), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ estado: newStatus }),

@@ -1,3 +1,4 @@
+import { apiUrl } from "@/lib/api";
 ﻿import React, { useEffect, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
@@ -26,7 +27,7 @@ export default function VeterinarioForm({ veterinario, onSubmit, onCancel, isLoa
   const { data: diasMaestros = [] } = useQuery({
     queryKey: ["dias_maestros"],
     queryFn: async () => {
-      const res = await fetch("https://apivet.strategtic.com/api/mascotas/datos-maestros/14");
+      const res = await fetch(apiUrl("/mascotas/datos-maestros/14"));
       const json = await res.json();
       return json?.data || [];
     },
@@ -36,7 +37,7 @@ export default function VeterinarioForm({ veterinario, onSubmit, onCancel, isLoa
     queryKey: ["turnos_veterinario", veterinario?.id],
     queryFn: async () => {
       if (!veterinario?.id) return [];
-      const res = await fetch(`https://apivet.strategtic.com/api/turnos-veterinarios/veterinario/${veterinario.id}`);
+      const res = await fetch(apiUrl(`/turnos-veterinarios/veterinario/${veterinario.id}`));
       const json = await res.json();
       return json?.data || [];
     },
@@ -133,8 +134,8 @@ export default function VeterinarioForm({ veterinario, onSubmit, onCancel, isLoa
       };
 
       const url = turno.turno_id
-        ? `https://apivet.strategtic.com/api/turnos-veterinarios/${turno.turno_id}`
-        : "https://apivet.strategtic.com/api/turnos-veterinarios";
+        ? apiUrl(`/turnos-veterinarios/${turno.turno_id}`)
+        : apiUrl("/turnos-veterinarios");
 
       const res = await fetch(url, {
         method: "POST",

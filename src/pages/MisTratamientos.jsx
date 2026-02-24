@@ -3,6 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Calendar, FileText, Stethoscope, User } from "lucide-react";
+import { apiUrl } from "@/lib/api";
 
 export default function MisTratamientos() {
   const [cliente, setCliente] = useState(null);
@@ -33,7 +34,7 @@ export default function MisTratamientos() {
 
     const loadCliente = async () => {
       try {
-        const res = await fetch("https://apivet.strategtic.com/api/clientes");
+        const res = await fetch(apiUrl("/clientes"));
         const json = await res.json();
         const items = Array.isArray(json?.data) ? json.data : [];
         const found = items.find(
@@ -58,7 +59,7 @@ export default function MisTratamientos() {
     enabled: !!clienteId,
     queryFn: async () => {
       const res = await fetch(
-        `https://apivet.strategtic.com/api/tratamientos?cliente_id=${clienteId}`
+        apiUrl(`/tratamientos?cliente_id=${clienteId}`)
       );
       const json = await res.json();
       const items = Array.isArray(json?.data) ? json.data : [];

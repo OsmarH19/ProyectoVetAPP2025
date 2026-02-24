@@ -1,3 +1,4 @@
+import { apiUrl } from "@/lib/api";
 ﻿import React, { useEffect, useState } from "react";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -30,7 +31,7 @@ export default function TratamientoForm({ tratamiento, citas, mascotas, clientes
     const loadMedications = async () => {
       if (tratamiento?.id) {
         try {
-          const res = await fetch(`https://apivet.strategtic.com/api/medicamentos?tratamiento_id=${tratamiento.id}`);
+          const res = await fetch(apiUrl(`/medicamentos?tratamiento_id=${tratamiento.id}`));
           const json = await res.json();
           const meds = Array.isArray(json?.data) ? json.data : [];
           setFormData((prev) => ({

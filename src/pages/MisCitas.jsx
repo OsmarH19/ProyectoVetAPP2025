@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Calendar, Clock, FileText, PawPrint, User } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { apiUrl } from "@/lib/api";
 
 export default function MisCitas() {
   const [clienteId, setClienteId] = useState(null);
@@ -34,7 +35,7 @@ export default function MisCitas() {
 
     const loadClienteId = async () => {
       try {
-        const res = await fetch("https://apivet.strategtic.com/api/clientes");
+        const res = await fetch(apiUrl("/clientes"));
         const json = await res.json();
         const items = Array.isArray(json?.data) ? json.data : [];
         const found = items.find(
@@ -57,7 +58,7 @@ export default function MisCitas() {
     queryFn: async () => {
       if (!normalizedClienteId) return [];
       const res = await fetch(
-        `https://apivet.strategtic.com/api/citas?cliente_id=${normalizedClienteId}`
+        apiUrl(`/citas?cliente_id=${normalizedClienteId}`)
       );
       const json = await res.json();
       const items = Array.isArray(json?.data) ? json.data : [];
@@ -92,7 +93,7 @@ export default function MisCitas() {
     queryFn: async () => {
       if (!normalizedClienteId) return [];
       const res = await fetch(
-        `https://apivet.strategtic.com/api/mascotas/filtrar?cliente_id=${normalizedClienteId}`
+        apiUrl(`/mascotas/filtrar?cliente_id=${normalizedClienteId}`)
       );
       const json = await res.json();
       const items = Array.isArray(json?.data) ? json.data : [];
@@ -111,7 +112,7 @@ export default function MisCitas() {
     queryFn: async () => {
       if (!normalizedClienteId) return [];
       const res = await fetch(
-        `https://apivet.strategtic.com/api/tratamientos?cliente_id=${normalizedClienteId}`
+        apiUrl(`/tratamientos?cliente_id=${normalizedClienteId}`)
       );
       const json = await res.json();
       return Array.isArray(json?.data) ? json.data : [];

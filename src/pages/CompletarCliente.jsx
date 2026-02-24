@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Search } from "lucide-react";
+import { apiUrl } from "@/lib/api";
 
 function extractApiErrorMessage(json, fallback = "No se pudo completar el perfil.") {
   const baseMessage = (json?.message || fallback || "").trim();
@@ -60,7 +61,7 @@ export default function CompletarCliente() {
   const lastLookupRef = useRef("");
 
   const createClienteEndpoint =
-    import.meta.env.VITE_CLIENTE_CREATE_ENDPOINT || "https://apivet.strategtic.com/api/clientes";
+    import.meta.env.VITE_CLIENTE_CREATE_ENDPOINT || apiUrl("/clientes");
   const welcomeEmailEndpoint = import.meta.env.VITE_WELCOME_EMAIL_ENDPOINT || "";
 
   const handleChange = (field, value) => {

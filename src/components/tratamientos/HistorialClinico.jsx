@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Download, FileText, X } from "lucide-react";
 import toastr from "toastr";
 import { getHistorialPdfUrl, setHistorialPdfUrl } from "@/lib/historialPdf";
+import { apiUrl } from "@/lib/api";
 
 export default function HistorialClinico({ mascotaId, onClose, autoGeneratePdf, className = "" }) {
   const [pdfUrl, setPdfUrl] = useState("");
@@ -12,15 +13,11 @@ export default function HistorialClinico({ mascotaId, onClose, autoGeneratePdf, 
   const [downloading, setDownloading] = useState(false);
   const [autoRan, setAutoRan] = useState(false);
 
-  const apiBase = import.meta.env.VITE_API_URL || "https://apivet.strategtic.com";
-
   const fetchPdfUrl = async () => {
     const cached = getHistorialPdfUrl(mascotaId);
     if (cached) return cached;
 
-    const endpoint = mascotaId
-      ? `${apiBase}/api/mascotas/${mascotaId}/historial-pdf`
-      : "";
+    const endpoint = mascotaId ? apiUrl(`/mascotas/${mascotaId}/historial-pdf`) : "";
     if (!endpoint) throw new Error("No PDF endpoint");
 
     const res = await fetch(endpoint);

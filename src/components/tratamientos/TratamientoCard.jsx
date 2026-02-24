@@ -6,13 +6,14 @@ import { Badge } from "@/components/ui/badge";
 import { Edit, Trash2, FileText, Calendar, Pill, AlertCircle } from "lucide-react";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
+import { apiUrl } from "@/lib/api";
 
 export default function TratamientoCard({ tratamiento, mascota, cliente, cita, onEdit, onDelete, onViewHistorial }) {
   const { data: medicamentos = [] } = useQuery({
     queryKey: ['api_medicamentos', tratamiento.id],
     queryFn: async () => {
       try {
-        const res = await fetch(`https://apivet.strategtic.com/api/medicamentos?tratamiento_id=${tratamiento.id}`)
+        const res = await fetch(apiUrl(`/medicamentos?tratamiento_id=${tratamiento.id}`))
         const json = await res.json()
         return Array.isArray(json?.data) ? json.data : []
       } catch (_) {

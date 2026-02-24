@@ -1,3 +1,4 @@
+import { apiUrl } from "@/lib/api";
 ﻿import React, { useEffect, useMemo, useState } from "react";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -58,8 +59,8 @@ export default function CitaForm({ cita, mascotas, clientes, veterinarios, onSub
     const loadMascotasYEstados = async () => {
       try {
         const [resMascotas, resEstados] = await Promise.all([
-          fetch("https://apivet.strategtic.com/api/mascotas"),
-          fetch("https://apivet.strategtic.com/api/mascotas/datos-maestros/13"),
+          fetch(apiUrl("/mascotas")),
+          fetch(apiUrl("/mascotas/datos-maestros/13")),
         ]);
         const jsonMascotas = await resMascotas.json();
         const jsonEstados = await resEstados.json();
@@ -86,8 +87,8 @@ export default function CitaForm({ cita, mascotas, clientes, veterinarios, onSub
     const loadVeterinariosYTurnos = async () => {
       try {
         const [resVets, resTurnos] = await Promise.all([
-          fetch("https://apivet.strategtic.com/api/veterinarios"),
-          fetch("https://apivet.strategtic.com/api/turnos-veterinarios"),
+          fetch(apiUrl("/veterinarios")),
+          fetch(apiUrl("/turnos-veterinarios")),
         ]);
         const jsonVets = await resVets.json();
         const jsonTurnos = await resTurnos.json();
@@ -105,7 +106,7 @@ export default function CitaForm({ cita, mascotas, clientes, veterinarios, onSub
   useEffect(() => {
     const loadServicios = async () => {
       try {
-        const res = await fetch("https://apivet.strategtic.com/api/servicios");
+        const res = await fetch(apiUrl("/servicios"));
         const json = await res.json();
         const items = Array.isArray(json?.data) ? json.data : [];
         setServiciosApi(items);

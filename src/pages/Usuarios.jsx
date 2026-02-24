@@ -1,3 +1,4 @@
+import { apiUrl } from "@/lib/api";
 ﻿import React, { useEffect, useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
@@ -11,7 +12,7 @@ import toastr from "toastr";
 import { Edit, Plus, Save, Search, X } from "lucide-react";
 
 const fetchUsers = async () => {
-  const response = await fetch("https://apivet.strategtic.com/api/user");
+  const response = await fetch(apiUrl("/user"));
   const json = await response.json();
   if (!response.ok || json?.status === false) {
     throw new Error(json?.message || "No se pudo obtener los usuarios");
@@ -176,7 +177,7 @@ export default function Usuarios() {
 
   const createMutation = useMutation({
     mutationFn: async (payload) => {
-      const response = await fetch("https://apivet.strategtic.com/api/register", {
+      const response = await fetch(apiUrl("/register"), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
@@ -200,7 +201,7 @@ export default function Usuarios() {
 
   const updateMutation = useMutation({
     mutationFn: async ({ id, payload }) => {
-      const response = await fetch(`https://apivet.strategtic.com/api/updateUser/${id}`, {
+      const response = await fetch(apiUrl(`/updateUser/${id}`), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),

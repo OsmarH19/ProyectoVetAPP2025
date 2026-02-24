@@ -1,3 +1,4 @@
+import { apiUrl } from "@/lib/api";
 ﻿import { useRef, useState } from "react";
 import PropTypes from "prop-types";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
@@ -88,7 +89,7 @@ export default function ClienteForm({ cliente, onSubmit, onCancel, isLoading }) 
       setSubmitting(true);
       const updateId = cliente?.cliente_id ?? cliente?.id;
       if (updateId) {
-        const res = await fetch(`https://apivet.strategtic.com/api/clientes/${updateId}`, {
+        const res = await fetch(apiUrl(`/clientes/${updateId}`), {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(formData),
@@ -102,7 +103,7 @@ export default function ClienteForm({ cliente, onSubmit, onCancel, isLoading }) 
         toastr.success("Cliente actualizado correctamente.");
         if (onSubmit) onSubmit(updated);
       } else {
-        const res = await fetch("https://apivet.strategtic.com/api/clientes", {
+        const res = await fetch(apiUrl("/clientes"), {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(formData),

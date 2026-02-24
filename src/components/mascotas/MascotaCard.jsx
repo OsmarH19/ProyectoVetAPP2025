@@ -4,6 +4,7 @@ import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card"
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Edit, Trash2, User, Calendar, Weight } from "lucide-react";
+import { apiUrl } from "@/lib/api";
 
 export default function MascotaCard({ mascota, cliente, onEdit, onDelete }) {
   const especieColors = {
@@ -111,7 +112,7 @@ export function MascotasApiCards({ onEdit, onDelete, searchTerm = "" }) {
   const { data, isLoading, isError } = useQuery({
     queryKey: ["mascotas_api"],
     queryFn: async () => {
-      const res = await fetch("https://apivet.strategtic.com/api/mascotas");
+      const res = await fetch(apiUrl("/mascotas"));
       if (!res.ok) {
         throw new Error("Error al cargar mascotas");
       }

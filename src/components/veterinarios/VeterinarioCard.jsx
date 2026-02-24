@@ -4,12 +4,13 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/componen
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Edit, Power, Mail, Phone, Stethoscope, Clock } from "lucide-react";
+import { apiUrl } from "@/lib/api";
 
 export default function VeterinarioCard({ veterinario, onEdit, onToggleActive }) {
   const { data: diasMaestros = [] } = useQuery({
     queryKey: ["dias_maestros"],
     queryFn: async () => {
-      const res = await fetch("https://apivet.strategtic.com/api/mascotas/datos-maestros/14");
+      const res = await fetch(apiUrl("/mascotas/datos-maestros/14"));
       const json = await res.json();
       return json?.data || [];
     },
@@ -18,7 +19,7 @@ export default function VeterinarioCard({ veterinario, onEdit, onToggleActive })
   const { data: turnos = [] } = useQuery({
     queryKey: ["turnos_veterinario", veterinario.id],
     queryFn: async () => {
-      const res = await fetch(`https://apivet.strategtic.com/api/turnos-veterinarios/veterinario/${veterinario.id}`);
+      const res = await fetch(apiUrl(`/turnos-veterinarios/veterinario/${veterinario.id}`));
       const json = await res.json();
       return json?.data || [];
     },

@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { notifyAuthChanged, renewSessionWindow } from "@/lib/session";
+import { apiUrl } from "@/lib/api";
 
 function parseJwtPayload(token) {
   try {
@@ -41,7 +42,7 @@ export default function Login() {
   const welcomeEmailEndpoint = import.meta.env.VITE_WELCOME_EMAIL_ENDPOINT || "";
   const clientesEndpoint =
     import.meta.env.VITE_CLIENTE_CREATE_ENDPOINT ||
-    "https://apivet.strategtic.com/api/clientes";
+    apiUrl("/clientes");
 
   const canSubmit = email.trim() && password.trim() && !isLoading;
   const canUseGoogle = useMemo(
@@ -171,7 +172,7 @@ export default function Login() {
     setError("");
 
     try {
-      const res = await fetch("https://apivet.strategtic.com/api/login", {
+      const res = await fetch(apiUrl("/login"), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),

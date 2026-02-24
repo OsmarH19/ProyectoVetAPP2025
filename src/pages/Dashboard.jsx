@@ -1,3 +1,4 @@
+import { apiUrl } from "@/lib/api";
 ﻿import React, { useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -31,7 +32,7 @@ export default function Dashboard() {
     queryKey: ["api_clientes"],
     queryFn: async () => {
       try {
-        const res = await fetch("https://apivet.strategtic.com/api/clientes");
+        const res = await fetch(apiUrl("/clientes"));
         const json = await res.json();
         return Array.isArray(json?.data) ? json.data : [];
       } catch (_) {
@@ -44,7 +45,7 @@ export default function Dashboard() {
     queryKey: ["api_mascotas"],
     queryFn: async () => {
       try {
-        const res = await fetch("https://apivet.strategtic.com/api/mascotas");
+        const res = await fetch(apiUrl("/mascotas"));
         const json = await res.json();
         return Array.isArray(json?.data) ? json.data : [];
       } catch (_) {
@@ -57,7 +58,7 @@ export default function Dashboard() {
     queryKey: ["api_citas"],
     queryFn: async () => {
       try {
-        const res = await fetch("https://apivet.strategtic.com/api/citas");
+        const res = await fetch(apiUrl("/citas"));
         const json = await res.json();
         const items = json?.data || [];
         return items.map((item) => ({
@@ -84,7 +85,7 @@ export default function Dashboard() {
     queryKey: ["api_tratamientos"],
     queryFn: async () => {
       try {
-        const res = await fetch("https://apivet.strategtic.com/api/tratamientos");
+        const res = await fetch(apiUrl("/tratamientos"));
         const json = await res.json();
         return Array.isArray(json?.data) ? json.data : [];
       } catch (_) {

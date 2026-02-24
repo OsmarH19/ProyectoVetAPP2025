@@ -1,3 +1,4 @@
+import { apiUrl } from "@/lib/api";
 ﻿import React, { useState } from "react";
 import { base44 } from "@/api/base44Client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
@@ -19,12 +20,11 @@ export default function Tratamientos() {
   const [selectedMascotaId, setSelectedMascotaId] = useState(null);
   const [autoPdfMascotaId, setAutoPdfMascotaId] = useState(null);
   const queryClient = useQueryClient();
-  const apiBase = import.meta.env.VITE_API_URL || "https://apivet.strategtic.com";
 
   const generateHistorialPdf = async (mascotaId) => {
     if (!mascotaId) return;
     try {
-      const res = await fetch(`${apiBase}/api/mascotas/${mascotaId}/historial-pdf`);
+      const res = await fetch(apiUrl(`/mascotas/${mascotaId}/historial-pdf`));
       const json = await res.json().catch(() => ({}));
       if (res.ok && json?.data?.url) {
         setHistorialPdfUrl(mascotaId, json.data.url);
@@ -38,7 +38,7 @@ export default function Tratamientos() {
     queryKey: ['api_tratamientos'],
     queryFn: async () => {
       try {
-        const res = await fetch('https://apivet.strategtic.com/api/tratamientos')
+        const res = await fetch(apiUrl("/tratamientos"))
         const json = await res.json()
         const items = Array.isArray(json?.data) ? json.data : []
         return items.map(item => ({
@@ -65,7 +65,7 @@ export default function Tratamientos() {
     queryKey: ['api_citas'],
     queryFn: async () => {
       try {
-        const res = await fetch('https://apivet.strategtic.com/api/citas')
+        const res = await fetch(apiUrl("/citas"))
         const json = await res.json()
         const items = json?.data || []
         return items.map((item) => ({
@@ -92,7 +92,7 @@ export default function Tratamientos() {
     queryKey: ['api_mascotas'],
     queryFn: async () => {
       try {
-        const res = await fetch('https://apivet.strategtic.com/api/mascotas')
+        const res = await fetch(apiUrl("/mascotas"))
         const json = await res.json()
         return Array.isArray(json?.data) ? json.data : []
       } catch (_) {
@@ -105,7 +105,7 @@ export default function Tratamientos() {
     queryKey: ['api_clientes'],
     queryFn: async () => {
       try {
-        const res = await fetch('https://apivet.strategtic.com/api/clientes')
+        const res = await fetch(apiUrl("/clientes"))
         const json = await res.json()
         return Array.isArray(json?.data) ? json.data : []
       } catch (_) {
@@ -118,7 +118,7 @@ export default function Tratamientos() {
     queryKey: ['api_veterinarios'],
     queryFn: async () => {
       try {
-        const res = await fetch('https://apivet.strategtic.com/api/veterinarios')
+        const res = await fetch(apiUrl("/veterinarios"))
         const json = await res.json()
         return Array.isArray(json?.data) ? json.data : []
       } catch (_) {
@@ -258,7 +258,7 @@ export default function Tratamientos() {
         mascota_id: Number(data.mascota_id),
       };
 
-      const res = await fetch('https://apivet.strategtic.com/api/tratamientos', {
+      const res = await fetch(apiUrl("/tratamientos"), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(body),
@@ -277,7 +277,7 @@ export default function Tratamientos() {
           dosis: m.dosis || '',
           duracion: m.duracion || '',
         };
-        await fetch('https://apivet.strategtic.com/api/medicamentos', {
+        await fetch(apiUrl("/medicamentos"), {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(medBody),
@@ -308,7 +308,7 @@ export default function Tratamientos() {
         mascota_id: Number(data.mascota_id),
       };
 
-      const res = await fetch(`https://apivet.strategtic.com/api/tratamientos/${id}`, {
+      const res = await fetch(apiUrl(`/tratamientos/${id}`), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(body),
@@ -325,13 +325,13 @@ export default function Tratamientos() {
         };
         if (m.medicamento_id || m.id) {
           const medId = m.medicamento_id || m.id;
-          await fetch(`https://apivet.strategtic.com/api/medicamentos/${medId}`, {
+          await fetch(apiUrl(`/medicamentos/${medId}`), {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(medBody),
           });
         } else {
-          await fetch('https://apivet.strategtic.com/api/medicamentos', {
+          await fetch(apiUrl("/medicamentos"), {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ ...medBody }),

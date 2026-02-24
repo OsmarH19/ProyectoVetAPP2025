@@ -1,4 +1,5 @@
 ﻿import { useMemo, useState } from "react";
+import { apiUrl } from "@/lib/api";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import toastr from "toastr";
 import {
@@ -98,7 +99,6 @@ export default function Servicios() {
   const [deleteTarget, setDeleteTarget] = useState(null);
 
   const queryClient = useQueryClient();
-  const apiBase = import.meta.env.VITE_API_URL || "https://apivet.strategtic.com";
 
   const {
     data: servicios = [],
@@ -108,7 +108,7 @@ export default function Servicios() {
   } = useQuery({
     queryKey: ["api_servicios"],
     queryFn: async () => {
-      const response = await fetch(`${apiBase}/api/servicios`);
+      const response = await fetch(apiUrl("/servicios"));
       const json = await parseJsonSafe(response);
       if (!response.ok || json?.success === false) {
         throw new Error(extractApiError(json, "No se pudo cargar servicios."));
@@ -174,7 +174,7 @@ export default function Servicios() {
 
   const saveMutation = useMutation({
     mutationFn: async ({ payload }) => {
-      const response = await fetch(`${apiBase}/api/servicios`, {
+      const response = await fetch(apiUrl("/servicios"), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
@@ -198,7 +198,7 @@ export default function Servicios() {
 
   const deleteMutation = useMutation({
     mutationFn: async (id) => {
-      const response = await fetch(`${apiBase}/api/servicios/${id}`, {
+      const response = await fetch(apiUrl(`/servicios/${id}`), {
         method: "DELETE",
       });
       const json = await parseJsonSafe(response);

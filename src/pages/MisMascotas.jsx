@@ -1,3 +1,4 @@
+import { apiUrl } from "@/lib/api";
 ﻿import { useEffect, useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Badge } from "@/components/ui/badge";
@@ -36,7 +37,7 @@ export default function MisMascotas() {
 
     const loadClienteId = async () => {
       try {
-        const res = await fetch("https://apivet.strategtic.com/api/clientes");
+        const res = await fetch(apiUrl("/clientes"));
         const json = await res.json();
         const items = Array.isArray(json?.data) ? json.data : [];
         const found = items.find(
@@ -59,7 +60,7 @@ export default function MisMascotas() {
     queryFn: async () => {
       if (!normalizedClienteId) return [];
       const res = await fetch(
-        `https://apivet.strategtic.com/api/mascotas/filtrar?cliente_id=${normalizedClienteId}`
+        apiUrl(`/mascotas/filtrar?cliente_id=${normalizedClienteId}`)
       );
       const json = await res.json();
       const items = Array.isArray(json?.data) ? json.data : [];
@@ -85,7 +86,7 @@ export default function MisMascotas() {
     queryFn: async () => {
       if (!normalizedClienteId) return [];
       const res = await fetch(
-        `https://apivet.strategtic.com/api/tratamientos?cliente_id=${normalizedClienteId}`
+        apiUrl(`/tratamientos?cliente_id=${normalizedClienteId}`)
       );
       const json = await res.json();
       return Array.isArray(json?.data) ? json.data : [];

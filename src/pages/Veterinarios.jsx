@@ -7,6 +7,7 @@ import { Plus, Search } from "lucide-react";
 import toastr from "toastr";
 import VeterinarioCard from "../components/veterinarios/VeterinarioCard";
 import VeterinarioForm from "../components/veterinarios/VeterinarioForm";
+import { apiUrl } from "@/lib/api";
 
 export default function Veterinarios() {
   const [showForm, setShowForm] = useState(false);
@@ -19,7 +20,7 @@ export default function Veterinarios() {
   const { data: veterinarios = [] } = useQuery({
     queryKey: ['veterinarios_api'],
     queryFn: async () => {
-      const res = await fetch('https://apivet.strategtic.com/api/veterinarios');
+      const res = await fetch(apiUrl("/veterinarios"));
       const json = await res.json();
       const arr = json?.data || [];
       return arr.map(v => ({
@@ -45,7 +46,7 @@ export default function Veterinarios() {
         email: vetData.email,
         activo: vetData.activo ? '1' : '0',
       };
-      const res = await fetch('https://apivet.strategtic.com/api/veterinarios', {
+      const res = await fetch(apiUrl("/veterinarios"), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
@@ -68,7 +69,7 @@ export default function Veterinarios() {
 
       const results = await Promise.allSettled(
         validTurnos.map((turno) =>
-          fetch('https://apivet.strategtic.com/api/turnos-veterinarios', {
+          fetch(apiUrl("/turnos-veterinarios"), {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -112,7 +113,7 @@ export default function Veterinarios() {
         email: data.email,
         activo: data.activo ? '1' : '0',
       };
-      const res = await fetch(`https://apivet.strategtic.com/api/veterinarios/${id}`, {
+      const res = await fetch(apiUrl(`/veterinarios/${id}`), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),

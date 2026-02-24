@@ -1,3 +1,4 @@
+import { apiUrl } from "@/lib/api";
 ﻿import React, { useEffect, useMemo, useState } from "react";
 import { base44 } from "@/api/base44Client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
@@ -52,7 +53,7 @@ export default function Mascotas() {
   const { data: mascotasApi = [], isLoading: loadingMascotas, isError: errorMascotas } = useQuery({
     queryKey: ["mascotas_api"],
     queryFn: async () => {
-      const res = await fetch("https://apivet.strategtic.com/api/mascotas");
+      const res = await fetch(apiUrl("/mascotas"));
       if (!res.ok) {
         throw new Error("Error al cargar mascotas");
       }

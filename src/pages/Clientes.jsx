@@ -1,3 +1,4 @@
+import { apiUrl } from "@/lib/api";
 ﻿import React, { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
@@ -20,7 +21,7 @@ export default function Clientes() {
   const { data: clientes = [] } = useQuery({
     queryKey: ['clientes'],
     queryFn: async () => {
-      const res = await fetch('https://apivet.strategtic.com/api/clientes');
+      const res = await fetch(apiUrl("/clientes"));
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const json = await res.json();
       const items = Array.isArray(json?.data) ? json.data : [];
