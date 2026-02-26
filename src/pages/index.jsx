@@ -13,6 +13,12 @@ import Veterinarios from "./Veterinarios";
 import Usuarios from "./Usuarios";
 import Login from "./Login.jsx";
 import CompletarCliente from "./CompletarCliente.jsx";
+import SiteLayout from "./site/SiteLayout.jsx";
+import HomePage from "./site/HomePage.jsx";
+import SolutionsPage from "./site/SolutionsPage.jsx";
+import PricingPage from "./site/PricingPage.jsx";
+import CaseStudiesPage from "./site/CaseStudiesPage.jsx";
+import ContactPage from "./site/ContactPage.jsx";
 
 const PAGES = {
   Dashboard,
@@ -29,6 +35,8 @@ const PAGES = {
   CompletarCliente,
 };
 
+const SITE_ROUTE_PATHS = ["/", "/soluciones", "/precios", "/casos", "/contacto"];
+
 function getCurrentPage(url) {
   let normalizedUrl = url;
   if (normalizedUrl.endsWith("/")) {
@@ -42,6 +50,18 @@ function getCurrentPage(url) {
     (page) => page.toLowerCase() === urlLastPart.toLowerCase()
   );
   return pageName || Object.keys(PAGES)[0];
+}
+
+function normalizePath(path = "/") {
+  const lowered = String(path || "/").toLowerCase();
+  if (lowered.length > 1 && lowered.endsWith("/")) {
+    return lowered.slice(0, -1);
+  }
+  return lowered;
+}
+
+function isPublicSiteRoute(path) {
+  return SITE_ROUTE_PATHS.includes(path);
 }
 
 function getAuthUser() {
@@ -120,7 +140,25 @@ function ProtectedRoute({
 function PagesContent() {
   const location = useLocation();
   const currentPage = getCurrentPage(location.pathname);
-  const lowerPath = location.pathname.toLowerCase();
+  const lowerPath = normalizePath(location.pathname);
+
+  if (isPublicSiteRoute(lowerPath)) {
+    if (lowerPath === "/" && isAuthenticated()) {
+      return <Navigate to={getDefaultRouteForUser()} replace />;
+    }
+
+    return (
+      <Routes>
+        <Route element={<SiteLayout />}>
+          <Route path="/" element={<HomePage />} />
+          <Route path="/soluciones" element={<SolutionsPage />} />
+          <Route path="/precios" element={<PricingPage />} />
+          <Route path="/casos" element={<CaseStudiesPage />} />
+          <Route path="/contacto" element={<ContactPage />} />
+        </Route>
+      </Routes>
+    );
+  }
 
   if (lowerPath === "/login") {
     if (isAuthenticated()) {
@@ -141,10 +179,6 @@ function PagesContent() {
   return (
     <Layout currentPageName={currentPage}>
       <Routes>
-        <Route
-          path="/"
-          element={<Navigate to={isAuthenticated() ? getDefaultRouteForUser() : "/login"} replace />}
-        />
         <Route
           path="/completar-cliente"
           element={<ProtectedRoute element={<CompletarCliente />} allowIncompleteProfile />}
@@ -193,6 +227,10 @@ function PagesContent() {
         <Route
           path="/usuarios"
           element={<ProtectedRoute element={<Usuarios />} denyClients />}
+        />
+        <Route
+          path="*"
+          element={<Navigate to={isAuthenticated() ? getDefaultRouteForUser() : "/"} replace />}
         />
       </Routes>
     </Layout>
