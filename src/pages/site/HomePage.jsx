@@ -84,7 +84,18 @@ const variants = {
 export default function HomePage() {
   useSiteSeo(
     "MiVetApp | Plataforma veterinaria completa",
-    "Gestiona agenda, mascotas, tratamientos y experiencia del cliente con una plataforma veterinaria completa."
+    "Gestiona agenda, mascotas, tratamientos y experiencia del cliente con una plataforma veterinaria completa.",
+    {
+      path: "/",
+      image: "/img/login.jpg",
+      keywords: [
+        "software veterinario",
+        "gestion veterinaria",
+        "agenda veterinaria",
+        "historial clinico veterinario",
+        "vetapp",
+      ],
+    }
   );
 
   const [heroApi, setHeroApi] = useState(null);

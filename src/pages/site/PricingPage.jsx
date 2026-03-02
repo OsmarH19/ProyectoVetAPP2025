@@ -38,7 +38,20 @@ const COMPARE = [
 ];
 
 export default function PricingPage() {
-  useSiteSeo("Precios MiVetApp | Planes para clinicas veterinarias", "Elige el plan ideal de MiVetApp para tu clinica.");
+  useSiteSeo(
+    "Precios MiVetApp | Planes para clinicas veterinarias",
+    "Elige el plan ideal de MiVetApp para tu clinica.",
+    {
+      path: "/precios",
+      image: "/img/login.jpg",
+      keywords: [
+        "precios software veterinario",
+        "plan veterinaria",
+        "sistema clinica veterinaria",
+        "costo software veterinario",
+      ],
+    }
+  );
 
   const [billing, setBilling] = useState("monthly");
   const plans = useMemo(() => (billing === "monthly" ? MONTHLY : YEARLY), [billing]);
@@ -141,4 +154,3 @@ export default function PricingPage() {
     </div>
   );
 }
-

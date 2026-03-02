@@ -40,7 +40,16 @@ const TESTIMONIALS = [
 ];
 
 export default function CaseStudiesPage() {
-  useSiteSeo("Casos de exito MiVetApp", "Resultados reales de clinicas que implementaron MiVetApp.");
+  useSiteSeo("Casos de exito MiVetApp", "Resultados reales de clinicas que implementaron MiVetApp.", {
+    path: "/casos",
+    image: "/img/login.jpg",
+    keywords: [
+      "casos de exito veterinaria",
+      "resultados software veterinario",
+      "clinica veterinaria digital",
+      "testimonios veterinarios",
+    ],
+  });
 
   const [testimonialsApi, setTestimonialsApi] = useState(null);
 

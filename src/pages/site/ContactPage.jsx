@@ -18,7 +18,16 @@ const FAQ = [
 ];
 
 export default function ContactPage() {
-  useSiteSeo("Contacto MiVetApp | Solicitar demo", "Solicita una demo de MiVetApp y recibe asesoria para tu clinica.");
+  useSiteSeo("Contacto MiVetApp | Solicitar demo", "Solicita una demo de MiVetApp y recibe asesoria para tu clinica.", {
+    path: "/contacto",
+    image: "/img/login.jpg",
+    keywords: [
+      "contacto software veterinario",
+      "demo veterinaria",
+      "agendar demo vetapp",
+      "asesoria clinica veterinaria",
+    ],
+  });
 
   const [submitted, setSubmitted] = useState(false);
 
@@ -120,4 +129,3 @@ export default function ContactPage() {
     </div>
   );
 }
-

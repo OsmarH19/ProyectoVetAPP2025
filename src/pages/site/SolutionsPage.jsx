@@ -56,7 +56,17 @@ const GALLERY = [
 export default function SolutionsPage() {
   useSiteSeo(
     "Soluciones MiVetApp | Modulos clinicos conectados",
-    "Conoce los modulos de agenda, servicios, tratamientos y portal cliente de MiVetApp."
+    "Conoce los modulos de agenda, servicios, tratamientos y portal cliente de MiVetApp.",
+    {
+      path: "/soluciones",
+      image: "/img/login.jpg",
+      keywords: [
+        "modulos veterinarios",
+        "agenda veterinaria",
+        "portal cliente veterinaria",
+        "tratamientos veterinarios",
+      ],
+    }
   );
 
   const [galleryApi, setGalleryApi] = useState(null);
